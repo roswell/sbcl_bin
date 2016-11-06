@@ -61,8 +61,8 @@
           do
              (print uri)
              (dex:fetch uri path :if-exists :supersede)
-             (github path "files" "roswell" "sbcl-bin-mirror")
+             (ignore-errors(github path "files" "roswell" "sbcl-bin-mirror"))
              ))
   (let ((path "sbcl-bin.html"))
     (print path)
-    (github path "files" "roswell" "sbcl-bin-mirror")))
+    (ignore-errors(github path "files" "roswell" "sbcl-bin-mirror"))))
