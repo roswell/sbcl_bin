@@ -9,14 +9,14 @@ env:
   matrix:
     - LISP=sbcl-bin
 
-addons:
-  apt:
-    packages:
+#addons:
+#  apt:
+#    packages:
 #      - libc6-i386
 
 install:
   - curl -L https://raw.githubusercontent.com/roswell/roswell/$ROSWELL_BRANCH/scripts/install-for-ci.sh | sh
-  - ros install lake
+  - ros install lake snmsts/sn.github
 
 script:
   - lake
