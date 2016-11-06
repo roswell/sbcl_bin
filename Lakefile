@@ -65,4 +65,4 @@
              ))
   (let ((path "sbcl-bin.html"))
     (print path)
-    (ignore-errors(github path "files" "roswell" "sbcl-bin-mirror"))))
+    (ignore-errors(github path "files" "roswell" "sbcl-bin-mirror" t))))
