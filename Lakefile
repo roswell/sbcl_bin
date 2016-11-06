@@ -1,0 +1,32 @@
+#|-*- mode:lisp -*-|#
+(ql:quickload '(:dexador :lake :plump) :silent t)
+(in-package :cl-user)
+(defpackage :lake.user
+  (:use :cl :lake :cl-syntax)
+  (:shadowing-import-from :lake
+                          :directory))
+(in-package :lake.user)
+
+(use-syntax :interpol)
+
+(defvar *release* "files")
+(defvar *user* "roswell")
+(defvar *repo* "sbcl-bin-mirror")
+
+(task "default" ()
+  (sh "ros install snmsts/sn.github")
+  (sh "mkdir -p scripts")
+  (dex:fetch "https://raw.githubusercontent.com/roswell/roswell-bin/master/scripts/up.ros"
+             #P"scripts/up.ros" :if-exists :supersede)
+  (dex:fetch "http://sbcl.org/platform-table.html" #P"sbcl-bin.html" :if-exists :supersede)
+  ;;(sh #?"ros scripts/up.ros github sbcl-bin.html files roswell sbcl-bin-mirror force")
+  (sh "cat sbcl-bin.html| grep http|awk -F '\"' '{print $2}'|grep binary > uris")
+  (with-open-file (in "uris")
+    (loop for uri = (read-line in nil nil)
+          while uri
+          for path = (file-namestring (quri:uri-path (quri:uri uri)))
+          do
+             (print uri)
+             (dex:fetch uri path :if-exists :supersede)
+             (uiop:run-program #?"ros scripts/up.ros github ${path} files roswell sbcl-bin-mirror"
+                               :ignore-error-status t))))
