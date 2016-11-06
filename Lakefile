@@ -29,4 +29,7 @@
              (print uri)
              (dex:fetch uri path :if-exists :supersede)
              (uiop:run-program #?"ros scripts/up.ros github ${path} files roswell sbcl-bin-mirror"
-                               :ignore-error-status t))))
+                               :ignore-error-status t)))
+  (let ((path #P"sbcl-bin.html"))
+    (uiop:run-program #?"ros scripts/up.ros github ${path} files roswell sbcl-bin-mirror t"
+                      :ignore-error-status t)))
