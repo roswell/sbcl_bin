@@ -30,7 +30,7 @@
 (defun asset-upload (path tagname &key owner repo force)
   (let ((release-id (getf (release-exist-p tagname :owner owner :repo repo) :|id|))
         (name (file-namestring path)))
-    (format t "release-id: ~A :name name force ~A~%" release-id name force)
+    (format t "release-id: ~A :name ~A force ~A~%" release-id name force)
     (force-output)
     (when force
       (let ((id (getf (find name (releases-assets-list owner repo release-id)
