@@ -1,0 +1,22 @@
+language: c
+sudo: false
+
+env:
+  global:
+   - PATH=~/.roswell/bin:$PATH
+   - ROSWELL_BRANCH=master
+   - ROSWELL_INSTALL_DIR=$HOME/.roswell
+  matrix:
+    - LISP=sbcl-bin
+
+addons:
+  apt:
+    packages:
+#      - libc6-i386
+
+install:
+  - curl -L https://raw.githubusercontent.com/roswell/roswell/$ROSWELL_BRANCH/scripts/install-for-ci.sh | sh
+  - ros install lake
+
+script:
+  - lake
