@@ -65,9 +65,9 @@
           for path = (file-namestring (quri:uri-path (quri:uri uri)))
           do
              (print uri)
-             (dex:fetch uri path :if-exists :supersede)
-             (ignore-errors(github path "files" "roswell" "sbcl-bin-mirror"))
-             ))
+             (ignore-errors
+              (dex:fetch uri path :if-exists :supersede)
+              (github path "files" "roswell" "sbcl-bin-mirror"))))
   (let ((path "sbcl-bin.html"))
     (print path)
     (ignore-errors(github path "files" "roswell" "sbcl-bin-mirror" t))))
