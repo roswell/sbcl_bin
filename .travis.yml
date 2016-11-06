@@ -7,16 +7,20 @@ env:
    - ROSWELL_BRANCH=master
    - ROSWELL_INSTALL_DIR=$HOME/.roswell
   matrix:
-    - LISP=sbcl-bin
+    - LISP=sbcl-bin TASK=mirror
 
-#addons:
-#  apt:
-#    packages:
-#      - libc6-i386
+os:
+  - osx
+  - linux
+
+matrix:
+  exclude:
+    - os: osx
+      env: LISP=sbcl-bin TASK=mirror
 
 install:
   - curl -L https://raw.githubusercontent.com/roswell/roswell/$ROSWELL_BRANCH/scripts/install-for-ci.sh | sh
   - ros install lake snmsts/sn.github snmsts/cl-gists/response-headers
 
 script:
-  - lake
+  - lake $TASK

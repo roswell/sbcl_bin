@@ -55,21 +55,20 @@
     (print "upload done")))
 
 (task "default" ()
-  (sh "mkdir -p scripts")
-  (dex:fetch "https://raw.githubusercontent.com/roswell/roswell-bin/master/scripts/up.ros"
-             #P"scripts/up.ros" :if-exists :supersede)
+  )
+
+(task "mirror" ()
   (dex:fetch "http://sbcl.org/platform-table.html" #P"sbcl-bin.html" :if-exists :supersede)
-  ;;(sh #?"ros scripts/up.ros github sbcl-bin.html files roswell sbcl-bin-mirror force")
   (sh "cat sbcl-bin.html| grep http|awk -F '\"' '{print $2}'|grep binary > uris")
   (with-open-file (in "uris")
     (loop for uri = (read-line in nil nil)
           while uri
           for path = (file-namestring (quri:uri-path (quri:uri uri)))
           do
-             (print uri)
+             (format t "~A " uri)
              (ignore-errors
               (dex:fetch uri path :if-exists :supersede)
               (github path "files" "roswell" "sbcl-bin-mirror"))))
   (let ((path "sbcl-bin.html"))
-    (print path)
+    (format t "~A " path)
     (ignore-errors(github path "files" "roswell" "sbcl-bin-mirror" t))))
