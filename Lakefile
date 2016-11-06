@@ -34,6 +34,7 @@
       (let ((id (getf (find name (releases-assets-list owner repo release-id)
                             :key (lambda (x) (getf x :|name|))
                             :test #'equal) :|id|)))
+        (print id)
         (when id 
           (releases-asset-delete owner repo id))))
      
@@ -45,7 +46,11 @@
   (unless (uiop:getenv "GITHUB_OAUTH_TOKEN")
     (error "GITHUB_OAUTH_TOKEN must be set"))
   (ensure-release-exists tagname :owner owner :repo repo)
-  (asset-upload (pathname path) tagname :owner owner :repo repo :force (when force t)))
+  (when force
+    (print "upload start"))
+  (asset-upload (pathname path) tagname :owner owner :repo repo :force (when force t))
+  (when force
+    (print "upload done")))
 
 (task "default" ()
   (sh "mkdir -p scripts")
