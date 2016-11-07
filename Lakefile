@@ -38,11 +38,13 @@
   (let ((release-id (getf (release-exist-p tagname :owner owner :repo repo) :|id|))
         (name (file-namestring path)))
     (format t "release-id: ~A :name ~A force ~A" release-id name force)
+    (force-output)
     (when force
       (let ((id (getf (find name (releases-assets-list owner repo release-id)
                             :key (lambda (x) (getf x :|name|))
                             :test #'equal) :|id|)))
         (format t "id:~A" id)
+        (force-output)
         (when id 
           (releases-asset-delete owner repo id))))
     (releases-asset-upload
