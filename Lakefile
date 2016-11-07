@@ -79,6 +79,7 @@
              (format t "~%")
              (force-output)))
   (let ((path "sbcl-bin.html"))
-    (format t "~A " path)
+    (format t "~A ~%" (list path *release* *user* *repo* t))
+    (force-output)
     (ignore-errors
      (github path *release* *user* *repo* t))))
