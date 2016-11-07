@@ -17,9 +17,10 @@
           (string #\lf)
           (uiop:run-program "git remote -v | head -n 1|awk -F ' ' '{print $2}'" :output :string)))
         2))
+
 (defvar *release* "files")
 (defvar *user* (first *user/repo*))
-(defvar *repo* (first (split-sequence:split-sequence #\. (second *user/repo*))))
+(defvar *repo* (subseq (second *user/repo*) 0 (- (length (second *user/repo*)) 4)))
 
 (defun release-exist-p (tagname &key owner repo)
   (ignore-errors
@@ -75,7 +76,8 @@
              (format t "~A " uri)
              (ignore-errors
               (dex:fetch uri path :if-exists :supersede)
-              (github path *release* *user* *repo*))
+              (let ((*release* (second (split-sequence:split-sequence #\- (pathname-name path)))))
+                (github path *release* *user* *repo*)))
              (format t "~%")
              (force-output)))
   (let ((path "sbcl-bin.html"))
