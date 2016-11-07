@@ -19,7 +19,7 @@
         2))
 (defvar *release* "files")
 (defvar *user* (first *user/repo*))
-(defvar *repo* (second *user/repo*))
+(defvar *repo* (first (split-sequence:split-sequence #\. (second *user/repo*))))
 
 (defun release-exist-p (tagname &key owner repo)
   (ignore-errors
