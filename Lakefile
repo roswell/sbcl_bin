@@ -37,16 +37,15 @@
 (defun asset-upload (path tagname &key owner repo force)
   (let ((release-id (getf (release-exist-p tagname :owner owner :repo repo) :|id|))
         (name (file-namestring path)))
-    (format t "release-id: ~A :name ~A force ~A~%" release-id name force)
-    (force-output)
+    (format t "release-id: ~A :name ~A force ~A" release-id name force)
     (when force
       (let ((id (getf (find name (releases-assets-list owner repo release-id)
                             :key (lambda (x) (getf x :|name|))
                             :test #'equal) :|id|)))
-        (format t "id:~A~%" id)
-        (force-output)
+        (format t "id:~A" id)
         (when id 
           (releases-asset-delete owner repo id))))
+    (format t "~%")
     (releases-asset-upload
      owner repo
      release-id path)))
@@ -56,10 +55,10 @@
     (error "GITHUB_OAUTH_TOKEN must be set"))
   (ensure-release-exists tagname :owner owner :repo repo)
   (when force
-    (print "upload start"))
+    (format t "upload start:"))
   (asset-upload (pathname path) tagname :owner owner :repo repo :force (when force t))
   (when force
-    (print "upload done")))
+    (format t "upload done")))
 
 (task "default" ()
   )
