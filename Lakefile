@@ -1,6 +1,6 @@
 #|-*- mode:lisp -*-|#
-(ql:quickload '(:dexador :lake :plump) :silent t)
-(ql:quickload '(:cl-ppcre :split-sequence :sn.github) :silent t)
+(ql:quickload '(:dexador :lake :plump :cl-ppcre :split-sequence :sn.github) :silent t)
+
 (in-package :cl-user)
 (defpackage :lake.user
   (:use :cl :lake :cl-syntax :sn.github.repos.releases)
@@ -10,9 +10,16 @@
 
 (use-syntax :interpol)
 
+(defvar *user/repo*
+  (last (split-sequence:split-sequence
+         #\/
+         (string-trim
+          (string #\lf)
+          (uiop:run-program "git remote -v | head -n 1|awk -F ' ' '{print $2}'" :output :string)))
+        2))
 (defvar *release* "files")
-(defvar *user* "roswell")
-(defvar *repo* "sbcl-bin-mirror")
+(defvar *user* (first *user/repo*))
+(defvar *repo* (second *user/repo*))
 
 (defun release-exist-p (tagname &key owner repo)
   (ignore-errors
@@ -68,7 +75,8 @@
              (format t "~A " uri)
              (ignore-errors
               (dex:fetch uri path :if-exists :supersede)
-              (github path "files" "roswell" "sbcl-bin-mirror"))))
+              (github path *release* *user* *repo*))))
   (let ((path "sbcl-bin.html"))
     (format t "~A " path)
-    (ignore-errors(github path "files" "roswell" "sbcl-bin-mirror" t))))
+    (ignore-errors
+      (github path *release* *user* *repo* t))))
