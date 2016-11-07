@@ -46,6 +46,7 @@
         (when id 
           (releases-asset-delete owner repo id))))
     (format t "~%")
+    (force-output)
     (releases-asset-upload
      owner repo
      release-id path)))
@@ -78,4 +79,4 @@
   (let ((path "sbcl-bin.html"))
     (format t "~A " path)
     (ignore-errors
-      (github path *release* *user* *repo* t))))
+     (github path *release* *user* *repo* t))))
