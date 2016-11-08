@@ -65,7 +65,7 @@
 (defun output-html (in out)
   (let ((p (plump:parse (pathname in)))
         (uri "https://github.com/roswell/sbcl-bin/releases/download/"))
-    (with-open-file (o (pathname outpath) :direction :output)
+    (with-open-file (o (pathname out) :direction :output)
       (mapc #'(lambda (x)
                 (let ((file (first (last (split-sequence:split-sequence #\/ (plump:get-attribute x "href"))))))
                   (format o "<a href=~S></a>~%" (concatenate 'string uri (second (split-sequence:split-sequence #\- file)) "/" file))))
