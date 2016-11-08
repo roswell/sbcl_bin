@@ -62,6 +62,19 @@
   (when force
     (format t "upload done")))
 
+(defun output-html (in out)
+  (let ((p (plump:parse (pathname in)))
+        (uri "https://github.com/roswell/sbcl-bin/releases/download/"))
+    (with-open-file (o (pathname outpath) :direction :output)
+      (mapc #'(lambda (x)
+                (let ((file (first (last (split-sequence:split-sequence #\/ (plump:get-attribute x "href"))))))
+                  (format o "<a href=~S></a>~%" (concatenate 'string uri (second (split-sequence:split-sequence #\- file)) "/" file))))
+            (remove-if-not
+             #'(lambda (x)
+                 (find (first (last (split-sequence:split-sequence #\.(plump:get-attribute x "href"))))
+                       '("bz2" "msi") :test 'equal))
+             (plump:get-elements-by-tag-name p "a"))))))
+
 (task "default" ()
   )
 
@@ -80,8 +93,12 @@
                 (github path *release* *user* *repo*)))
              (format t "~%")
              (force-output)))
-  (let ((path "sbcl-bin.html"))
+  (let ((path "sbcl-bin.html")
+        (out "mirror.html"))
     (format t "~A ~%" (list path *release* *user* *repo* t))
     (force-output)
     (ignore-errors
-     (github path *release* *user* *repo* t))))
+     (github path *release* *user* *repo* t))
+    (output-html path out)
+    (ignore-errors
+     (github out *release* *user* *repo* t))))
