@@ -91,24 +91,34 @@
                 (format nil "git tag -a \"~A\" -m \"~A\"" (first i) (first i))))
       (uiop:run-program x))))
 
-(task "default" ()
-  )
+(defun fetch-upload (path uri)
+  "fetch&upload"
+  (format t "~A " uri)
+  (ignore-errors
+   (dex:fetch uri path :if-exists :supersede)
+   (let ((*release* (second (split-sequence:split-sequence #\- (pathname-name path)))))
+     (github path *release* *user* *repo*)))
+  (format t "~%")
+  (force-output))
 
-(task "mirror" ()
+(defun mirror-version (version)
+  (loop with base-uri = (format nil "https://sourceforge.net/projects/sbcl/files/sbcl/~A/" version)
+        with html = (plump:parse (dex:get base-uri))
+        with *release* = version
+        for i in (remove-if-not (lambda (x) (equal (string-trim " " (plump:get-attribute x "class")) "file"))
+                                (plump:get-elements-by-tag-name html "tr"))
+        for uri = (concatenate 'string base-uri (plump:get-attribute i "title"))
+        for path = (file-namestring (quri:uri-path (quri:uri uri)))
+        do (fetch-upload path uri)))
+
+(defun mirror-newest ()
   (dex:fetch "http://sbcl.org/platform-table.html" #P"sbcl-bin.html" :if-exists :supersede)
   (sh "cat sbcl-bin.html| grep http|awk -F '\"' '{print $2}'|grep binary > uris")
   (with-open-file (in "uris")
     (loop for uri = (read-line in nil nil)
           while uri
           for path = (file-namestring (quri:uri-path (quri:uri uri)))
-          do
-             (format t "~A " uri)
-             (ignore-errors
-              (dex:fetch uri path :if-exists :supersede)
-              (let ((*release* (second (split-sequence:split-sequence #\- (pathname-name path)))))
-                (github path *release* *user* *repo*)))
-             (format t "~%")
-             (force-output)))
+          do (fetch-upload path uri)))
   (let ((path "sbcl-bin.html")
         (out "mirror.html"))
     (format t "~A ~%" (list path *release* *user* *repo* t))
@@ -118,3 +128,13 @@
     (output-html path out)
     (ignore-errors
      (github out *release* *user* *repo* t))))
+
+(task "default" ()
+  )
+
+(task "mirror" ()
+  (let ((ver (ros:getenv "VERSION")))
+    (if ver
+        (mirror-version ver)
+        (mirror-newest))))
+
