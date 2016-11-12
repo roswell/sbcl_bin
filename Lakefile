@@ -75,6 +75,22 @@
                        '("bz2" "msi") :test 'equal))
              (plump:get-elements-by-tag-name p "a"))))))
 
+(defun get-tags-from-sourceforge ()
+  (let ((html (plump:parse (dex:get "https://sourceforge.net/projects/sbcl/files/sbcl/"))))
+    (loop for i in (remove-if-not (lambda (x) (equal (string-trim " " (plump:get-attribute x "class")) "folder"))
+                                  (plump:get-elements-by-tag-name html "tr"))
+          collect `(,(plump:get-attribute i "title")
+                    ,(plump:get-attribute (first (plump:get-elements-by-tag-name i "abbr")) "title")))))
+
+(defun commit-tags (tags)
+  (dolist (i tags)
+    (dolist (x (list
+                (format nil "echo ~A> version" (first i))
+                (format nil "git add version")
+                (format nil "git commit -m 'version ~A on ~A'" (first i) (second i))
+                (format nil "git tag -a \"~A\" -m \"~A\"" (first i) (first i))))
+      (uiop:run-program x))))
+
 (task "default" ()
   )
 
