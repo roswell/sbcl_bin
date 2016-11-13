@@ -140,6 +140,14 @@
     (setf release-dir (namestring (truename (merge-pathnames "../"  (uiop:getcwd)))))
     (sh "rm -rf .git")
     (sh (format nil "echo '~S' > version.lisp-expr " version))
+    (with-open-stream (s (open "customize-target-features.lisp"
+                               :direction :output
+                               :if-exists :supersede))
+      (format s "~S"
+              '(lambda (list)
+                (pushnew :sb-thread list)
+                (pushnew :sb-core-compression list)
+                list)))
     (sh (format nil "bash make.sh \"ros run\""))
     (sh (format nil "ln -s ~A ~Asbcl-~A-~A-~A"
           (sb-posix:getcwd)
