@@ -139,18 +139,25 @@
     (sh (format nil "echo '~S' > version.lisp-expr " version))
     (sh (format nil "bash make.sh \"ros run\""))
     (sh (format nil "ln -s ~A ~Asbcl-~A-~A-~A"
-                (sb-posix:getcwd)
-                release-dir
-                version
-                (ros.util:uname-m)
-                (ros.util:uname)))
+          (sb-posix:getcwd)
+          release-dir
+          version
+          (ros.util:uname-m)
+          (ros.util:uname)))
     (sh (format nil "~A/binary-distribution.sh ~Asbcl-~A-~A-~A"
                 (sb-posix:getcwd)
                 release-dir
                 version
                 (ros.util:uname-m)
                 (ros.util:uname)))
-    (sh (format nil "bzip2 sbcl-$VERSION*.tar"))))
+    (uiop:chdir release-dir)
+    (let ((path (format nil "sbcl-~A-~A-~A-binary.tar"
+                        version
+                        (ros.util:uname-m)
+                        (ros.util:uname))))
+      (sh (format nil "bzip2 ~A" path))
+      #+darwin
+      (github (format nil "~A.bz2" path) *release* *user* *repo* t))))
 
 (task "default" ()
   (let ((ver (or (ros:getenv "VERSION")
