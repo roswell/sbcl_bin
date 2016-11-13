@@ -1,5 +1,6 @@
 #|-*- mode:lisp -*-|#
 (ql:quickload '(:dexador :lake :plump :cl-ppcre :split-sequence :sn.github) :silent t)
+(ros:include "util")
 
 (in-package :cl-user)
 (defpackage :lake.user
@@ -129,8 +130,27 @@
     (ignore-errors
       (github out *release* *user* *repo* t))))
 
-(defun build-sbcl-bin ()
-  )
+(defun build-sbcl-bin (version)
+  (let (release-dir)
+    (sh (format nil "git clone --depth 5 https://github.com/sbcl/sbcl --branch=sbcl-~A" version))
+    (uiop:chdir "sbcl")
+    (setf release-dir (namestring (truename (merge-pathnames "../"  (uiop:getcwd)))))
+    (sh "rm -rf .git")
+    (sh (format nil "echo '~S' > version.lisp-expr " version))
+    (sh (format nil "bash make.sh \"ros run\""))
+    (sh (format nil "ln -s ~A ~Asbcl-~A-~A-~A"
+                (sb-posix:getcwd)
+                release-dir
+                version
+                (ros.util:uname-m)
+                (ros.util:uname)))
+    (sh (format nil "~A/binary-distribution.sh ~Asbcl-~A-~A-~A"
+                (sb-posix:getcwd)
+                release-dir
+                version
+                (ros.util:uname-m)
+                (ros.util:uname)))
+    (sh (format nil "bzip2 sbcl-$VERSION*.tar"))))
 
 (task "default" ()
   (let ((ver (or (ros:getenv "VERSION")
@@ -138,7 +158,7 @@
                    (ros:getenv "TRAVIS_TAG")))))
     (if ver
         (progn
-          (build-sbcl-bin)
+          (build-sbcl-bin ver)
           #-darwin
           (mirror-version ver))
         #-darwin
