@@ -133,8 +133,10 @@
   )
 
 (task "mirror" ()
-  (let ((ver (ros:getenv "VERSION")))
+  (let ((ver (or (ros:getenv "VERSION")
+                 (ros:getenv "TRAVIS_TAG"))))
     (if ver
-        (mirror-version ver)
+        (progn
+          (mirror-version ver))
         (mirror-newest))))
 

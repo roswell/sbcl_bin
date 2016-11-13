@@ -7,36 +7,21 @@ env:
    - ROSWELL_BRANCH=master
    - ROSWELL_INSTALL_DIR=$HOME/.roswell
    - LISP=sbcl-bin
-   - TASK=mirror
   matrix:
-   - VERSION=1.1.18
-   - VERSION=1.1.17
-   - VERSION=1.1.16
-   - VERSION=1.1.15
-   - VERSION=1.1.14
-   - VERSION=1.1.13
-   - VERSION=1.1.12
-   - VERSION=1.1.11
-   - VERSION=1.1.10
-   - VERSION=1.1.9
-   - VERSION=1.1.8
-   - VERSION=1.1.7
-   - VERSION=1.1.6
-   - VERSION=1.1.5
-   - VERSION=1.1.4
-   - VERSION=1.1.3
-   - VERSION=1.1.2
-   - VERSION=1.1.1
-   - VERSION=1.1.0
+   - TASK=mirror
 
 os:
   - linux
-# - osx
+  - osx
 
 matrix:
   exclude:
     - os: osx
-      env: LISP=sbcl-bin TASK=mirror
+      env: TASK=mirror
+
+cache:
+  directories:
+    - $HOME/.roswell
 
 install:
   - curl -L https://raw.githubusercontent.com/roswell/roswell/$ROSWELL_BRANCH/scripts/install-for-ci.sh | sh
