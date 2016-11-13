@@ -127,18 +127,20 @@
      (github path *release* *user* *repo* t))
     (output-html path out)
     (ignore-errors
-     (github out *release* *user* *repo* t))))
+      (github out *release* *user* *repo* t))))
 
-(task "default" ()
+(defun build-sbcl-bin ()
   )
 
-(task "mirror" ()
+(task "default" ()
   (let ((ver (or (ros:getenv "VERSION")
                  (unless (zerop (length (ros:getenv "TRAVIS_TAG")))
                    (ros:getenv "TRAVIS_TAG")))))
-    (format t "mirror ~A~%" ver)
-    (force-output)
     (if ver
         (progn
+          (build-sbcl-bin)
+          #-darwin
           (mirror-version ver))
+        #-darwin
         (mirror-newest))))
+

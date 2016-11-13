@@ -7,17 +7,10 @@ env:
    - ROSWELL_BRANCH=master
    - ROSWELL_INSTALL_DIR=$HOME/.roswell
    - LISP=sbcl-bin
-  matrix:
-   - TASK=mirror
 
 os:
-  - linux
   - osx
-
-matrix:
-  exclude:
-    - os: osx
-      env: TASK=mirror
+  - linux
 
 cache:
   directories:
@@ -28,4 +21,4 @@ install:
   - if ! which lake ; then ros install snmsts/sn.github Rudolph-Miller/cl-gists lake; fi
 
 script:
-  - lake $TASK
+  - lake
