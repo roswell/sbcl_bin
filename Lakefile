@@ -28,8 +28,7 @@
 (defun release-exist-p (tagname &key owner repo)
   (ignore-errors
     (find tagname
-          (or (gethash (format nil "~A/~A" owner repo) *release-list-cache*)
-              (setf (gethash (format nil "~A/~A" owner repo) *release-list-cache*) (releases-list owner repo)))
+          (releases-list owner repo)
           :key (lambda (x) (getf x :|tag_name|))
           :test 'equal)))
 
@@ -151,10 +150,10 @@
     (sh (format nil "bash make.sh --arch=~A '--xc-host=ros -L sbcl-bin run'" uname-m))
     (uiop:chdir release-dir)
     (sh (format nil "ln -s sbcl ~Asbcl-~A-~A-~A"
-          release-dir
-          version
-          uname-m
-          (ros.util:uname)))
+                release-dir
+                version
+                uname-m
+                (ros.util:uname)))
     (sh (format nil "sbcl/binary-distribution.sh sbcl-~A-~A-~A"
                 version
                 uname-m
