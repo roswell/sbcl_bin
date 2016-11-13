@@ -165,7 +165,7 @@
                         (ros.util:uname))))
       (sh (format nil "rm -f ~A.bz2" path))
       (sh (format nil "bzip2 ~A" path))
-      (github (format nil "~A.bz2" path) version *user* *repo* t))))
+      (github (format nil "~A.bz2" path) version *user* *repo*))))
 
 (task "default" ()
   (let ((ver (or (unless (zerop (length (ros:getenv "TRAVIS_TAG")))
@@ -175,8 +175,8 @@
     (if ver
         (progn
           #-darwin
-          (mirror-version ver)
-          (build-sbcl-bin ver "x86-64")
-          (build-sbcl-bin ver "x86"))
+          (unless (ros:getenv "UNAME")
+            (mirror-version ver))
+          (build-sbcl-bin ver (or (ros:getenv "UNAME") "x86-64")))
         #-darwin
         (mirror-newest))))
