@@ -134,7 +134,8 @@
 
 (task "mirror" ()
   (let ((ver (or (ros:getenv "VERSION")
-                 (ros:getenv "TRAVIS_TAG"))))
+                 (unless (zerop (length (ros:getenv "TRAVIS_TAG")))
+                   (ros:getenv "TRAVIS_TAG")))))
     (format t "mirror ~A~%" ver)
     (force-output)
     (if ver
