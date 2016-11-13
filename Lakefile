@@ -23,10 +23,13 @@
 (defvar *user* (first *user/repo*))
 (defvar *repo* (subseq (second *user/repo*) 0 (- (length (second *user/repo*)) 4)))
 
+(defvar *release-list-cache* (make-hash-table :test 'equal))
+
 (defun release-exist-p (tagname &key owner repo)
   (ignore-errors
     (find tagname
-          (releases-list owner repo)
+          (or (gethash (format nil "~A/~A" owner repo) *release-list-cache*)
+              (setf (gethash (format nil "~A/~A" owner repo) *release-list-cache*) (releases-list owner repo)))
           :key (lambda (x) (getf x :|tag_name|))
           :test 'equal)))
 
@@ -156,7 +159,6 @@
                         (ros.util:uname-m)
                         (ros.util:uname))))
       (sh (format nil "bzip2 ~A" path))
-      #+darwin
       (github (format nil "~A.bz2" path) version *user* *repo* t))))
 
 (task "default" ()
@@ -165,8 +167,8 @@
                    (ros:getenv "TRAVIS_TAG")))))
     (if ver
         (progn
-          (build-sbcl-bin ver)
           #-darwin
-          (mirror-version ver))
+          (mirror-version ver)
+          (build-sbcl-bin ver))
         #-darwin
         (mirror-newest))))

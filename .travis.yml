@@ -9,8 +9,8 @@ env:
    - LISP=sbcl-bin
 
 os:
-  - osx
   - linux
+  - osx
 
 cache:
   directories:
