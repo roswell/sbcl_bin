@@ -134,10 +134,10 @@
       (github out *release* *user* *repo* t))))
 
 (defun build-sbcl-bin (version &optional (uname-m (ros.util:uname-m)))
-  (let (release-dir)
+  (let ((release-dir (namestring (uiop:getcwd))))
+    (sh "rm -rf sbcl")
     (sh (format nil "git clone --depth 5 https://github.com/sbcl/sbcl --branch=sbcl-~A" version))
     (uiop:chdir "sbcl")
-    (setf release-dir (namestring (truename (merge-pathnames "../"  (uiop:getcwd)))))
     (sh "rm -rf .git")
     (sh (format nil "echo '~S' > version.lisp-expr " version))
     (with-open-stream (s (open "customize-target-features.lisp"
