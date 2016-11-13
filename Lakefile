@@ -157,7 +157,7 @@
                         (ros.util:uname))))
       (sh (format nil "bzip2 ~A" path))
       #+darwin
-      (github (format nil "~A.bz2" path) *release* *user* *repo* t))))
+      (github (format nil "~A.bz2" path) version *user* *repo* t))))
 
 (task "default" ()
   (let ((ver (or (ros:getenv "VERSION")
@@ -170,4 +170,3 @@
           (mirror-version ver))
         #-darwin
         (mirror-newest))))
-
