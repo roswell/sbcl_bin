@@ -12,6 +12,12 @@ os:
   - linux
   - osx
 
+addons:
+  apt:
+    packages:
+      - libc6-i386
+      - lib32gcc-5-dev
+
 cache:
   directories:
     - $HOME/.roswell
