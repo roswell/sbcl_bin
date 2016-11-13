@@ -16,7 +16,7 @@ addons:
   apt:
     packages:
       - libc6-i386
-      - lib32gcc1
+      - gcc-multilib
 
 cache:
   directories:
