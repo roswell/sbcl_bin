@@ -149,7 +149,7 @@
                 (pushnew :sb-core-compression list)
                 list)))
     (sh (format nil "bash make.sh --arch=~A '--xc-host=ros -L sbcl-bin run'" uname-m))
-    (sh (format nil "ln -s ~A ~Asbcl-~A-~A-~A"
+    (sh (format nil "ln -s ~A/sbcl ~Asbcl-~A-~A-~A"
           (sb-posix:getcwd)
           release-dir
           version
