@@ -151,13 +151,11 @@
     (sh (format nil "bash make.sh --arch=~A '--xc-host=ros -L sbcl-bin run'" uname-m))
     (uiop:chdir release-dir)
     (sh (format nil "ln -s sbcl ~Asbcl-~A-~A-~A"
-          (sb-posix:getcwd)
           release-dir
           version
           uname-m
           (ros.util:uname)))
     (sh (format nil "sbcl/binary-distribution.sh sbcl-~A-~A-~A"
-                (sb-posix:getcwd)
                 version
                 uname-m
                 (ros.util:uname)))
