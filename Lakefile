@@ -139,15 +139,8 @@
     (uiop:chdir "sbcl")
     (sh "rm -rf .git")
     (sh (format nil "echo '~S' > version.lisp-expr " version))
-    (with-open-stream (s (open "customize-target-features.lisp"
-                               :direction :output
-                               :if-exists :supersede))
-      (format s "~S"
-              '(lambda (list)
-                (pushnew :sb-thread list)
-                (pushnew :sb-core-compression list)
-                list)))
-    (sh (format nil "bash make.sh --arch=~A '--xc-host=ros -L sbcl-bin run'" uname-m))
+    (sh (format nil "bash make.sh --with-thread --with-core-compression --arch=~A '--xc-host=ros -L sbcl-bin run'" uname-m))
+    (sh "bash run-sbcl.sh --eval '(progn (print *features*)(quit))'")
     (uiop:chdir release-dir)
     (sh (format nil "ln -s sbcl ~Asbcl-~A-~A-~A"
                 release-dir
