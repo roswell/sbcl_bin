@@ -63,7 +63,8 @@
     (format t "upload start:"))
   (asset-upload (pathname path) tagname :owner owner :repo repo :force (when force t))
   (when force
-    (format t "upload done")))
+    (format t "upload done"))
+  t)
 
 (defun output-html (in out)
   (let ((p (plump:parse (pathname in)))
@@ -139,7 +140,7 @@
     (uiop:chdir "sbcl")
     (sh "rm -rf .git")
     (sh (format nil "echo '~S' > version.lisp-expr " version))
-    (sh (format nil "bash make.sh --with-thread --with-core-compression --arch=~A '--xc-host=ros -L sbcl-bin run'" uname-m))
+    (sh (format nil "bash make.sh --with-sb-thread --with-sb-core-compression --arch=~A '--xc-host=ros -L sbcl-bin run'" uname-m))
     (sh "bash run-sbcl.sh --eval '(progn (print *features*)(quit))'")
     (uiop:chdir release-dir)
     (sh (format nil "ln -s sbcl ~Asbcl-~A-~A-~A"
@@ -157,7 +158,10 @@
                         (ros.util:uname))))
       (sh (format nil "rm -f ~A.bz2" path))
       (sh (format nil "bzip2 ~A" path))
-      (github (format nil "~A.bz2" path) version *user* *repo*))))
+      (loop repeat 10
+            until (ignore-errors
+                   (github (format nil "~A.bz2" path) version *user* *repo*))
+            do (sleep 3)))))
 
 (task "default" ()
   (let ((ver (or (unless (zerop (length (ros:getenv "TRAVIS_TAG")))
