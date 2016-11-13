@@ -155,9 +155,8 @@
           version
           uname-m
           (ros.util:uname)))
-    (sh (format nil "~A/binary-distribution.sh ~Asbcl-~A-~A-~A"
+    (sh (format nil "~A/binary-distribution.sh sbcl-~A-~A-~A"
                 (sb-posix:getcwd)
-                release-dir
                 version
                 uname-m
                 (ros.util:uname)))
