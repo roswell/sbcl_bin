@@ -158,6 +158,7 @@
                         version
                         (ros.util:uname-m)
                         (ros.util:uname))))
+      (sh (format nil "rm ~A.bz2" path))
       (sh (format nil "bzip2 ~A" path))
       (github (format nil "~A.bz2" path) version *user* *repo* t))))
 
