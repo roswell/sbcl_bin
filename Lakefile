@@ -149,18 +149,18 @@
                 (pushnew :sb-core-compression list)
                 list)))
     (sh (format nil "bash make.sh --arch=~A '--xc-host=ros -L sbcl-bin run'" uname-m))
-    (sh (format nil "ln -s ~A/sbcl ~Asbcl-~A-~A-~A"
+    (uiop:chdir release-dir)
+    (sh (format nil "ln -s sbcl ~Asbcl-~A-~A-~A"
           (sb-posix:getcwd)
           release-dir
           version
           uname-m
           (ros.util:uname)))
-    (sh (format nil "~A/binary-distribution.sh sbcl-~A-~A-~A"
+    (sh (format nil "sbcl/binary-distribution.sh sbcl-~A-~A-~A"
                 (sb-posix:getcwd)
                 version
                 uname-m
                 (ros.util:uname)))
-    (uiop:chdir release-dir)
     (let ((path (format nil "sbcl-~A-~A-~A-binary.tar"
                         version
                         uname-m

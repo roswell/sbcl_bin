@@ -16,6 +16,7 @@ addons:
   apt:
     packages:
       - libc6-i386
+      - lib32gcc1
 
 cache:
   directories:
@@ -26,5 +27,4 @@ install:
   - if ! which lake ; then ros install snmsts/sn.github Rudolph-Miller/cl-gists lake;lake-tools dump; fi
 
 script:
-  - if which apt-cache; then apt-cache search lib32gcc; fi
   - lake
