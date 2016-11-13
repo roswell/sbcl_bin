@@ -133,7 +133,7 @@
     (ignore-errors
       (github out *release* *user* *repo* t))))
 
-(defun build-sbcl-bin (version)
+(defun build-sbcl-bin (version &optional (uname-m (ros.util:uname-m)))
   (let (release-dir)
     (sh (format nil "git clone --depth 5 https://github.com/sbcl/sbcl --branch=sbcl-~A" version))
     (uiop:chdir "sbcl")
@@ -148,36 +148,38 @@
                 (pushnew :sb-thread list)
                 (pushnew :sb-core-compression list)
                 list)))
-    (sh (format nil "bash make.sh \"ros run\""))
+    (sh (format nil "bash make.sh --arch=~A '--xc-host=ros -L sbcl-bin run'" uname-m))
     (sh (format nil "ln -s ~A ~Asbcl-~A-~A-~A"
           (sb-posix:getcwd)
           release-dir
           version
-          (ros.util:uname-m)
+          uname-m
           (ros.util:uname)))
     (sh (format nil "~A/binary-distribution.sh ~Asbcl-~A-~A-~A"
                 (sb-posix:getcwd)
                 release-dir
                 version
-                (ros.util:uname-m)
+                uname-m
                 (ros.util:uname)))
     (uiop:chdir release-dir)
     (let ((path (format nil "sbcl-~A-~A-~A-binary.tar"
                         version
-                        (ros.util:uname-m)
+                        uname-m
                         (ros.util:uname))))
-      (sh (format nil "rm ~A.bz2" path))
+      (sh (format nil "rm -f ~A.bz2" path))
       (sh (format nil "bzip2 ~A" path))
       (github (format nil "~A.bz2" path) version *user* *repo* t))))
 
 (task "default" ()
-  (let ((ver (or (ros:getenv "VERSION")
-                 (unless (zerop (length (ros:getenv "TRAVIS_TAG")))
-                   (ros:getenv "TRAVIS_TAG")))))
+  (let ((ver (or (unless (zerop (length (ros:getenv "TRAVIS_TAG")))
+                   (ros:getenv "TRAVIS_TAG"))
+                 (unless (zerop (length (ros:getenv "VERSION")))
+                   (ros:getenv "VERSION")))))
     (if ver
         (progn
           #-darwin
           (mirror-version ver)
-          (build-sbcl-bin ver))
+          (build-sbcl-bin ver "x86-64")
+          (build-sbcl-bin ver "x86"))
         #-darwin
         (mirror-newest))))
