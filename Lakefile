@@ -168,12 +168,13 @@
   (let ((ver (or (unless (zerop (length (ros:getenv "TRAVIS_TAG")))
                    (ros:getenv "TRAVIS_TAG"))
                  (unless (zerop (length (ros:getenv "VERSION")))
-                   (ros:getenv "VERSION")))))
+                   (ros:getenv "VERSION"))))
+        (m (ros:getenv "TARGET")))
     (if ver
         (progn
           #-darwin
-          (unless (ros:getenv "UNAME")
+          (when (equal "x86-64" m)
             (mirror-version ver))
-          (build-sbcl-bin ver (or (ros:getenv "UNAME") "x86-64")))
+          (build-sbcl-bin ver m))
         #-darwin
-        '(mirror-newest))))
+        (mirror-newest))))

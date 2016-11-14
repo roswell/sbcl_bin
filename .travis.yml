@@ -8,28 +8,8 @@ env:
    - ROSWELL_INSTALL_DIR=$HOME/.roswell
    - LISP=sbcl-bin
   matrix:
-    - VERSION=1.3.10
-    - VERSION=1.3.10 UNAME=x86
-    - VERSION=1.3.9
-    - VERSION=1.3.9 UNAME=x86
-    - VERSION=1.3.8
-    - VERSION=1.3.8 UNAME=x86
-    - VERSION=1.3.7
-    - VERSION=1.3.7 UNAME=x86
-    - VERSION=1.3.6
-    - VERSION=1.3.6 UNAME=x86
-    - VERSION=1.3.5
-    - VERSION=1.3.5 UNAME=x86
-    - VERSION=1.3.4
-    - VERSION=1.3.4 UNAME=x86
-    - VERSION=1.3.3
-    - VERSION=1.3.3 UNAME=x86
-    - VERSION=1.3.2
-    - VERSION=1.3.2 UNAME=x86
-    - VERSION=1.3.1
-    - VERSION=1.3.1 UNAME=x86
-    - VERSION=1.3.0
-    - VERSION=1.3.0 UNAME=x86
+    - TARGET=x86-64
+    - TARGET=x86
 
 os:
   - linux
