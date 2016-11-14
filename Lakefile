@@ -176,4 +176,4 @@
             (mirror-version ver))
           (build-sbcl-bin ver (or (ros:getenv "UNAME") "x86-64")))
         #-darwin
-        (mirror-newest))))
+        '(mirror-newest))))
