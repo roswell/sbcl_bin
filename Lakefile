@@ -195,7 +195,7 @@
                          #P"sbcl-bin.html" :if-exists :supersede)
               (format t "~A ~%" (list path *release* *user* *repo* t))
               (force-output)
-              (output-html path out version)
+              (output-html path out ver)
               (ignore-errors
                 (github out *release* *user* *repo* t)))))
         #-darwin
