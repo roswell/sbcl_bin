@@ -190,7 +190,7 @@
           #+darwin
           (when (equal "x86" m)
             (let ((path "sbcl-bin.html")
-                  (out "mirror+.html"))
+                  (out "build.html"))
               (dex:fetch "http://sbcl.org/platform-table.html"
                          #P"sbcl-bin.html" :if-exists :supersede)
               (format t "~A ~%" (list path *release* *user* *repo* t))
