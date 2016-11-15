@@ -24,6 +24,11 @@
 (defvar *repo* (subseq (second *user/repo*) 0 (- (length (second *user/repo*)) 4)))
 
 (defvar *release-list-cache* (make-hash-table :test 'equal))
+(defvar *ci-supported*
+  '("x86-64-linux-binary.tar.bz2"
+    "x86-linux-binary.tar.bz2"
+    "x86-64-darwin-binary.tar.bz2"
+    "x86-darwin-binary.tar.bz2"))
 
 (defun release-exist-p (tagname &key owner repo)
   (ignore-errors
@@ -66,10 +71,16 @@
     (format t "upload done"))
   t)
 
-(defun output-html (in out)
+(defun output-html (in out &optional version)
   (let ((p (plump:parse (pathname in)))
         (uri (format nil "https://github.com/~A/~A/releases/download/" *user* *repo*)))
     (with-open-file (o (pathname out) :direction :output)
+      (when version
+        (let ((tmp (format nil "~A~A/sbcl-~A-" uri version version)))
+          (mapc
+           (lambda (x)
+             (format o "<a href=~S></a>~%" (format nil "~A~A" tmp x)))
+           *ci-supported*)))
       (mapc #'(lambda (x)
                 (let ((file (first (last (split-sequence:split-sequence #\/ (plump:get-attribute x "href"))))))
                   (format o "<a href=~S></a>~%" (concatenate 'string uri (second (split-sequence:split-sequence #\- file)) "/" file))))
@@ -175,6 +186,17 @@
           #-darwin
           (when (equal "x86-64" m)
             (mirror-version ver))
-          (build-sbcl-bin ver m))
+          (build-sbcl-bin ver m)
+          #+darwin
+          (when (equal "x86" m)
+            (let ((path "sbcl-bin.html")
+                  (out "mirror+.html"))
+              (dex:fetch "http://sbcl.org/platform-table.html"
+                         #P"sbcl-bin.html" :if-exists :supersede)
+              (format t "~A ~%" (list path *release* *user* *repo* t))
+              (force-output)
+              (output-html path out version)
+              (ignore-errors
+                (github out *release* *user* *repo* t)))))
         #-darwin
         (mirror-newest))))
