@@ -62,13 +62,16 @@
           for uri = (read-line in nil nil)
           while uri
           for path = (file-namestring (quri:uri-path (quri:uri uri)))
-          do (unless (find path (getf (find *release*
-                                            releases
-                                            :key (lambda (x) (getf x :|tag_name|))
-                                            :test 'equal) :|assets|)
-                           :key (lambda (x) (getf x :|name|))
-                           :test #'equal)
-               (fetch-upload path uri))))
+          do (if (let ((*release* (second (split-sequence:split-sequence #\- (pathname-name path)))))
+                   (find path (getf (find *release*
+                                          releases
+                                          :key (lambda (x) (getf x :|tag_name|))
+                                          :test 'equal) :|assets|)
+                         :key (lambda (x) (getf x :|name|))
+                         :test #'equal))
+                 (format t "skip ~A~%" uri)
+                 (fetch-upload path uri))
+             (force-output)))
   (let ((path "sbcl-bin.html")
         (out "mirror.html"))
     (format t "~A ~%" (list path *release* *user* *repo* t))
