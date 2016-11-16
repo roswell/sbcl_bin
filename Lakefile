@@ -58,11 +58,14 @@
   (dex:fetch "http://sbcl.org/platform-table.html" #P"sbcl-bin.html" :if-exists :supersede)
   (sh "cat sbcl-bin.html| grep http|awk -F '\"' '{print $2}'|grep binary > uris")
   (with-open-file (in "uris")
-    (loop with assets = (getf (release-exist-p *release* :owner *user* :repo *repo*) :|assets|)
+    (loop with releases = (releases-list *user* *repo*)
           for uri = (read-line in nil nil)
           while uri
           for path = (file-namestring (quri:uri-path (quri:uri uri)))
-          do (unless (find path assets
+          do (unless (find path (getf (find *release*
+                                            releases
+                                            :key (lambda (x) (getf x :|tag_name|))
+                                            :test 'equal) :|assets|)
                            :key (lambda (x) (getf x :|name|))
                            :test #'equal)
                (fetch-upload path uri))))
