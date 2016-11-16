@@ -1,7 +1,7 @@
 (in-package :cl-user)
 (defpackage :roswell.github.utils
   (:use :cl :sn.github.repos.releases)
-  (:export :*repo* :*user* :*release* :fetch-upload :github))
+  (:export :*repo* :*user* :*release* :fetch-upload :github :release-exist-p))
 
 (in-package :roswell.github.utils)
 

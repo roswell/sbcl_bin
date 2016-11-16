@@ -58,10 +58,14 @@
   (dex:fetch "http://sbcl.org/platform-table.html" #P"sbcl-bin.html" :if-exists :supersede)
   (sh "cat sbcl-bin.html| grep http|awk -F '\"' '{print $2}'|grep binary > uris")
   (with-open-file (in "uris")
-    (loop for uri = (read-line in nil nil)
+    (loop with assets = (getf (release-exist-p *release* :owner *user* :repo *repo*) :|assets|)
+          for uri = (read-line in nil nil)
           while uri
           for path = (file-namestring (quri:uri-path (quri:uri uri)))
-          do (fetch-upload path uri)))
+          do (unless (find path assets
+                           :key (lambda (x) (getf x :|name|))
+                           :test #'equal)
+               (fetch-upload path uri))))
   (let ((path "sbcl-bin.html")
         (out "mirror.html"))
     (format t "~A ~%" (list path *release* *user* *repo* t))
@@ -70,7 +74,7 @@
      (github path *release* *user* *repo* t))
     (output-html path out)
     (ignore-errors
-      (github out *release* *user* *repo* t))))
+     (github out *release* *user* *repo* t))))
 
 (defun build-sbcl-bin (version &optional (uname-m (ros.util:uname-m)))
   (let ((release-dir (namestring (uiop:getcwd))))
