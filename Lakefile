@@ -45,14 +45,22 @@
                     ,(plump:get-attribute (first (plump:get-elements-by-tag-name i "abbr")) "title")))))
 
 (defun mirror-version (version)
-  (loop with base-uri = (format nil "https://sourceforge.net/projects/sbcl/files/sbcl/~A/" version)
+  (loop with releases = (releases-list *user* *repo*)
+        with base-uri = (format nil "https://sourceforge.net/projects/sbcl/files/sbcl/~A/" version)
         with html = (plump:parse (dex:get base-uri))
         with *release* = version
         for i in (remove-if-not (lambda (x) (equal (string-trim " " (plump:get-attribute x "class")) "file"))
                                 (plump:get-elements-by-tag-name html "tr"))
         for uri = (concatenate 'string base-uri (plump:get-attribute i "title"))
         for path = (file-namestring (quri:uri-path (quri:uri uri)))
-        do (fetch-upload path uri)))
+        do (if (find path (getf (find *release*
+                                      releases
+                                      :key (lambda (x) (getf x :|tag_name|))
+                                      :test 'equal) :|assets|)
+                     :key (lambda (x) (getf x :|name|))
+                     :test #'equal)
+               (format t "skip ~A~%" uri)
+               (fetch-upload path uri))))
 
 (defun mirror-newest ()
   (dex:fetch "http://sbcl.org/platform-table.html" #P"sbcl-bin.html" :if-exists :supersede)
@@ -62,13 +70,13 @@
           for uri = (read-line in nil nil)
           while uri
           for path = (file-namestring (quri:uri-path (quri:uri uri)))
-          do (if (let ((*release* (second (split-sequence:split-sequence #\- (pathname-name path)))))
-                   (find path (getf (find *release*
-                                          releases
-                                          :key (lambda (x) (getf x :|tag_name|))
-                                          :test 'equal) :|assets|)
-                         :key (lambda (x) (getf x :|name|))
-                         :test #'equal))
+          for *release* = (second (split-sequence:split-sequence #\- (pathname-name path)))
+          do (if (find path (getf (find *release*
+                                        releases
+                                        :key (lambda (x) (getf x :|tag_name|))
+                                        :test 'equal) :|assets|)
+                       :key (lambda (x) (getf x :|name|))
+                       :test #'equal)
                  (format t "skip ~A~%" uri)
                  (fetch-upload path uri))
              (force-output)))
