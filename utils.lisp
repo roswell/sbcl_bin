@@ -67,12 +67,11 @@
                 (format nil "git tag -a \"~A\" -m \"~A\"" (first i) (first i))))
       (uiop:run-program x))))
 
-(defun fetch-upload (path uri)
+(defun fetch-upload (path uri *release*)
   "fetch&upload"
   (format t "~A " uri)
   (ignore-errors
    (dex:fetch uri path :if-exists :supersede)
-   (let ((*release* (second (split-sequence:split-sequence #\- (pathname-name path)))))
-     (github path *release* *user* *repo*)))
+   (github path *release* *user* *repo*))
   (format t "~%")
   (force-output))

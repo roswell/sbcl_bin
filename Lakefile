@@ -60,7 +60,7 @@
                      :key (lambda (x) (getf x :|name|))
                      :test #'equal)
                (format t "skip ~A~%" uri)
-               (fetch-upload path uri))))
+               (fetch-upload path uri (second (split-sequence:split-sequence #\- (pathname-name path)))))))
 
 (defun mirror-newest ()
   (dex:fetch "http://sbcl.org/platform-table.html" #P"sbcl-bin.html" :if-exists :supersede)
@@ -78,7 +78,7 @@
                        :key (lambda (x) (getf x :|name|))
                        :test #'equal)
                  (format t "skip ~A~%" uri)
-                 (fetch-upload path uri))
+                 (fetch-upload path uri (second (split-sequence:split-sequence #\- (pathname-name path)))))
              (force-output)))
   (let ((path "sbcl-bin.html")
         (out "mirror.html"))
