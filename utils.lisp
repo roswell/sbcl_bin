@@ -51,11 +51,11 @@
   (unless (uiop:getenv "GITHUB_OAUTH_TOKEN")
     (error "GITHUB_OAUTH_TOKEN must be set"))
   (ensure-release-exists tagname :owner owner :repo repo)
-  (when force
-    (format t "upload start:"))
+  (format t "create ~A ~A ~A:" owner repo tagname)
+  (format t "upload start:")
   (asset-upload (pathname path) tagname :owner owner :repo repo :force (when force t))
-  (when force
-    (format t "upload done"))
+  (format t "upload done")
+  (force-output t)
   t)
 
 (defun commit-tags (tags)
