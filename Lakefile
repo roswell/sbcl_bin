@@ -143,6 +143,7 @@
               (force-output)
               (output-html path out ver)
               (ignore-errors
-                (github out *release* *user* *repo* t)))))
+               (github out *release* *user* *repo* t)))))
         #-darwin
-        (mirror-newest))))
+        (when (equal "x86-64" m)
+          (mirror-newest)))))
