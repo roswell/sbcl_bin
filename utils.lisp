@@ -25,6 +25,8 @@
           :test 'equal)))
 
 (defun ensure-release-exists (tagname &key owner repo)
+  (format t "ensure-release-exists ~A ~A ~A:" tagname owner repo)
+  (force-output)
   (let ((found (release-exist-p tagname :owner owner :repo repo)))
     (if found
         found
