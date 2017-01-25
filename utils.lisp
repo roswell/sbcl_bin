@@ -71,9 +71,8 @@
 
 (defun fetch-upload (path uri *release*)
   "fetch&upload"
-  (format t "~A " uri)
+  (format t "~A~%" uri)
+  (finish-output)
   (ignore-errors
    (dex:fetch uri path :if-exists :supersede)
-   (github path *release* *user* *repo*))
-  (format t "~%")
-  (force-output))
+   (github path *release* *user* *repo*)))
