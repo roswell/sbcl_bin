@@ -47,7 +47,7 @@
 (defun mirror-version (version)
   (loop with releases = (releases-list *user* *repo*)
         with base-uri = (format nil "https://sourceforge.net/projects/sbcl/files/sbcl/~A/" version)
-        with html = (plump:parse (dex:get base-uri))
+        with html = (progn (format t "get ~A~%" base-uri) (finish-output) (plump:parse (dex:get base-uri)))
         with *release* = version
         for i in (remove-if-not (lambda (x) (equal (string-trim " " (plump:get-attribute x "class")) "file"))
                                 (plump:get-elements-by-tag-name html "tr"))
