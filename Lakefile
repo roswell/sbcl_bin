@@ -68,7 +68,10 @@
   (sh "cat sbcl-bin.html| grep http|awk -F '\"' '{print $2}'|grep binary > uris")
   (format t "fetching uris~%")(force-output)
   (with-open-file (in "uris")
-    (loop with releases = (releases-list *user* *repo*)
+    (loop with releases = (progn
+                            (format t "fetching releases-list ~A ~A" *user* *repo*)(force-output)
+                            (prog1 (releases-list *user* *repo*)
+                              (format t "done~%")(force-output)))
           for uri = (read-line in nil nil)
           while uri
           for path = (file-namestring (quri:uri-path (quri:uri uri)))
