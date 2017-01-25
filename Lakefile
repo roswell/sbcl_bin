@@ -73,13 +73,15 @@
           while uri
           for path = (file-namestring (quri:uri-path (quri:uri uri)))
           for *release* = (second (split-sequence:split-sequence #\- (pathname-name path)))
-          do (if (find path (getf (find *release*
+          do (format t "~%~a " uri)
+             (force-output)
+             (if (find path (getf (find *release*
                                         releases
                                         :key (lambda (x) (getf x :|tag_name|))
                                         :test 'equal) :|assets|)
                        :key (lambda (x) (getf x :|name|))
                        :test #'equal)
-                 (format t "skip ~A~%" uri)
+                 (format t "skip")
                  (fetch-upload path uri (second (split-sequence:split-sequence #\- (pathname-name path)))))
              (force-output)))
   (let ((path "sbcl-bin.html")
