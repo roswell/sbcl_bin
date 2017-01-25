@@ -63,8 +63,10 @@
                (fetch-upload path uri (second (split-sequence:split-sequence #\- (pathname-name path)))))))
 
 (defun mirror-newest ()
+  (format t "mirror-newest~%")(force-output)
   (dex:fetch "http://sbcl.org/platform-table.html" #P"sbcl-bin.html" :if-exists :supersede)
   (sh "cat sbcl-bin.html| grep http|awk -F '\"' '{print $2}'|grep binary > uris")
+  (format t "fetching uris~%")(force-output)
   (with-open-file (in "uris")
     (loop with releases = (releases-list *user* *repo*)
           for uri = (read-line in nil nil)
@@ -128,6 +130,8 @@
                  (unless (zerop (length (ros:getenv "VERSION")))
                    (ros:getenv "VERSION"))))
         (m (ros:getenv "TARGET")))
+    (format t "~A ~A~%" ver m)
+    (force-output)
     (if ver
         (progn
           #-darwin
