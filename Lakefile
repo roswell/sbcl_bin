@@ -92,7 +92,7 @@
 
 (defun build-sbcl-bin (version &optional (uname-m (roswell.util:uname-m)))
   (let ((release-dir (namestring (uiop:getcwd)))
-        (uname (roswell.util:uname))
+        (uname (roswell.util:uname)))
     (sh "rm -rf sbcl")
     (sh (format nil "git clone --depth 5 https://github.com/sbcl/sbcl --branch=sbcl-~A" version))
     (uiop:chdir "sbcl")
