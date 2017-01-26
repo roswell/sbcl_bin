@@ -26,6 +26,7 @@ cache:
     - $HOME/.roswell
 
 install:
+  - curl -v https://api.github.com
   - curl -L https://raw.githubusercontent.com/roswell/roswell/$ROSWELL_BRANCH/scripts/install-for-ci.sh | sh
   - if ! which lake ; then ros install snmsts/sn.github Rudolph-Miller/cl-gists lake;lake-tools dump; fi
 
