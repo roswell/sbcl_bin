@@ -1,7 +1,6 @@
 platform:
   - x64
 environment:
-  global:
   matrix:
     - MSYS2_BITS: 64
       MSYSTEM: MINGW64
