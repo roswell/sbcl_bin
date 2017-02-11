@@ -11,4 +11,4 @@ build_script:
   - C:\msys%MSYS2_BITS%\usr\bin\bash -lc "cd $APPVEYOR_BUILD_FOLDER; if ! which lake ; then ros install snmsts/sn.github Rudolph-Miller/cl-gists lake;lake-tools dump; fi; exec 0</dev/null;"
 
 test_script:
-  - C:\msys%MSYS2_BITS%\usr\bin\bash -lc "cd $APPVEYOR_BUILD_FOLDER; lake ; fi; exec 0</dev/null;"
+  - C:\msys%MSYS2_BITS%\usr\bin\bash -lc "export PATH=$HOME/.roswell/bin:$PATH; cd $APPVEYOR_BUILD_FOLDER; lake ; exec 0</dev/null;"
