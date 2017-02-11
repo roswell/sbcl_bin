@@ -1,6 +1,6 @@
 #|-*- mode:lisp -*-|#
 (load "roswell.github.utils.asd")
-(ql:quickload :roswell.github.utils :silent t)
+(ql:quickload :roswell.github.utils :silent nil)
 (ros:include "util")
 
 (in-package :cl-user)
