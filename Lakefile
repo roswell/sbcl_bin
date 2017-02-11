@@ -140,7 +140,7 @@
     (force-output)
     (if ver
         (cl+ssl:with-global-context (ctx)
-          #-darwin
+          #+linux
           (when (equal "x86-64" m)
             (mirror-version ver))
           (build-sbcl-bin ver m)
@@ -155,7 +155,7 @@
               (output-html path out ver)
               (ignore-errors
                (github out *release* *user* *repo* t)))))
-        #-darwin
+        #+linux
         (when (equal "x86-64" m)
           (cl+ssl:with-global-context (ctx)
             (mirror-newest))))))
