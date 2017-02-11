@@ -7,7 +7,7 @@ environment:
       ROSWELL_BRANCH: master
 
 install:
-  - SET PATH=%USERPROFILE%\.roswell;%PATH%
+  - SET PATH=%USERPROFILE%\.roswell\bin;%PATH%
 
 build_script:
   - C:\msys%MSYS2_BITS%\usr\bin\bash -lc "cd $APPVEYOR_BUILD_FOLDER;curl -L https://raw.githubusercontent.com/roswell/roswell/$ROSWELL_BRANCH/scripts/install-for-ci.sh | sh; exec 0</dev/null;"
