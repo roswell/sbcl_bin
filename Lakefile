@@ -132,14 +132,15 @@
 (task "default" ()
   (let ((ver (or (unless (zerop (length (ros:getenv "TRAVIS_TAG")))
                    (ros:getenv "TRAVIS_TAG"))
+                 (unless (zerop (length (ros:getenv "APPVEYOR_REPO_TAG_NAME")))
+                   (ros:getenv "APPVEYOR_REPO_TAG_NAME"))
                  (unless (zerop (length (ros:getenv "VERSION")))
                    (ros:getenv "VERSION"))))
-        (ctx (cl+ssl:make-context :verify-depth 10 :verify-mode cl+ssl:+ssl-verify-none+ :verify-location :default))
         (m (ros:getenv "TARGET")))
     (format t "~A ~A~%" ver m)
     (force-output)
     (if ver
-        (cl+ssl:with-global-context (ctx)
+        (progn
           #+linux
           (when (equal "x86-64" m)
             (mirror-version ver))
@@ -157,5 +158,4 @@
                (github out *release* *user* *repo* t)))))
         #+linux
         (when (equal "x86-64" m)
-          (cl+ssl:with-global-context (ctx)
-            (mirror-newest))))))
+          (mirror-newest)))))
