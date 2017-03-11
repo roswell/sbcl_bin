@@ -1,10 +1,15 @@
 platform:
   - x64
 environment:
+  global:
+    ROSWELL_BRANCH: release
   matrix:
     - MSYS2_BITS: 64
       MSYSTEM: MINGW64
-      ROSWELL_BRANCH: master
+      TARGET: x86-64
+    - MSYS2_BITS: 32
+      MSYSTEM: MINGW32
+      TARGET: x86
 
 install:
   - SET PATH=%USERPROFILE%\.roswell\bin;%PATH%
