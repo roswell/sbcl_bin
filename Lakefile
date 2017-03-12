@@ -105,7 +105,7 @@
     (uiop:chdir "sbcl")
     (sh "rm -rf .git")
     (sh (format nil "echo '~S' > version.lisp-expr " version))
-    (sh (format nil "bash make.sh --with-sb-thread --with-sb-core-compression --arch=~A '--xc-host=ros -L sbcl-bin run'"
+    (sh (format nil "bash make.sh --with-sb-thread --with-sb-core-compression --arch=~A '--xc-host=ros +Q -L sbcl-bin run'"
                 uname-m))
     (sh "bash run-sbcl.sh --eval '(progn (print *features*)(quit))'")
     (uiop:chdir release-dir)
