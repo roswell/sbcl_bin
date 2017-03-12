@@ -101,10 +101,11 @@
   (let ((release-dir (namestring (uiop:getcwd)))
         (uname (roswell.util:uname)))
     (sh "rm -rf sbcl")
-    (sh (format nil "git clone --depth 5 https://github.com/sbcl/sbcl --branch=sbcl-~A" version))
+    (sh (format nil "git clone --depth 5 https://github.com/sbcl/sbcl --branch=~:[master~;sbcl-~:*~A~]"
+                version))
     (uiop:chdir "sbcl")
     (sh "rm -rf .git")
-    (sh (format nil "echo '~S' > version.lisp-expr " version))
+    (sh (format nil "echo '~S' > version.lisp-expr" (or version "99.99.99")))
     (sh (format nil "bash make.sh --with-sb-thread --with-sb-core-compression --arch=~A '--xc-host=ros +Q -L sbcl-bin run'"
                 uname-m))
     (sh "bash run-sbcl.sh --eval '(progn (print *features*)(quit))'")
@@ -124,10 +125,11 @@
                         uname)))
       (sh (format nil "rm -f ~A.bz2" path))
       (sh (format nil "bzip2 ~A" path))
-      (loop repeat 10
-            until (ignore-errors
-                   (github (format nil "~A.bz2" path) version *user* *repo*))
-            do (sleep 3)))))
+      (when version
+        (loop repeat 10
+              until (ignore-errors
+                     (github (format nil "~A.bz2" path) version *user* *repo*))
+              do (sleep 3))))))
 
 (task "default" ()
   (let ((ver (or (unless (zerop (length (ros:getenv "TRAVIS_TAG")))
@@ -156,6 +158,8 @@
               (output-html path out ver)
               (ignore-errors
                (github out *release* *user* *repo* t)))))
-        #+linux
-        (when (equal "x86-64" m)
-          (mirror-newest)))))
+        (progn
+          #+linux
+          (when (equal "x86-64" m)
+            (mirror-newest))
+          (build-sbcl-bin nil m)))))
