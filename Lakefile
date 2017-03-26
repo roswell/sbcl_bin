@@ -149,8 +149,9 @@
     (if ver
         (progn
           #+linux
-          (when (equal "x86-64" m)
-            (mirror-version ver))
+          (and (equal "x86-64" m)
+               (< (length ver) 20)
+               (mirror-version ver))
           (build-sbcl-bin ver m)
           #+darwin
           (when (equal "x86" m)
