@@ -99,13 +99,17 @@
 
 (defun build-sbcl-bin (version &optional (uname-m (roswell.util:uname-m)))
   (let ((release-dir (namestring (uiop:getcwd)))
-        (uname (roswell.util:uname)))
+        (uname (roswell.util:uname))
+        (release (and version (< (length version) 20)))) ;; sha length is 40,version length is about 10.20 is enough.
     (sh "rm -rf sbcl")
-    (sh (format nil "git clone --depth 5 https://github.com/sbcl/sbcl --branch=~:[master~;sbcl-~:*~A~]"
-                version))
+    (sh (format nil "git clone ~:[--depth 5 ~;~:]https://github.com/sbcl/sbcl --branch=~:[master~;sbcl-~:*~A~]"
+                (and version (not release))
+                (and release version)))
     (uiop:chdir "sbcl")
+    (when (and version (not release))
+      (sh "git checkout ~A" version))
     (sh "rm -rf .git")
-    (sh (format nil "echo '~S' > version.lisp-expr" (or version "99.99.99")))
+    (sh (format nil "echo '~S' > version.lisp-expr" (if release version "99.99.99")))
     (ignore-errors
      (sh (format nil "bash make.sh --with-sb-thread --with-sb-core-compression --arch=~A '--xc-host=ros +Q -L sbcl-bin run'"
                 uname-m)))
@@ -126,7 +130,7 @@
                         uname)))
       (sh (format nil "rm -f ~A.bz2" path))
       (sh (format nil "bzip2 ~A" path))
-      (when version
+      (when release
         (loop repeat 10
               until (ignore-errors
                      (github (format nil "~A.bz2" path) version *user* *repo*))
