@@ -107,7 +107,7 @@
                 (and release version)))
     (uiop:chdir "sbcl")
     (when (and version (not release))
-      (sh "git checkout ~A" version))
+      (sh (format nil "git checkout ~A" version)))
     (sh "rm -rf .git")
     (sh (format nil "echo '~S' > version.lisp-expr" (if release version "99.99.99")))
     (ignore-errors
