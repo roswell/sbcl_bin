@@ -108,6 +108,8 @@
     (uiop:chdir "sbcl")
     (when (and version (not release))
       (sh (format nil "git checkout ~A" version)))
+    (sh "git diff 806e8eb1381fcb98a5ae8730ccf255fec662a77f 4e761b4dd73ccb76761b82b719d4ee706b98162b src/runtime/x86-64-arch.c src/runtime/x86-64-arch.h src/runtime/x86-64-darwin-os.c > patch")
+    (sh "git apply patch")
     (sh "rm -rf .git")
     (sh (format nil "echo '~S' > version.lisp-expr" (if release version "99.99.99")))
     (ignore-errors
