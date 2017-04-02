@@ -1,0 +1,7 @@
+---
++++ src/runtime/x86-64-darwin-os.c
+@@ -302,3 +302,3 @@
+     x86_avx_state64_t *target_float_state;
+-    int float_state_flavor = avx_supported? x86_AVX_STATE64 : x86_FLOAT_STATE64_COUNT;
++    int float_state_flavor = avx_supported? x86_AVX_STATE64 : x86_FLOAT_STATE64;
+ #else
