@@ -114,8 +114,7 @@
                    (and (find version '("1.3.15" "1.3.16") :test 'equal)
                         (find :darwin *features*)
                         '("darwin-1.3.15-16"))))
-      (uiop/run-program:run-program
-       "patch -p0 -N" :output t :input (merge-pathnames file "../patch/") :ignore-error-status t))
+      (sh "cat ../patch/~A|patch -p0 -N" file))
     (ignore-errors
      (sh (format nil "bash make.sh --with-sb-thread --with-sb-core-compression --arch=~A '--xc-host=ros +Q -L sbcl-bin run'"
                 uname-m)))
