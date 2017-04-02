@@ -159,7 +159,7 @@
           (build-sbcl-bin ver m)
           #+darwin
           (when (and (equal "x86" m)
-                     (< (length version) 20))
+                     (< (length ver) 20))
             (let ((path "sbcl-bin.html")
                   (out "build.html"))
               (dex:fetch "http://sbcl.org/platform-table.html"
