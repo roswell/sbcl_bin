@@ -31,3 +31,9 @@ install:
 
 script:
   - lake
+
+jobs:
+  include:
+    - stage: deploy
+      script: lake upload-buiild-list
+      os: linux

@@ -142,37 +142,36 @@
                      (github (format nil "~A.bz2" path) version *user* *repo*))
               do (sleep 3))))))
 
+(defun version-target ()
+  (values (or (unless (zerop (length (ros:getenv "TRAVIS_TAG")))
+                (ros:getenv "TRAVIS_TAG"))
+              (unless (zerop (length (ros:getenv "APPVEYOR_REPO_TAG_NAME")))
+                (ros:getenv "APPVEYOR_REPO_TAG_NAME"))
+              (unless (zerop (length (ros:getenv "VERSION")))
+                (ros:getenv "VERSION")))
+          (ros:getenv "TARGET")))
+
 (task "default" ()
-  (let ((ver (or (unless (zerop (length (ros:getenv "TRAVIS_TAG")))
-                   (ros:getenv "TRAVIS_TAG"))
-                 (unless (zerop (length (ros:getenv "APPVEYOR_REPO_TAG_NAME")))
-                   (ros:getenv "APPVEYOR_REPO_TAG_NAME"))
-                 (unless (zerop (length (ros:getenv "VERSION")))
-                   (ros:getenv "VERSION"))))
-        (m (ros:getenv "TARGET")))
+  (multiple-value-bind (ver m) (version-target)
     (format t "~A ~A~%" ver m)
     (force-output)
-    (if ver
-        (progn
-          #+linux
-          (and (equal "x86-64" m)
-               (< (length ver) 20)
+    #+linux
+    (when (equal "x86-64" m)
+      (if ver
+          (and (< (length ver) 20)
                (mirror-version ver))
-          (build-sbcl-bin ver m)
-          #+darwin
-          (when (and (equal "x86" m)
-                     (< (length ver) 20))
-            (let ((path "sbcl-bin.html")
-                  (out "build.html"))
-              (dex:fetch "http://sbcl.org/platform-table.html"
-                         #P"sbcl-bin.html" :if-exists :supersede)
-              (format t "~A ~%" (list path *release* *user* *repo* t))
-              (force-output)
-              (output-html path out ver)
-              (ignore-errors
-               (github out *release* *user* *repo* t)))))
-        (progn
-          #+linux
-          (when (equal "x86-64" m)
-            (mirror-newest))
-          (build-sbcl-bin nil m)))))
+          (mirror-newest)))
+    (build-sbcl-bin ver m)))
+
+(task "upload-buiild-list" ()
+  (multiple-value-bind (ver m) (version-target)
+    (when (< (length ver) 20)
+      (let ((path "sbcl-bin.html")
+            (out "build.html"))
+        (dex:fetch "http://sbcl.org/platform-table.html"
+                   #P"sbcl-bin.html" :if-exists :supersede)
+        (format t "~A ~%" (list path *release* *user* *repo* t))
+        (force-output)
+        (output-html path out ver)
+        (ignore-errors
+         (github out *release* *user* *repo* t))))))
