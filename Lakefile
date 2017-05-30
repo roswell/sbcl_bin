@@ -165,7 +165,7 @@
 
 (task "upload-buiild-list" ()
   (multiple-value-bind (ver) (version-target)
-    (when (and (not (zerop ver))
+    (when (and (not (zerop (length ver)))
                (< (length ver) 20))
       (let ((path "sbcl-bin.html")
             (out "build.html"))
