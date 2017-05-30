@@ -164,8 +164,9 @@
     (build-sbcl-bin ver m)))
 
 (task "upload-buiild-list" ()
-  (multiple-value-bind (ver m) (version-target)
-    (when (< (length ver) 20)
+  (multiple-value-bind (ver) (version-target)
+    (when (and (not (zerop ver))
+               (< (length ver) 20))
       (let ((path "sbcl-bin.html")
             (out "build.html"))
         (dex:fetch "http://sbcl.org/platform-table.html"
