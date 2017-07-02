@@ -56,7 +56,9 @@
     (format t "create ~A ~A ~A:" owner repo tagname)
     (format t "upload start:")
     (when (or force
-              (not (find (pathname path)  (getf release :|assets|) :key (lambda (x) (getf x :|name|)) :test 'equal)))
+              (not (find (file-namestring path) (getf release :|assets|)
+                         :key (lambda (x) (getf x :|name|))
+                         :test 'equal)))
       (asset-upload (pathname path) tagname :owner owner :repo repo :force (when force t))))
   (format t "upload done")
   (force-output t)
