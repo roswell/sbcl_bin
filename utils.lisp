@@ -14,7 +14,7 @@
         2))
 
 (defvar *release* "files")
-(defvar *user* (first *user/repo*))
+(defvar *user*  (first *user/repo*))
 (defvar *repo* (subseq (second *user/repo*) 0 (- (length (second *user/repo*)) 4)))
 
 (defun release-exist-p (tagname &key owner repo)
@@ -52,10 +52,12 @@
 (defun github (path tagname owner repo &optional force)
   (unless (uiop:getenv "GITHUB_OAUTH_TOKEN")
     (error "GITHUB_OAUTH_TOKEN must be set"))
-  (ensure-release-exists tagname :owner owner :repo repo)
-  (format t "create ~A ~A ~A:" owner repo tagname)
-  (format t "upload start:")
-  (asset-upload (pathname path) tagname :owner owner :repo repo :force (when force t))
+  (let ((release (ensure-release-exists tagname :owner owner :repo repo)))
+    (format t "create ~A ~A ~A:" owner repo tagname)
+    (format t "upload start:")
+    (when (or force
+              (not (find (pathname path)  (getf release :|assets|) :key (lambda (x) (getf x :|name|)) :test 'equal)))
+      (asset-upload (pathname path) tagname :owner owner :repo repo :force (when force t))))
   (format t "upload done")
   (force-output t)
   t)
