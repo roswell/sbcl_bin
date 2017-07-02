@@ -11,6 +11,11 @@ env:
     - TARGET=x86-64
     - TARGET=x86
 
+matrix:
+  allow_failures:
+    - os: linux
+      env: TARGET=x86-64
+
 os:
   - linux
   - osx
