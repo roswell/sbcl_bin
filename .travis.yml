@@ -1,5 +1,5 @@
 language: c
-sudo: false
+sudo: required
 
 env:
   global:
@@ -26,6 +26,7 @@ cache:
     - $HOME/.roswell
 
 install:
+  - if [ $TARGET = x86 ] && [ $TRAVIS_OS_NAME = linux ]; then sudo ln -s /usr/include/x86_64-linux-gnu/zconf.h /usr/include; fi
   - curl -L https://raw.githubusercontent.com/roswell/roswell/$ROSWELL_BRANCH/scripts/install-for-ci.sh | sh
   - if ! which lake ; then ros install snmsts/sn.github Rudolph-Miller/cl-gists lake;lake-tools dump; fi
 
