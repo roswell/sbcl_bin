@@ -117,7 +117,7 @@
                         '("win32-posixwait"))))
       (sh (format nil "cat ../patch/~A|patch -p0 -N" file)))
     (ignore-errors
-     (sh (format nil "bash make.sh --with-sb-thread --with-sb-core-compression --arch=~A '--xc-host=ros -L sbcl-bin --no-rc run'"
+     (sh (format nil "bash make.sh --with-sb-core-compression --arch=~A '--xc-host=ros -L sbcl-bin --no-rc run'"
                 uname-m)))
     (sh "bash run-sbcl.sh --eval '(progn (print *features*)(quit))'")
     (uiop:chdir release-dir)
