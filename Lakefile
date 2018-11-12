@@ -53,12 +53,14 @@
                                 (plump:get-elements-by-tag-name html "tr"))
         for uri = (concatenate 'string base-uri (plump:get-attribute i "title"))
         for path = (file-namestring (quri:uri-path (quri:uri uri)))
-        do (if (find path (getf (find *release*
-                                      releases
-                                      :key (lambda (x) (getf x :|tag_name|))
-                                      :test 'equal) :|assets|)
-                     :key (lambda (x) (getf x :|name|))
-                     :test #'equal)
+        do (if (or (find-if (lambda (x) (equal path (format nil "sbcl-~A-~A" version x)))
+                            *ci-supported*)
+                   (find path (getf (find *release*
+                                          releases
+                                          :key (lambda (x) (getf x :|tag_name|))
+                                          :test 'equal) :|assets|)
+                         :key (lambda (x) (getf x :|name|))
+                         :test #'equal))
                (format t "skip ~A~%" uri)
                (fetch-upload path uri (second (split-sequence:split-sequence #\- (pathname-name path)))))))
 
