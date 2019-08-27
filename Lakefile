@@ -141,7 +141,7 @@
       (when release
         (loop repeat 10
               until (ignore-errors
-                     (github (format nil "~A.bz2" path) version *user* *repo*))
+                     (github (format nil "~A.bz2" path) version *user* *repo* t))
               do (sleep 3))))))
 
 (defun version-target ()
