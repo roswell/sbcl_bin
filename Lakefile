@@ -99,14 +99,22 @@
     (ignore-errors
      (github out *release* *user* *repo* t))))
 
+(defun git-clone (uris version release)
+  (format nil "~{~A~^ || ~}"
+          (mapcar (lambda (uri)
+                    (format nil "git clone ~:[--depth 5 ~;~:]~A --branch=~:[master~;sbcl-~:*~A~]"
+                            (and version (not release))
+                            uri
+                            (and release version)))
+                  uris)))
+
 (defun build-sbcl-bin (version &optional (uname-m (roswell.util:uname-m)))
   (let ((release-dir (namestring (uiop:getcwd)))
         (uname (roswell.util:uname))
         (release (and version (< (length version) 20)))) ;; sha length is 40,version length is about 10.20 is enough.
     (sh "rm -rf sbcl")
-    (sh (format nil "git clone ~:[--depth 5 ~;~:]https://github.com/sbcl/sbcl --branch=~:[master~;sbcl-~:*~A~]"
-                (and version (not release))
-                (and release version)))
+    (sh (git-clone '("https://github.com/sbcl/sbcl"
+                     "https://git.code.sf.net/p/sbcl/sbcl") version release))
     (uiop:chdir "sbcl")
     (when (and version (not release))
       (sh (format nil "git checkout ~A" version)))
@@ -119,8 +127,8 @@
                         '("win32-posixwait"))))
       (sh (format nil "cat ../patch/~A|patch -p0 -N" file)))
     (ignore-errors
-     (sh (format nil "bash make.sh --with-sb-core-compression --arch=~A '--xc-host=ros -L sbcl-bin --no-rc run'"
-                uname-m)))
+      (sh (format nil "bash make.sh --with-sb-core-compression --arch=~A '--xc-host=ros -L sbcl-bin --no-rc run'"
+                  uname-m)))
     (sh "bash run-sbcl.sh --eval '(progn (print *features*)(quit))'")
     (uiop:chdir release-dir)
     (sh (format nil "ln -s sbcl ~Asbcl-~A-~A-~A"
@@ -141,7 +149,7 @@
       (when release
         (loop repeat 10
               until (ignore-errors
-                     (github (format nil "~A.bz2" path) version *user* *repo* t))
+                      (github (format nil "~A.bz2" path) version *user* *repo* t))
               do (sleep 3))))))
 
 (defun version-target ()
