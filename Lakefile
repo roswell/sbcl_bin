@@ -113,8 +113,8 @@
         (uname (roswell.util:uname))
         (release (and version (< (length version) 20)))) ;; sha length is 40,version length is about 10.20 is enough.
     (sh "rm -rf sbcl")
-    (sh (git-clone '("https://github.com/sbcl/sbcl"
-                     "https://git.code.sf.net/p/sbcl/sbcl") version release))
+    (sh (git-clone '("https://git.code.sf.net/p/sbcl/sbcl"
+                     "https://github.com/sbcl/sbcl") version release))
     (uiop:chdir "sbcl")
     (when (and version (not release))
       (sh (format nil "git checkout ~A" version)))
