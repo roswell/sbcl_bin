@@ -7,19 +7,24 @@ env:
    - ROSWELL_BRANCH=master
    - ROSWELL_INSTALL_DIR=$HOME/.roswell
    - LISP=sbcl-bin/1.4.15
-  matrix:
-    - TARGET=x86-64
-    - TARGET=x86
 
 matrix:
   include:
     - os: linux
+      env: TARGET=x86-64
     - os: osx
+      env: TARGET=x86-64
+    - os: linux
+      env: TARGET=x86
+    - os: osx
+      env: TARGET=x86
   allow_failures:
     - os: osx
       osx_image: xcode6.4
+      env: TARGET=x86-64
     - os: osx
       osx_image: xcode11
+      env: TARGET=x86-64
 
 addons:
   apt:
