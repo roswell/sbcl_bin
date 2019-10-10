@@ -19,8 +19,10 @@ matrix:
   allow_failures:
     - os: osx
       osx_image: xcode6.4
+      env: TARGET=x86-64
     - os: osx
       osx_image: xcode11
+      env: TARGET=x86-64
 
 addons:
   apt:
