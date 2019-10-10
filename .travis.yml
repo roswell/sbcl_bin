@@ -11,9 +11,15 @@ env:
     - TARGET=x86-64
     - TARGET=x86
 
-os:
-  - linux
-  - osx
+matrix:
+  include:
+    - os: linux
+    - os: osx
+  allow_failures:
+    - os: osx
+      osx_image: xcode6.4
+    - os: osx
+      osx_image: xcode11
 
 addons:
   apt:
