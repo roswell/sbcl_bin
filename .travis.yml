@@ -17,6 +17,10 @@ matrix:
       - os: linux
         arch: arm64
         env: TARGET=arm64
+        addons:
+          apt:
+            packages:
+              - libcurl4-openssl-dev
       - os: osx
         env: TARGET=x86-64
       - os: linux
