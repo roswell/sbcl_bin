@@ -2,7 +2,11 @@ language: c
 sudo: required
 
 env:
-  - PATH=~/.roswell/bin:$PATH ROSWELL_BRANCH=master ROSWELL_INSTALL_DIR=$HOME/.roswell LISP=sbcl-bin/1.4.15
+  global:
+    - PATH=~/.roswell/bin:$PATH
+    - ROSWELL_BRANCH=master
+    - ROSWELL_INSTALL_DIR=$HOME/.roswell
+    - LISP=sbcl-bin/1.4.15
 
 os:
     - linux
@@ -26,6 +30,9 @@ matrix:
       - os: linux
         stage: deploy
         script: lake upload-buiild-list
+    exclude:
+      - os: linux
+      - os: osx
 
 cache:
   directories:
