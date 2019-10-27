@@ -9,20 +9,23 @@ os:
     - osx
 
 matrix:
-  include:
-    - os: osx
-      env: TARGET=x86-64
-    - os: linux
-      env: TARGET=x86-64
-    - os: osx
-      env: TARGET=x86
-    - os: linux
-      env: TARGET=x86
-      addons:
-        apt:
-          packages:
-            - lib32z1-dev
-            - gcc-multilib
+    include:
+      - os: osx
+        env: TARGET=x86-64
+      - os: linux
+        env: TARGET=x86-64
+      - os: osx
+        env: TARGET=x86
+      - os: linux
+        env: TARGET=x86
+        addons:
+          apt:
+            packages:
+              - lib32z1-dev
+              - gcc-multilib
+      - os: linux
+        stage: deploy
+        script: lake upload-buiild-list
 
 cache:
   directories:
@@ -34,9 +37,3 @@ install:
 
 script:
   - lake
-
-jobs:
-  include:
-    - stage: deploy
-      script: lake upload-buiild-list
-      os: linux
