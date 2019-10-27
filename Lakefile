@@ -16,7 +16,8 @@
   '("x86-64-linux-binary.tar.bz2"
     "x86-linux-binary.tar.bz2"
     "x86-64-darwin-binary.tar.bz2"
-    "x86-darwin-binary.tar.bz2"))
+    "x86-darwin-binary.tar.bz2"
+    "arm64-linux-binary.tar.bz2"))
 
 (defun output-html (in out &optional version)
   (let ((p (plump:parse (pathname in)))
