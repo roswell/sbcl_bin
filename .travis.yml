@@ -22,7 +22,7 @@ matrix:
             packages:
               - libcurl4-openssl-dev
       - os: linux-ppc64le
-        env: TARGET=ppc64le
+        env: TARGET=ppc64le LISP=sbcl-bin/1.5.8
       - os: osx
         env: TARGET=x86-64
       - os: linux
