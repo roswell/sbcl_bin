@@ -2,11 +2,11 @@ language: c
 sudo: required
 
 env:
-  global:
-   - PATH=~/.roswell/bin:$PATH
-   - ROSWELL_BRANCH=master
-   - ROSWELL_INSTALL_DIR=$HOME/.roswell
-   - LISP=sbcl-bin/1.4.15
+  - PATH=~/.roswell/bin:$PATH ROSWELL_BRANCH=master ROSWELL_INSTALL_DIR=$HOME/.roswell LISP=sbcl-bin/1.4.15
+
+os:
+    - linux
+    - osx
 
 matrix:
   include:
@@ -18,12 +18,11 @@ matrix:
       env: TARGET=x86
     - os: linux
       env: TARGET=x86
-
-addons:
-  apt:
-    packages:
-      - lib32z1-dev
-      - gcc-multilib
+      addons:
+        apt:
+          packages:
+            - lib32z1-dev
+            - gcc-multilib
 
 cache:
   directories:
