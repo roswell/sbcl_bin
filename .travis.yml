@@ -13,6 +13,9 @@ os:
     - osx
 
 matrix:
+    allow_failures:
+      - os: windows
+        env: TARGET=x86-64
     include:
       - os: linux
         arch: arm64
@@ -36,6 +39,8 @@ matrix:
             packages:
               - lib32z1-dev
               - gcc-multilib
+      - os: windows
+        env: TARGET=x86-64
       - os: linux
         env: TARGET=x86-64
         stage: deploy
