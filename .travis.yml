@@ -30,6 +30,7 @@ matrix:
         env: TARGET=x86-64
       - os: linux
         env: TARGET=x86-64
+        script: lake mirror; lake
       - os: osx
         env: TARGET=x86
       - os: linux

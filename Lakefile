@@ -166,13 +166,14 @@
   (multiple-value-bind (ver m) (version-target)
     (format t "~A ~A~%" ver m)
     (force-output)
-    #+linux
-    (when (equal "x86-64" m)
-      (if ver
-          (and (< (length ver) 20)
-               (mirror-version ver))
-          (mirror-newest)))
     (build-sbcl-bin ver m)))
+
+(task "mirror" ()
+  (multiple-value-bind (ver m) (version-target)
+    (if ver
+        (and (< (length ver) 20)
+             (mirror-version ver))
+        (mirror-newest))))
 
 (task "upload-buiild-list" ()
   (multiple-value-bind (ver) (version-target)
