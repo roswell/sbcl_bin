@@ -109,9 +109,10 @@
                             (and release version)))
                   uris)))
 
-(defun build-sbcl-bin (version &optional (uname-m (roswell.util:uname-m)))
+(defun build-sbcl-bin (version &optional uname-m)
   (let ((release-dir (namestring (uiop:getcwd)))
         (uname (roswell.util:uname))
+        (uname-m (or uname-m (roswell.util:uname-m)))
         (release (and version (< (length version) 20)))) ;; sha length is 40,version length is about 10.20 is enough.
     (sh "rm -rf sbcl")
     (sh (git-clone '("https://git.code.sf.net/p/sbcl/sbcl"
@@ -169,7 +170,7 @@
     (build-sbcl-bin ver m)))
 
 (task "mirror" ()
-  (multiple-value-bind (ver m) (version-target)
+  (let ((ver (version-target)))
     (if ver
         (and (< (length ver) 20)
              (mirror-version ver))
