@@ -38,13 +38,6 @@
                        '("bz2" "msi") :test 'equal))
              (plump:get-elements-by-tag-name p "a"))))))
 
-(defun get-tags-from-sourceforge ()
-  (let ((html (plump:parse (dex:get "https://sourceforge.net/projects/sbcl/files/sbcl/"))))
-    (loop for i in (remove-if-not (lambda (x) (equal (string-trim " " (plump:get-attribute x "class")) "folder"))
-                                  (plump:get-elements-by-tag-name html "tr"))
-          collect `(,(plump:get-attribute i "title")
-                    ,(plump:get-attribute (first (plump:get-elements-by-tag-name i "abbr")) "title")))))
-
 (defun mirror-version (version)
   (loop with releases = (releases-list *user* *repo*)
         with base-uri = (format nil "https://sourceforge.net/projects/sbcl/files/sbcl/~A/" version)
@@ -109,10 +102,9 @@
                             (and release version)))
                   uris)))
 
-(defun build-sbcl-bin (version &optional uname-m)
+(defun build-sbcl-bin (version uname-m)
   (let ((release-dir (namestring (uiop:getcwd)))
         (uname (roswell.util:uname))
-        (uname-m (or uname-m (roswell.util:uname-m)))
         (release (and version (< (length version) 20)))) ;; sha length is 40,version length is about 10.20 is enough.
     (sh "rm -rf sbcl")
     (sh (git-clone '("https://git.code.sf.net/p/sbcl/sbcl"
@@ -147,12 +139,7 @@
                         uname-m
                         uname)))
       (sh (format nil "rm -f ~A.bz2" path))
-      (sh (format nil "bzip2 ~A" path))
-      (when release
-        (loop repeat 10
-              until (ignore-errors
-                      (github (format nil "~A.bz2" path) version *user* *repo* t))
-              do (sleep 3))))))
+      (sh (format nil "bzip2 ~A" path)))))
 
 (defun version-target ()
   (values (or (unless (zerop (length (ros:getenv "TRAVIS_TAG")))
@@ -161,13 +148,31 @@
                 (ros:getenv "APPVEYOR_REPO_TAG_NAME"))
               (unless (zerop (length (ros:getenv "VERSION")))
                 (ros:getenv "VERSION")))
-          (ros:getenv "TARGET")))
+          (or (ros:getenv "TARGET")
+              (roswell.util:uname-m))))
+
+(defun upload-archive ()
+  (multiple-value-bind (version uname-m) (version-target)
+    (let* ((uname (roswell.util:uname))
+           (release (and version (< (length version) 20)))
+           (path (format nil "sbcl-~A-~A-~A-binary.tar"
+                         version
+                         uname-m
+                         uname)))
+      (when release
+        (loop repeat 10
+              until (ignore-errors
+                      (github (format nil "~A.bz2" path) version *user* *repo* t))
+              do (sleep 3))))))
 
 (task "default" ()
   (multiple-value-bind (ver m) (version-target)
     (format t "~A ~A~%" ver m)
     (force-output)
     (build-sbcl-bin ver m)))
+
+(task "upload" ()
+  (upload-archive))
 
 (task "mirror" ()
   (let ((ver (version-target)))
@@ -176,7 +181,7 @@
              (mirror-version ver))
         (mirror-newest))))
 
-(task "upload-buiild-list" ()
+(task "upload-build-list" ()
   (multiple-value-bind (ver) (version-target)
     (when (and (not (zerop (length ver)))
                (< (length ver) 20))

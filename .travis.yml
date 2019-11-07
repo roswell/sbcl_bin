@@ -45,7 +45,7 @@ matrix:
       - os: linux
         env: TARGET=x86-64
         stage: deploy
-        script: lake upload-buiild-list
+        script: lake upload-build-list
     exclude:
       - os: linux
       - os: osx
@@ -59,4 +59,4 @@ install:
   - if ! which lake ; then ros install snmsts/sn.github Rudolph-Miller/cl-gists lake;lake-tools dump; fi
 
 script:
-  - lake
+  - lake; lake upload
