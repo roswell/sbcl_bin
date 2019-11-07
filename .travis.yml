@@ -17,6 +17,15 @@ matrix:
       - os: windows
         env: TARGET=x86-64
     include:
+      - os: windows
+        env:
+          - TARGET=x86-64
+          - PATH=/c/tools/msys64/usr/bin:$PATH
+        install:
+          - choco install --no-progress msys2 --params "/NoUpdate"
+          - C:\tools\msys64\usr\bin\bash -c 'pacman -S --noconfirm --needed make'
+          - curl -L https://raw.githubusercontent.com/roswell/roswell/$ROSWELL_BRANCH/scripts/install-for-ci.sh | sh
+          - if ! which lake ; then ros install snmsts/sn.github lake;lake-tools dump; fi
       - os: linux
         arch: arm64
         env: TARGET=arm64
@@ -40,8 +49,6 @@ matrix:
             packages:
               - lib32z1-dev
               - gcc-multilib
-      - os: windows
-        env: TARGET=x86-64
       - os: linux
         env: TARGET=x86-64
         stage: deploy
@@ -56,7 +63,7 @@ cache:
 
 install:
   - curl -L https://raw.githubusercontent.com/roswell/roswell/$ROSWELL_BRANCH/scripts/install-for-ci.sh | sh
-  - if ! which lake ; then ros install snmsts/sn.github Rudolph-Miller/cl-gists lake;lake-tools dump; fi
+  - if ! which lake ; then ros install snmsts/sn.github lake;lake-tools dump; fi
 
 script:
   - lake; lake upload
