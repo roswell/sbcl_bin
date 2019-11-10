@@ -90,5 +90,5 @@ jobs:
     displayName: 'install gcc'
 
   - script: |
-      C:\tools\msys64\usr\bin\bash -c 'pwd'
-    displayName: 'test pwd'
+      C:\tools\msys64\usr\bin\bash -c "PATH=~/.roswell/bin:$PATH ROSWELL_INSTALL_DIR=$HOME/.roswell curl -L https://raw.githubusercontent.com/roswell/roswell/$ROSWELL_BRANCH/scripts/install-for-ci.sh | sh"
+    displayName: 'install roswell'
