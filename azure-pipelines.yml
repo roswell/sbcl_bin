@@ -26,3 +26,8 @@ jobs:
      ros install snmsts/sn.github lake
      lake-tools dump
     displayName: 'setup lake'
+
+  - script: |
+     export PATH=~/.roswell/bin:$PATH
+     lake
+    displayName: 'lake'
