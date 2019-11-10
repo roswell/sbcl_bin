@@ -1,6 +1,5 @@
 variables:
   ROSWELL_BRANCH: master
-  ROSWELL_INSTALL_DIR: $HOME/.roswell
   LISP: sbcl-bin/1.4.2
 
 trigger:
@@ -18,6 +17,7 @@ jobs:
     displayName: 'install required'
   - script: |
      export PATH=~/.roswell/bin:$PATH
+     export ROSWELL_INSTALL_DIR=$HOME/.roswell
      curl -L https://raw.githubusercontent.com/roswell/roswell/$ROSWELL_BRANCH/scripts/install-for-ci.sh | sh
     displayName: 'install roswell'
 
