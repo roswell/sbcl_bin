@@ -76,6 +76,7 @@ jobs:
   variables:
     mingw_path: C:\tools\msys64\usr\bin
     CC: x86_64-w64-mingw32-gcc
+    ROSWELL_BRANCH: release
 
   pool:
     vmImage: 'vs2017-win2016'
