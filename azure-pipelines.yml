@@ -21,6 +21,7 @@ jobs:
 
   steps:
   - script: |
+     sudo apt-get -qq -y update
      sudo apt-get -qq -y install libcurl4-openssl-dev lib32z1-dev gcc-multilib
     displayName: 'install required'
   - script: |
