@@ -16,11 +16,8 @@ jobs:
   - script: |
      sudo apt-get -qq -y install libcurl4-openssl-dev
     displayName: 'install required'
-  - bash: |
-     export PATH=$(echo $HOME/.roswell/bin:$PATH)
-     echo "##vso[task.setvariable variable=PATH]$PATH"
-    displayName: set roswell in PATH
   - script: |
+     export PATH=~/.roswell/bin:$PATH
      curl -L https://raw.githubusercontent.com/roswell/roswell/$ROSWELL_BRANCH/scripts/install-for-ci.sh | sh
     displayName: 'install roswell'
 
