@@ -71,3 +71,24 @@ jobs:
      export PATH=~/.roswell/bin:$PATH
      lake
     displayName: 'lake'
+
+- job: Windows
+  variables:
+    mingw_path: C:\tools\msys64\usr\bin
+    CC: x86_64-w64-mingw32-gcc
+
+  pool:
+    vmImage: 'vs2017-win2016'
+
+  steps:
+  - script: |
+      choco install --no-progress msys2 --params "/NoUpdate"
+    displayName: 'install host msys2'
+
+  - script: |
+      C:\tools\msys64\usr\bin\bash -c '/usr/bin/pacman -S --noconfirm --needed mingw-w64-x86_64-gcc make diffutils'
+    displayName: 'install gcc'
+
+  - script: |
+      C:\tools\msys64\usr\bin\bash -c 'pwd'
+    displayName: 'test pwd'
