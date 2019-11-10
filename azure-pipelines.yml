@@ -22,6 +22,7 @@ jobs:
     displayName: 'install roswell'
 
   - script: |
+     export PATH=~/.roswell/bin:$PATH
      ros install snmsts/sn.github lake
      lake-tools dump
-    displayName: 'setup lave'
+    displayName: 'setup lake'
