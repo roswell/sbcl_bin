@@ -47,6 +47,9 @@ jobs:
     vmImage: 'macOS-10.13'
   steps:
   - script: |
+     brew install automake autoconf
+    displayName: 'install host required'
+  - script: |
      export PATH=~/.roswell/bin:$PATH
      export ROSWELL_INSTALL_DIR=$HOME/.roswell
      curl -L https://raw.githubusercontent.com/roswell/roswell/$ROSWELL_BRANCH/scripts/install-for-ci.sh | sh
