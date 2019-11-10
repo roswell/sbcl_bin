@@ -14,6 +14,9 @@ jobs:
 
   steps:
   - script: |
+     sudo apt-get -qq -y install libcurl4-openssl-dev
+    displayName: 'install required'
+  - script: |
      curl -L https://raw.githubusercontent.com/roswell/roswell/$ROSWELL_BRANCH/scripts/install-for-ci.sh | sh
     displayName: 'install roswell'
 
