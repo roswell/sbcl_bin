@@ -40,3 +40,25 @@ jobs:
      export PATH=~/.roswell/bin:$PATH
      lake
     displayName: 'lake'
+
+- job: macOS
+
+  pool:
+    vmImage: 'macOS-10.13'
+  steps:
+  - script: |
+     export PATH=~/.roswell/bin:$PATH
+     export ROSWELL_INSTALL_DIR=$HOME/.roswell
+     curl -L https://raw.githubusercontent.com/roswell/roswell/$ROSWELL_BRANCH/scripts/install-for-ci.sh | sh
+    displayName: 'install roswell'
+
+  - script: |
+     export PATH=~/.roswell/bin:$PATH
+     ros install snmsts/sn.github lake
+     lake-tools dump
+    displayName: 'setup lake'
+
+  - script: |
+     export PATH=~/.roswell/bin:$PATH
+     lake
+    displayName: 'lake'
