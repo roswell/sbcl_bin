@@ -8,12 +8,20 @@ trigger:
 jobs:
 
 - job: Linux
+  strategy:
+    matrix:
+      amd64:
+        TARGET: "x86-64"
+      x86:
+        TARGET: "x86"
+  variables:
+    mingw_path: C:\tools\msys64\usr\bin:/c/Program Files/Steel Bank Common Lisp/1.4.14
   pool:
     vmImage: 'Ubuntu-16.04'
 
   steps:
   - script: |
-     sudo apt-get -qq -y install libcurl4-openssl-dev
+     sudo apt-get -qq -y install libcurl4-openssl-dev lib32z1-dev gcc-multilib
     displayName: 'install required'
   - script: |
      export PATH=~/.roswell/bin:$PATH
