@@ -86,7 +86,7 @@ jobs:
     displayName: 'install host msys2'
 
   - script: |
-      C:\tools\msys64\usr\bin\bash -c '/usr/bin/pacman -S --noconfirm --needed mingw-w64-x86_64-gcc make diffutils'
+      C:\tools\msys64\usr\bin\bash -c '/usr/bin/pacman -S --noconfirm --needed mingw-w64-x86_64-gcc make diffutils automake autoconf'
     displayName: 'install gcc'
 
   - script: |
