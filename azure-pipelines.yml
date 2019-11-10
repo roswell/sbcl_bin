@@ -9,8 +9,6 @@ trigger:
 jobs:
 
 - job: Linux
-  variables:
-    PATH: ~/.roswell/bin:$PATH
   pool:
     vmImage: 'Ubuntu-16.04'
 
