@@ -143,7 +143,7 @@
       (sh (format nil "bzip2 ~A" path)))))
 
 (defun env (name)
-  (let ((val (ros:getenv env)))
+  (let ((val (ros:getenv name)))
     (unless (zerop (length val))
       val)))
 
@@ -166,10 +166,14 @@
                          uname-m
                          uname)))
       (when release
-        (loop repeat 10
-              until (ignore-errors
-                      (github (format nil "~A.bz2" path) version *user* *repo* t))
-              do (sleep 3))))))
+        (ql:quickload :sb-md5)
+        (let ((bz2 (format nil "~A.bz2" path)))
+          (format t "~(~{~2,'0X~}~)"
+                  (map 'list #'identity (funcall (read-from-string "sb-md5:md5sum-file") bz2)))
+          (loop repeat 10
+                until (ignore-errors
+                        (github bz2 version *user* *repo* t))
+                do (sleep 3)))))))
 
 (task "default" ()
   (multiple-value-bind (ver m) (version-target)

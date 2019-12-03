@@ -67,4 +67,5 @@ install:
   - if ! which lake ; then ros install snmsts/sn.github lake;lake-tools dump; fi
 
 script:
-  - lake; lake upload
+  - lake
+  - lake upload
