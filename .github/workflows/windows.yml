@@ -9,9 +9,14 @@ jobs:
 
     steps:
     - uses: actions/checkout@v1
+    - name: Checkout sbcl
+      uses: actions/checkout@v2
+      with:
+        repository: sbcl/sbcl
+        path: sbcl
     - name: install host sbcl
       run: |
-        cinst sbcl -source tools-for-build
+        cinst sbcl -source sbcl\tools-for-build
         echo "::add-path::/c/Program Files/Steel Bank Common Lisp/1.4.14"
 
     - name: build
