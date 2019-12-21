@@ -14,7 +14,6 @@ jobs:
       with:
         repository: sbcl/sbcl
         path: sbcl
-    git fetch --prune --unshallow
     - name: install host sbcl
       run: |
         cinst sbcl -source sbcl\tools-for-build
