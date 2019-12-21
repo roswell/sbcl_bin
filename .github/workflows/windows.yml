@@ -23,4 +23,13 @@ jobs:
       env:
         SBCL_HOME: "/c/Program Files/Steel Bank Common Lisp/1.4.14"
       run: |
-        bash -c "sbcl --version"
+        bash -c "cd sbcl;./make.sh --xc-host='sbcl --lose-on-corruption --disable-ldb --disable-debugger'"
+    - name: make installer
+      run: |
+        bash -c "cd sbcl;./make-windows-installer.sh"
+        bash -c "mkdir sbcl-windows-installer; mv sbcl/output/*msi sbcl-windows-installer"
+    - name: save installer
+      uses: actions/upload-artifact@v1
+      with:
+        name: sbcl-windows-installer
+        path: sbcl-windows-installer
