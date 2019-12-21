@@ -8,5 +8,5 @@
 (in-package :roswell.github.utils)
 
 (defsystem roswell.github.utils
-  :depends-on (:dexador :lake :plump :cl-ppcre :split-sequence :sn.github)
+  :depends-on (:dexador :plump :cl-ppcre :split-sequence :sn.github)
   :components ((:file "utils")))

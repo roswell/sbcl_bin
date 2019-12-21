@@ -1,15 +1,15 @@
 #|-*- mode:lisp -*-|#
 (load "roswell.github.utils.asd")
-(ql:quickload :roswell.github.utils :silent nil)
+(ql:quickload '(:roswell.github.utils #-lparallel :cl-syntax) :silent t)
 (ros:include "util")
 
 (in-package :cl-user)
 (defpackage :lake.user
-  (:use :cl :lake :cl-syntax :roswell.github.utils)
+  (:use :cl #+lparallel :lake :cl-syntax :roswell.github.utils)
+  #+lparallel
   (:shadowing-import-from :lake
                           :directory))
 (in-package :lake.user)
-
 (use-syntax :interpol)
 
 (defvar *ci-supported*
@@ -18,6 +18,32 @@
     "x86-64-darwin-binary.tar.bz2"
     "x86-darwin-binary.tar.bz2"
     "arm64-linux-binary.tar.bz2"))
+
+#-lparallel ;; missing functions from lake
+(progn
+  (defmacro task (name ign &body body)
+    (declare (ignore ign))
+    `(defun ,(read-from-string name) ()
+       ,@body))
+  (defgeneric sh (command &key echo)
+    (:documentation
+     "Takes a string or list of strings and runs it from a shell."))
+
+  (defmethod sh ((command string) &key echo)
+    (when echo
+      (format *error-output* "~A" command))
+    (multiple-value-bind (output error-output return-status)
+        (uiop:run-program command :input :interactive
+                          :output :interactive
+                          :error-output :interactive
+                          :ignore-error-status t)
+      (declare (ignore output error-output))
+      (unless (zerop return-status)
+        (error "Command ~S exited with error code ~A." command return-status))))
+
+  (defmethod sh ((command list) &key echo)
+    (let ((command1 (format nil "~{~A~^ ~}" command)))
+      (sh command1 :echo echo))))
 
 (defun output-html (in out &optional version)
   (let ((p (plump:parse (pathname in)))
@@ -175,6 +201,7 @@
                         (github bz2 version *user* *repo* t))
                 do (sleep 3)))))))
 
+
 (task "default" ()
   (multiple-value-bind (ver m) (version-target)
     (format t "~A ~A~%" ver m)
@@ -204,3 +231,12 @@
         (output-html path out ver)
         (ignore-errors
          (github out *release* *user* *repo* t))))))
+
+#-lparallel
+(unwind-protect
+     (let (method)
+       (and (setf method (ros:getenv "METHOD"))
+            (setf method (read-from-string method))
+            (fboundp method)
+            (funcall method)))
+  (uiop:quit))

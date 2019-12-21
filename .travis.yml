@@ -15,7 +15,9 @@ os:
 matrix:
     allow_failures:
       - os: windows
-        env: TARGET=x86-64
+        env:
+          - TARGET=x86-64
+          - GNUMAKE=/c/tools/msys64/usr/bin/make
     include:
       - os: windows
         env:
@@ -26,7 +28,9 @@ matrix:
           - export shell="cmd.exe //C RefreshEnv.cmd & C:/tools/msys64/msys2_shell.cmd -defterm -mingw64 -no-start -full-path -here -c \$\* --"
           - $shell pacman -S --noconfirm --needed make
           - curl -L https://raw.githubusercontent.com/roswell/roswell/$ROSWELL_BRANCH/scripts/install-for-ci.sh | sh
-          - if ! which lake ; then ros install snmsts/sn.github lake;lake-tools dump; fi
+        script:
+          - METHOD=default ros run -l Lakefile
+          - METHOD=upload ros run -l Lakefile
       - os: linux
         arch: arm64
         env: TARGET=arm64
