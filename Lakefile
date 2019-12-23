@@ -128,7 +128,7 @@
                             (and release version)))
                   uris)))
 
-(defun build-sbcl-bin (version uname-m)
+(defun build-sbcl-bin (version uname-m suffix)
   (let ((release-dir (namestring (uiop:getcwd)))
         (uname (roswell.util:uname))
         (release (and version (< (length version) 20)))) ;; sha length is 40,version length is about 10.20 is enough.
@@ -152,19 +152,22 @@
                   uname-m)))
     (sh "bash run-sbcl.sh --eval '(progn (print *features*)(quit))'")
     (uiop:chdir release-dir)
-    (sh (format nil "ln -s sbcl ~Asbcl-~A-~A-~A"
+    (sh (format nil "ln -s sbcl ~Asbcl-~A-~A-~A~A"
                 release-dir
                 version
                 uname-m
-                uname))
-    (sh (format nil "sbcl/binary-distribution.sh sbcl-~A-~A-~A"
+                uname
+                suffix))
+    (sh (format nil "sbcl/binary-distribution.sh sbcl-~A-~A-~A~A"
                 version
                 uname-m
-                uname))
-    (let ((path (format nil "sbcl-~A-~A-~A-binary.tar"
+                uname
+                suffix))
+    (let ((path (format nil "sbcl-~A-~A-~A~A-binary.tar"
                         version
                         uname-m
-                        uname)))
+                        uname
+                        suffix)))
       (sh (format nil "rm -f ~A.bz2" path))
       (sh (format nil "bzip2 ~A" path)))))
 
@@ -181,16 +184,19 @@
                 (unless (equal "master" branch)
                   branch)))
           (or (env "TARGET")
-              (roswell.util:uname-m))))
+              (roswell.util:uname-m))
+          (or (env "SUFFIX")
+              "")))
 
 (defun upload-archive ()
-  (multiple-value-bind (version uname-m) (version-target)
+  (multiple-value-bind (version uname-m suffix) (version-target)
     (let* ((uname (roswell.util:uname))
            (release (and version (< (length version) 20)))
-           (path (format nil "sbcl-~A-~A-~A-binary.tar"
+           (path (format nil "sbcl-~A-~A-~A~A-binary.tar"
                          version
                          uname-m
-                         uname)))
+                         uname
+                         suffix)))
       (when release
         (ql:quickload :sb-md5)
         (let ((bz2 (format nil "~A.bz2" path)))
@@ -203,10 +209,10 @@
 
 
 (task "default" ()
-  (multiple-value-bind (ver m) (version-target)
+  (multiple-value-bind (ver m suffix) (version-target)
     (format t "~A ~A~%" ver m)
     (force-output)
-    (build-sbcl-bin ver m)))
+    (build-sbcl-bin ver m suffix)))
 
 (task "upload" ()
   (upload-archive))
