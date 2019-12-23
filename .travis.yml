@@ -55,11 +55,24 @@ matrix:
               - gcc-multilib
       - os: linux
         service: docker
-        env: TARGET=x86-64
+        env:
+          - TARGET=x86-64
+          - SUFFIX=-glibc2.10
         install:
           - docker image build -t cent6 ./tools-for-build/cent6
         script:
-          - docker run -v `pwd`:/tmp -e TRAVIS_BRANCH=$TRAVIS_BRANCH -e TRAVIS_TAG=$TRAVIS_TAG -e VERSION=$VERSION -e SUFFIX=-oldglibc -e -it cent6 bash -c "cd /tmp;env METHOD=default ros -l Lakefile"
+          - docker run -v `pwd`:/tmp -e TRAVIS_BRANCH=$TRAVIS_BRANCH -e TRAVIS_TAG=$TRAVIS_TAG -e VERSION=$VERSION -e SUFFIX=$SUFFIX -e -it cent6 bash -c "cd /tmp;env METHOD=default ros -l Lakefile"
+          - lake upload
+      - os: linux
+        service: docker
+        env:
+          - TARGET=x86
+          - SUFFIX=-glibc2.10
+        install:
+          - docker image build -t cent6 ./tools-for-build/cent6
+        script:
+          - docker run -v `pwd`:/tmp -e TRAVIS_BRANCH=$TRAVIS_BRANCH -e TRAVIS_TAG=$TRAVIS_TAG -e VERSION=$VERSION -e SUFFIX=$SUFFIX -e -it cent6 bash -c "cd /tmp;env METHOD=default ros -l Lakefile"
+          - lake upload
 
       - os: linux
         env: TARGET=x86-64
