@@ -10,7 +10,6 @@ env:
 
 os:
     - linux
-    - osx
 
 matrix:
     allow_failures:
@@ -39,14 +38,14 @@ matrix:
       #  env: TARGET=ppc64le LISP=sbcl-bin/1.5.8
       - os: osx
         env: TARGET=x86-64
+      - os: osx
+        env: TARGET=x86
       - os: linux
         env: TARGET=x86-64
         script:
           - lake mirror
           - lake
           - lake upload
-      - os: osx
-        env: TARGET=x86
       - os: linux
         env: TARGET=x86
         addons:
@@ -55,12 +54,19 @@ matrix:
               - lib32z1-dev
               - gcc-multilib
       - os: linux
+        service: docker
+        env: TARGET=x86-64
+        install:
+          - docker image build -t cent6 ./tools-for-build/cent6
+        script:
+          - docker run -v `pwd`:/tmp -e TRAVIS_BRANCH=$TRAVIS_BRANCH -e TRAVIS_TAG=$TRAVIS_TAG -e VERSION=$VERSION -e SUFFIX=-oldglibc -e -it cent6 bash -c "cd /tmp;env METHOD=default ros -l Lakefile"
+
+      - os: linux
         env: TARGET=x86-64
         stage: deploy
         script: lake upload-build-list
     exclude:
       - os: linux
-      - os: osx
 
 cache:
   directories:
