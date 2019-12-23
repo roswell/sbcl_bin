@@ -60,9 +60,11 @@ matrix:
           - SUFFIX=-glibc2.10
         install:
           - docker image build -t cent6 ./tools-for-build/cent6
+          - curl -L https://raw.githubusercontent.com/roswell/roswell/$ROSWELL_BRANCH/scripts/install-for-ci.sh | sh
+          - ros install snmsts/sn.github
         script:
-          - docker run -v `pwd`:/tmp -e TRAVIS_BRANCH=$TRAVIS_BRANCH -e TRAVIS_TAG=$TRAVIS_TAG -e VERSION=$VERSION -e SUFFIX=$SUFFIX -e -it cent6 bash -c "cd /tmp;env METHOD=default ros -l Lakefile"
-          - lake upload
+          - docker run -v `pwd`:/tmp -e TARGET=$TARGET -e TRAVIS_BRANCH=$TRAVIS_BRANCH -e TRAVIS_TAG=$TRAVIS_TAG -e VERSION=$VERSION -e SUFFIX=$SUFFIX -e -it cent6 bash -c "cd /tmp;env METHOD=default ros -l Lakefile"
+          - METHOD=upload ros run -l Lakefile
       - os: linux
         service: docker
         env:
@@ -70,9 +72,11 @@ matrix:
           - SUFFIX=-glibc2.10
         install:
           - docker image build -t cent6 ./tools-for-build/cent6
+          - curl -L https://raw.githubusercontent.com/roswell/roswell/$ROSWELL_BRANCH/scripts/install-for-ci.sh | sh
+          - ros install snmsts/sn.github
         script:
-          - docker run -v `pwd`:/tmp -e TRAVIS_BRANCH=$TRAVIS_BRANCH -e TRAVIS_TAG=$TRAVIS_TAG -e VERSION=$VERSION -e SUFFIX=$SUFFIX -e -it cent6 bash -c "cd /tmp;env METHOD=default ros -l Lakefile"
-          - lake upload
+          - docker run -v `pwd`:/tmp -e TARGET=$TARGET -e TRAVIS_BRANCH=$TRAVIS_BRANCH -e TRAVIS_TAG=$TRAVIS_TAG -e VERSION=$VERSION -e SUFFIX=$SUFFIX -e -it cent6 bash -c "cd /tmp;env METHOD=default ros -l Lakefile"
+          - METHOD=upload ros run -l Lakefile
 
       - os: linux
         env: TARGET=x86-64
