@@ -41,11 +41,9 @@ matrix:
       - os: osx
         env: TARGET=x86
       - os: linux
-        env: TARGET=x86-64
-        script:
-          - METHOD=mirror ros run -l Lakefile
-          - METHOD=default ros run -l Lakefile
-          - METHOD=upload ros run -l Lakefile
+        env:
+         - TARGET=x86-64
+         - MIRROR=t
       - os: linux
         env: TARGET=x86
         addons:
@@ -58,16 +56,12 @@ matrix:
         env:
           - TARGET=x86-64
           - SUFFIX=-glibc2.10
-        install:
-          - docker login docker.pkg.github.com -u snmsts -p $GITHUB_OAUTH_TOKEN
-          - docker pull docker.pkg.github.com/roswell/sbcl_bin/glibc2.10-sbcl1.5.7:1
-          - curl -L https://raw.githubusercontent.com/roswell/roswell/$ROSWELL_BRANCH/scripts/install-for-ci.sh | sh
-          - ros install snmsts/sn.github
+          - DOCKER=docker.pkg.github.com/roswell/sbcl_bin/glibc2.10-sbcl1.5.7:1
         script:
           - >
             docker run -v `pwd`:/tmp -e TARGET=$TARGET -e TRAVIS_BRANCH=$TRAVIS_BRANCH -e TRAVIS_TAG=$TRAVIS_TAG 
             -e VERSION=$VERSION -e SUFFIX=$SUFFIX 
-            -it docker.pkg.github.com/roswell/sbcl_bin/glibc2.10-sbcl1.5.7:1 bash 
+            -it $DOCKER bash 
             -c "cd /tmp;env METHOD=default ros -l Lakefile"
           - METHOD=upload ros run -l Lakefile
       - os: linux
@@ -75,16 +69,12 @@ matrix:
         env:
           - TARGET=x86
           - SUFFIX=-glibc2.10
-        install:
-          - docker login docker.pkg.github.com -u snmsts -p $GITHUB_OAUTH_TOKEN
-          - docker pull docker.pkg.github.com/roswell/sbcl_bin/glibc2.10-sbcl1.5.7:1
-          - curl -L https://raw.githubusercontent.com/roswell/roswell/$ROSWELL_BRANCH/scripts/install-for-ci.sh | sh
-          - ros install snmsts/sn.github
+          - DOCKER=docker.pkg.github.com/roswell/sbcl_bin/glibc2.10-sbcl1.5.7:1
         script:
           - >
             docker run -v `pwd`:/tmp -e TARGET=$TARGET -e TRAVIS_BRANCH=$TRAVIS_BRANCH -e TRAVIS_TAG=$TRAVIS_TAG 
             -e VERSION=$VERSION -e SUFFIX=$SUFFIX 
-            -it docker.pkg.github.com/roswell/sbcl_bin/glibc2.10-sbcl1.5.7:1 bash 
+            -it $DOCKER bash 
             -c "cd /tmp;env METHOD=default ros -l Lakefile"
           - METHOD=upload ros run -l Lakefile
 
@@ -100,9 +90,14 @@ cache:
     - $HOME/.roswell
 
 install:
+  - if [ -n "$DOCKER" ]; then
+       docker login docker.pkg.github.com -u snmsts -p $GITHUB_OAUTH_TOKEN;
+       docker pull $DOCKER;
+    fi
   - curl -L https://raw.githubusercontent.com/roswell/roswell/$ROSWELL_BRANCH/scripts/install-for-ci.sh | sh
   - ros install snmsts/sn.github
 
 script:
+  - if [ -n "$MIRROR" ]; then METHOD=mirror ros run -l Lakefile; fi
   - METHOD=default ros run -l Lakefile
   - METHOD=upload ros run -l Lakefile
