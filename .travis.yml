@@ -59,7 +59,7 @@ matrix:
           - TARGET=x86-64
           - SUFFIX=-glibc2.10
         install:
-          - echo $GITHUB_OAUTH_TOKEN | docker login docker.pkg.github.com --
+          - docker login docker.pkg.github.com -u snmsts -p $GITHUB_OAUTH_TOKEN
           - docker pull docker.pkg.github.com/roswell/sbcl_bin/glibc2.10-sbcl1.5.7:1
           - curl -L https://raw.githubusercontent.com/roswell/roswell/$ROSWELL_BRANCH/scripts/install-for-ci.sh | sh
           - ros install snmsts/sn.github
@@ -76,7 +76,7 @@ matrix:
           - TARGET=x86
           - SUFFIX=-glibc2.10
         install:
-          - echo $GITHUB_OAUTH_TOKEN | docker login docker.pkg.github.com --
+          - docker login docker.pkg.github.com -u snmsts -p $GITHUB_OAUTH_TOKEN
           - docker pull docker.pkg.github.com/roswell/sbcl_bin/glibc2.10-sbcl1.5.7:1
           - curl -L https://raw.githubusercontent.com/roswell/roswell/$ROSWELL_BRANCH/scripts/install-for-ci.sh | sh
           - ros install snmsts/sn.github
