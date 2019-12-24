@@ -43,9 +43,9 @@ matrix:
       - os: linux
         env: TARGET=x86-64
         script:
-          - lake mirror
-          - lake
-          - lake upload
+          - METHOD=mirror ros run -l Lakefile
+          - METHOD=default ros run -l Lakefile
+          - METHOD=upload ros run -l Lakefile
       - os: linux
         env: TARGET=x86
         addons:
@@ -91,7 +91,7 @@ matrix:
       - os: linux
         env: TARGET=x86-64
         stage: deploy
-        script: lake upload-build-list
+        script: METHOD=upload-build-list ros run -l Lakefile
     exclude:
       - os: linux
 
@@ -101,8 +101,8 @@ cache:
 
 install:
   - curl -L https://raw.githubusercontent.com/roswell/roswell/$ROSWELL_BRANCH/scripts/install-for-ci.sh | sh
-  - if ! which lake ; then ros install snmsts/sn.github lake;lake-tools dump; fi
+  - ros install snmsts/sn.github
 
 script:
-  - lake
-  - lake upload
+  - METHOD=default ros run -l Lakefile
+  - METHOD=upload ros run -l Lakefile
