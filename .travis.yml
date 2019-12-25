@@ -25,7 +25,6 @@ matrix:
           - ros install snmsts/sn.github
         script:
           - METHOD=default ros run -l Lakefile
-          - METHOD=upload ros run -l Lakefile
     include:
       - os: linux
         arch: arm64
@@ -57,26 +56,12 @@ matrix:
           - TARGET=x86-64
           - SUFFIX=-glibc2.10
           - DOCKER=docker.pkg.github.com/roswell/sbcl_bin/glibc2.10-sbcl1.5.7:1
-        script:
-          - >
-            docker run -v `pwd`:/tmp -e TARGET=$TARGET -e TRAVIS_BRANCH=$TRAVIS_BRANCH -e TRAVIS_TAG=$TRAVIS_TAG 
-            -e VERSION=$VERSION -e SUFFIX=$SUFFIX 
-            -it $DOCKER bash 
-            -c "cd /tmp;env METHOD=default ros -l Lakefile"
-          - METHOD=upload ros run -l Lakefile
       - os: linux
         service: docker
         env:
           - TARGET=x86
           - SUFFIX=-glibc2.10
           - DOCKER=docker.pkg.github.com/roswell/sbcl_bin/glibc2.10-sbcl1.5.7:1
-        script:
-          - >
-            docker run -v `pwd`:/tmp -e TARGET=$TARGET -e TRAVIS_BRANCH=$TRAVIS_BRANCH -e TRAVIS_TAG=$TRAVIS_TAG 
-            -e VERSION=$VERSION -e SUFFIX=$SUFFIX 
-            -it $DOCKER bash 
-            -c "cd /tmp;env METHOD=default ros -l Lakefile"
-          - METHOD=upload ros run -l Lakefile
 
       - os: linux
         env: TARGET=x86-64
@@ -99,5 +84,17 @@ install:
 
 script:
   - if [ -n "$MIRROR" ]; then METHOD=mirror ros run -l Lakefile; fi
-  - METHOD=default ros run -l Lakefile
+  - "if [ -n \"$DOCKER\" ]; then
+       docker run \
+       -v `pwd`:/tmp \
+       -e TARGET=$TARGET \
+       -e TRAVIS_BRANCH=$TRAVIS_BRANCH \
+       -e TRAVIS_TAG=$TRAVIS_TAG \
+       -e VERSION=$VERSION -e SUFFIX=$SUFFIX \
+       -it $DOCKER bash \
+       -c \"cd /tmp;env METHOD=default ros -l Lakefile\"
+    else
+      METHOD=default ros run -l Lakefile;
+    fi"
+after_success:
   - METHOD=upload ros run -l Lakefile
