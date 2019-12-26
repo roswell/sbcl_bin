@@ -192,7 +192,7 @@
   (multiple-value-bind (version target suffix) (version-target)
     (loop with uname =  (roswell.util:uname)
           with release  = (and version (< (length version) 20))
-          for m in in (uiop:split-string target :separator ",")
+          for m in (split-sequence:split-sequence #\, target)
           for path (format nil "sbcl-~A-~A-~A~A-binary.tar"
                            version
                            m
@@ -211,7 +211,7 @@
 
 (task "default" ()
   (multiple-value-bind (ver target suffix) (version-target)
-    (loop for m in in (uiop:split-string target :separator ",")
+    (loop for m in (split-sequence:split-sequence #\, target)
           do (format t "~S ~S ~S~%" ver m suffix)
              (force-output)
              (build-sbcl-bin ver m suffix))))
