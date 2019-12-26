@@ -189,30 +189,32 @@
               "")))
 
 (defun upload-archive ()
-  (multiple-value-bind (version uname-m suffix) (version-target)
-    (let* ((uname (roswell.util:uname))
-           (release (and version (< (length version) 20)))
-           (path (format nil "sbcl-~A-~A-~A~A-binary.tar"
-                         version
-                         uname-m
-                         uname
-                         suffix)))
-      (when release
-        (ql:quickload :sb-md5)
-        (let ((bz2 (format nil "~A.bz2" path)))
-          (format t "~(~{~2,'0X~}~)"
-                  (map 'list #'identity (funcall (read-from-string "sb-md5:md5sum-file") bz2)))
-          (loop repeat 10
-                until (ignore-errors
-                        (github bz2 version *user* *repo* t))
-                do (sleep 3)))))))
+  (multiple-value-bind (version target suffix) (version-target)
+    (loop with uname =  (roswell.util:uname)
+          with release  = (and version (< (length version) 20))
+          for m in in (uiop:split-string target :separator ",")
+          for path (format nil "sbcl-~A-~A-~A~A-binary.tar"
+                           version
+                           m
+                           uname
+                           suffix)
+          when release
+          do (ql:quickload :sb-md5)
+             (let ((bz2 (format nil "~A.bz2" path)))
+               (format t "~(~{~2,'0X~}~)"
+                       (map 'list #'identity (funcall (read-from-string "sb-md5:md5sum-file") bz2)))
+               (loop repeat 10
+                     until (ignore-errors
+                             (github bz2 version *user* *repo* t))
+                     do (sleep 3))))))
 
 
 (task "default" ()
-  (multiple-value-bind (ver m suffix) (version-target)
-    (format t "~A ~A~%" ver m)
-    (force-output)
-    (build-sbcl-bin ver m suffix)))
+  (multiple-value-bind (ver target suffix) (version-target)
+    (loop for m in in (uiop:split-string target :separator ",")
+          do (format t "~S ~S ~S~%" ver m suffix)
+             (force-output)
+             (build-sbcl-bin ver m suffix))))
 
 (task "upload" ()
   (upload-archive))

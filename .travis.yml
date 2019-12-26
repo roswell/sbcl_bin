@@ -36,15 +36,11 @@ matrix:
       #- os: linux-ppc64le
       #  env: TARGET=ppc64le LISP=sbcl-bin/1.5.8
       - os: osx
-        env: TARGET=x86-64
-      - os: osx
-        env: TARGET=x86
+        env: TARGET=x86-64,x86
       - os: linux
         env:
-         - TARGET=x86-64
+         - TARGET=x86-64,x86
          - MIRROR=t
-      - os: linux
-        env: TARGET=x86
         addons:
           apt:
             packages:
@@ -53,13 +49,7 @@ matrix:
       - os: linux
         service: docker
         env:
-          - TARGET=x86-64
-          - SUFFIX=-glibc2.10
-          - DOCKER=docker.pkg.github.com/roswell/sbcl_bin/glibc2.10-sbcl1.5.7:1
-      - os: linux
-        service: docker
-        env:
-          - TARGET=x86
+          - TARGET=x86-64,x86
           - SUFFIX=-glibc2.10
           - DOCKER=docker.pkg.github.com/roswell/sbcl_bin/glibc2.10-sbcl1.5.7:1
 
