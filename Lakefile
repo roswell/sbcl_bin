@@ -193,11 +193,11 @@
     (loop with uname =  (roswell.util:uname)
           with release  = (and version (< (length version) 20))
           for m in (split-sequence:split-sequence #\, target)
-          for path (format nil "sbcl-~A-~A-~A~A-binary.tar"
-                           version
-                           m
-                           uname
-                           suffix)
+          for path = (format nil "sbcl-~A-~A-~A~A-binary.tar"
+                             version
+                             m
+                             uname
+                             suffix)
           when release
           do (ql:quickload :sb-md5)
              (let ((bz2 (format nil "~A.bz2" path)))
