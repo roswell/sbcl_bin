@@ -246,5 +246,8 @@
        (and (setf method (ros:getenv "METHOD"))
             (setf method (read-from-string method))
             (fboundp method)
-            (funcall method)))
+            (progn
+              (format t "~A~%" method)
+              (force-output)
+              (funcall method))))
   (uiop:quit))
