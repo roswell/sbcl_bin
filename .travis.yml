@@ -82,7 +82,7 @@ script:
        -e TRAVIS_TAG=$TRAVIS_TAG \
        -e VERSION=$VERSION -e SUFFIX=$SUFFIX \
        -it $DOCKER bash \
-       -c \"cd /tmp;env METHOD=default ros -l Lakefile\"
+       -c \"cd /tmp;env METHOD=default ros -l Lakefile\";
     else
       METHOD=default ros run -l Lakefile;
     fi"
