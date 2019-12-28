@@ -27,17 +27,6 @@ matrix:
           - METHOD=default ros run -l Lakefile
     include:
       - os: linux
-        arch: arm64
-        env: TARGET=arm64
-        addons:
-          apt:
-            packages:
-              - libcurl4-openssl-dev
-      #- os: linux-ppc64le
-      #  env: TARGET=ppc64le LISP=sbcl-bin/1.5.8
-      - os: osx
-        env: TARGET=x86-64,x86
-      - os: linux
         env:
          - TARGET=x86-64,x86
          - MIRROR=t
@@ -46,12 +35,23 @@ matrix:
             packages:
               - lib32z1-dev
               - gcc-multilib
+      - os: osx
+        env: TARGET=x86-64,x86
+      - os: linux
+        arch: arm64
+        env: TARGET=arm64
+        addons:
+          apt:
+            packages:
+              - libcurl4-openssl-dev
       - os: linux
         service: docker
         env:
           - TARGET=x86-64,x86
           - SUFFIX=-glibc2.10
           - DOCKER=docker.pkg.github.com/roswell/sbcl_bin/glibc2.10-sbcl1.5.7:1
+      #- os: linux-ppc64le
+      #  env: TARGET=ppc64le LISP=sbcl-bin/1.5.8
 
       - os: linux
         env: TARGET=x86-64
