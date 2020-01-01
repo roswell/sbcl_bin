@@ -57,6 +57,7 @@ matrix:
         env: TARGET=x86-64
         stage: deploy
         script: METHOD=upload-build-list ros run -l Lakefile
+        after_success:
     exclude:
       - os: linux
 
