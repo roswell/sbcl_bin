@@ -240,7 +240,10 @@
     (if ver
         (and (< (length ver) 20)
              (mirror-version ver))
-        (mirror-newest))))
+        (mirror-newest)))
+  (let ((out "build.html"))
+    (output-updated-html out)
+    (github out *release* *user* *repo* t)))
 
 (task "upload-build-list" ()
   (multiple-value-bind (ver) (version-target)
@@ -254,10 +257,7 @@
         (force-output)
         (output-html path out ver)
         (ignore-errors
-          (github out *release* *user* *repo* t)))))
-  (let ((out "build.html"))
-    (output-updated-html out)
-    (github out *release* *user* *repo* t)))
+          (github out *release* *user* *repo* t))))))
 
 #-lparallel
 (unwind-protect
