@@ -1,6 +1,6 @@
 #|-*- mode:lisp -*-|#
 (load "roswell.github.utils.asd")
-(ql:quickload '(:roswell.github.utils #-lparallel :cl-syntax) :silent t)
+(ql:quickload '(:roswell.github.utils #-lparallel :cl-syntax :jonathan) :silent t)
 (ros:include "util")
 
 (in-package :cl-user)
@@ -64,6 +64,22 @@
                        '("bz2" "msi") :test 'equal))
              (plump:get-elements-by-tag-name p "a"))))))
 
+(defun output-updated-html (out)
+  (let ((uri (format nil "https://github.com/~A/~A"  *user* *repo*)))
+    (dex:fetch (format nil "~A/releases/download/files/mirror.html" uri)
+               #P"mirror.html" :if-exists :supersede)
+    (with-open-file (o (pathname out) :direction :output :if-exists :supersede)
+      (loop for line in (mapcar (lambda (x)
+                                  (getf x :|browser_download_url|))
+                                (remove-if-not (lambda (x) (find (getf x :|content_type|) '("application/x-bzip2" "application/x-msi") :test 'equal))
+                                               (getf (funcall (read-from-string "jojo:parse") (dex:get "https://api.github.com/repos/roswell/sbcl_bin/releases/latest")) :|assets|)))
+            do (format o "<a href=~S></a>~%" line))
+      (format o "~%")
+      (with-open-file (i #P"mirror.html")
+        (loop for line = (read-line i nil nil)
+              while line
+              do (format o "~A~%" line))))))
+
 (defun mirror-version (version)
   (loop with releases = (releases-list *user* *repo*)
         with base-uri = (format nil "https://sourceforge.net/projects/sbcl/files/sbcl/~A/" version)
@@ -114,10 +130,10 @@
     (format t "~A ~%" (list path *release* *user* *repo* t))
     (force-output)
     (ignore-errors
-     (github path *release* *user* *repo* t))
+      (github path *release* *user* *repo* t))
     (output-html path out)
     (ignore-errors
-     (github out *release* *user* *repo* t))))
+      (github out *release* *user* *repo* t))))
 
 (defun git-clone (uris version release)
   (format nil "~{~A~^ || ~}"
@@ -238,7 +254,10 @@
         (force-output)
         (output-html path out ver)
         (ignore-errors
-         (github out *release* *user* *repo* t))))))
+          (github out *release* *user* *repo* t)))))
+  (let ((out "build.html"))
+    (output-updated-html out)
+    (github out *release* *user* *repo* t)))
 
 #-lparallel
 (unwind-protect

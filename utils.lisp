@@ -6,11 +6,11 @@
 (in-package :roswell.github.utils)
 
 (defvar *user/repo*
-  (last (split-sequence:split-sequence
-         #\/
+  (last (uiop:split-string
          (string-trim
           (string #\lf)
-          (uiop:run-program "git remote -v | head -n 1|awk -F ' ' '{print $2}'" :output :string)))
+          (uiop:run-program "git remote -v | head -n 1|awk -F ' ' '{print $2}'" :output :string))
+         :separator '(#\/ #\:))
         2))
 
 (defvar *release* "files")
@@ -52,6 +52,8 @@
 (defun github (path tagname owner repo &optional force)
   (unless (uiop:getenv "GITHUB_OAUTH_TOKEN")
     (error "GITHUB_OAUTH_TOKEN must be set"))
+  (unless (probe-file path)
+    (error "file ~A is not exist" path))
   (let ((release (ensure-release-exists tagname :owner owner :repo repo)))
     (format t "create ~A ~A ~A:" owner repo tagname)
     (format t "upload start:")
