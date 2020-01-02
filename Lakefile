@@ -241,7 +241,7 @@
         (and (< (length ver) 20)
              (mirror-version ver))
         (mirror-newest)))
-  (let ((out "build.html"))
+  (let ((out "build2.html"))
     (output-updated-html out)
     (github out *release* *user* *repo* t)))
 
