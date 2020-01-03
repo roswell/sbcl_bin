@@ -238,7 +238,8 @@
         (sh (format nil "bzip2 ~A" path))))
     #+win32
     (progn
-      (sh "bash make-windows-installer.sh"))))
+      (sh "bash make-windows-installer.sh")
+      (sh "cp output/*.msi .."))))
 
 (defun env (name)
   (let ((val (ros:getenv name)))
@@ -262,14 +263,14 @@
     (loop with uname =  (roswell.util:uname)
           with release  = (and version (< (length version) 20))
           for m in (split-sequence:split-sequence #\, target)
-          for path = (format nil "sbcl-~A-~A-~A~A-binary.tar"
+          for path = (format nil "sbcl-~A-~A-~A~A-binary"
                              version
                              m
                              uname
                              suffix)
           when release
           do (ql:quickload :sb-md5)
-             (let ((bz2 (format nil "~A.bz2" path)))
+             (let ((bz2 (format nil #-win32 "~A.tar.bz2" #+win32 "~A.msi" path)))
                (format t "~(~{~2,'0X~}~)"
                        (map 'list #'identity (funcall (read-from-string "sb-md5:md5sum-file") bz2)))
                (loop repeat 10
