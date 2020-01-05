@@ -24,9 +24,9 @@ matrix:
           - choco install --no-progress msys2 --params "/NoUpdate"
           - $msysexec pacman -S --noconfirm --needed autoconf automake make zlib-devel mingw-w64-x86_64-gcc mingw-w64-i686-gcc
           - $msysexec curl -L https://raw.githubusercontent.com/roswell/roswell/$ROSWELL_BRANCH/scripts/install-for-ci.sh | sh
-          - $msysexec ros install snmsts/sn.github
+          - $msysexec /c/Users/travis/.roswell/bin/ros install snmsts/sn.github
         script:
-          - METHOD=default $msysexec ros run -l Lakefile;
+          - $msysexec METHOD=default /c/Users/travis/.roswell/bin/ros run -l Lakefile;
       - os: linux
         env:
          - TARGET=x86-64,x86
