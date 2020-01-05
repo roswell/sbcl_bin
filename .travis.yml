@@ -17,7 +17,6 @@ matrix:
         env:
           - TARGET=x86-64
           - LISP=sbcl-bin/2.0.0
-          - WIX="'/c/Program Files (x86)/WiX Toolset v3.11'"
         before_install:
           - choco list -localonly
           - choco install --no-progress msys2 --params "/NoUpdate"
@@ -27,6 +26,9 @@ matrix:
           - export msys2="cmd.exe //C C:/tools/msys64/msys2_shell.cmd -defterm -mingw64 -no-start -full-path -here -c \$\* --"
           - $msys2 pacman -S --noconfirm --needed autoconf automake make zlib-devel mingw-w64-x86_64-gcc mingw-w64-i686-gcc
           - export PATH=/c/Users/travis/.roswell/bin:$PATH
+          - export WIX="/c/Program Files (x86)/WiX Toolset v3.11"
+        before_cache:
+          - $msys2 pacman --sync --clean --noconfirm
       - os: linux
         env:
          - TARGET=x86-64,x86
@@ -65,6 +67,8 @@ matrix:
 cache:
   directories:
     - $HOME/.roswell
+    - $HOME/AppData/Local/Temp/chocolatey
+    - /C/tools/msys64
 
 install:
   - if [ -n "$DOCKER" ]; then
