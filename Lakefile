@@ -284,6 +284,7 @@
   (multiple-value-bind (ver target suffix) (version-target)
     (loop for m in (split-sequence:split-sequence #\, target)
           do (format t "~S ~S ~S~%" ver m suffix)
+             (format t "~S~%" (uiop:getenv "PATH"))
              (force-output)
              (build-sbcl-bin ver m suffix))))
 
