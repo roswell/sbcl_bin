@@ -19,10 +19,10 @@ matrix:
           - PATH=c:\Users\travis\.roswell\bin;$PATH
           - TARGET=x86-64
           - LISP=sbcl-bin/2.0.0
-        before_install:
-          - [[ ! -f C:/tools/msys64/msys2_shell.cmd ]] && rm -rf C:/tools/msys64
+        install:
+          - choco list -localonly
           - choco uninstall -y mingw
-          - choco upgrade --no-progress -y msys2
+          - choco install --no-progress msys2 --params "/NoUpdate"
           - export msys2='cmd //C RefreshEnv.cmd '
           - export msys2+='& set MSYS=winsymlinks:nativestrict '
           - export msys2+='& C:\\tools\\msys64\\msys2_shell.cmd -defterm -no-start'
@@ -32,6 +32,8 @@ matrix:
           - taskkill //IM gpg-agent.exe //F  # https://travis-ci.community/t/4967
           - export PATH=/C/tools/msys64/mingw64/bin:/C/Users/travis/.roswell/bin:$PATH
           - export MAKE=mingw32-make
+          - $mingw64 curl -L https://raw.githubusercontent.com/roswell/roswell/$ROSWELL_BRANCH/scripts/install-for-ci.sh | sh
+          - $mingw64 ros install snmsts/sn.github
       - os: linux
         env:
          - TARGET=x86-64,x86
