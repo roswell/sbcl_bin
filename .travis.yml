@@ -7,6 +7,7 @@ env:
     - ROSWELL_BRANCH=master
     - ROSWELL_INSTALL_DIR=$HOME/.roswell
     - LISP=sbcl-bin/1.4.2
+    - mingw64=
 
 os:
     - linux
@@ -15,19 +16,9 @@ matrix:
     include:
       - os: windows
         env:
+          - PATH=c:\Users\travis\.roswell\bin;$PATH
           - TARGET=x86-64
-          - GNUMAKE=/c/tools/msys64/usr/bin/make
           - LISP=sbcl-bin/2.0.0
-          - msysexec="cmd.exe //C RefreshEnv.cmd & C:/tools/msys64/msys2_shell.cmd -defterm -mingw64 -no-start -full-path -here -c \$\* --"
-        install:
-          - choco list -localonly
-          - choco install --no-progress msys2 --params "/NoUpdate"
-          - $msysexec pacman -S --noconfirm --needed autoconf automake make zlib-devel mingw-w64-x86_64-gcc mingw-w64-i686-gcc
-          - $msysexec curl -L https://raw.githubusercontent.com/roswell/roswell/$ROSWELL_BRANCH/scripts/install-for-ci.sh | sh
-          - $msysexec /c/Users/travis/.roswell/bin/ros install snmsts/sn.github
-        script:
-          - $msysexec ls -al
-          - METHOD=default $msysexec /c/Users/travis/.roswell/bin/ros run -l Lakefile;
       - os: linux
         env:
          - TARGET=x86-64,x86
@@ -66,19 +57,51 @@ matrix:
 cache:
   directories:
     - $HOME/.roswell
+    - $HOME/AppData/Local/Temp/chocolatey
+    - /C/tools/msys64
+
+before_install:
+- |-
+    case $TRAVIS_OS_NAME in
+      windows)
+        [[ ! -f C:/tools/msys64/msys2_shell.cmd ]] && rm -rf C:/tools/msys64
+        choco uninstall -y mingw
+        choco upgrade --no-progress -y msys2
+        export msys2='cmd //C RefreshEnv.cmd '
+        export msys2+='& set MSYS=winsymlinks:nativestrict '
+        export msys2+='& C:\\tools\\msys64\\msys2_shell.cmd -defterm -no-start'
+        export mingw64="$msys2 -mingw64 -full-path -here -c \$\* --"
+        export msys2+=" -msys2 -c \$\* --"
+        $msys2 pacman --sync --noconfirm --needed mingw-w64-x86_64-toolchain autoconf automake make zlib-devel mingw-w64-x86_64-gcc mingw-w64-i686-gcc
+        ## Install more MSYS2 packages from https://packages.msys2.org/base here
+        taskkill //IM gpg-agent.exe //F  # https://travis-ci.community/t/4967
+        export PATH=/C/tools/msys64/mingw64/bin:$PATH
+        export PATH=/C/Users/travis/.roswell/bin:$PATH
+        export MAKE=mingw32-make  # so that Autotools can find it
+        ;;
+    esac
+
+before_cache:
+- |-
+    case $TRAVIS_OS_NAME in
+      windows)
+        # https://unix.stackexchange.com/a/137322/107554
+        $msys2 pacman --sync --clean --noconfirm
+        ;;
+    esac
 
 install:
   - if [ -n "$DOCKER" ]; then
        docker login docker.pkg.github.com -u snmsts -p $GITHUB_OAUTH_TOKEN;
        docker pull $DOCKER;
     fi
-  - curl -L https://raw.githubusercontent.com/roswell/roswell/$ROSWELL_BRANCH/scripts/install-for-ci.sh | sh
-  - ros install snmsts/sn.github
+  - $mingw64 curl -L https://raw.githubusercontent.com/roswell/roswell/$ROSWELL_BRANCH/scripts/install-for-ci.sh | sh
+  - $mingw64 ros install snmsts/sn.github
 
 script:
   - if [ -n "$MIRROR" ]; then METHOD=mirror ros run -l Lakefile; fi
   - "if [ -n \"$DOCKER\" ]; then
-       docker run \
+       $mingw64 docker run \
        -v `pwd`:/tmp \
        -e TARGET=$TARGET \
        -e TRAVIS_BRANCH=$TRAVIS_BRANCH \
@@ -87,7 +110,7 @@ script:
        -it $DOCKER bash \
        -c \"cd /tmp;env METHOD=default ros -l Lakefile\";
     else
-      METHOD=default ros run -l Lakefile;
+      $mingw64 METHOD=default ros run -l Lakefile;
     fi"
 after_success:
-  - METHOD=upload ros run -l Lakefile
+  - $mingw64 METHOD=upload ros run -l Lakefile
