@@ -18,14 +18,15 @@ matrix:
           - TARGET=x86-64
           - GNUMAKE=/c/tools/msys64/usr/bin/make
           - LISP=sbcl-bin/2.0.0
-          - msysexec="cmd.exe //C RefreshEnv.cmd & C:/tools/msys64/msys2_shell.cmd -defterm -mingw64 -no-start -full-path -here -c \$\* --"
+          - msys2="cmd.exe //C C:/tools/msys64/msys2_shell.cmd -defterm -mingw64 -no-start -full-path -here -c \$\* --"
         install:
           - choco list -localonly
           - choco install --no-progress msys2 --params "/NoUpdate"
-          - $msysexec pacman -S --noconfirm --needed autoconf automake make zlib-devel mingw-w64-x86_64-gcc mingw-w64-i686-gcc
-          - $msysexec curl -L https://raw.githubusercontent.com/roswell/roswell/$ROSWELL_BRANCH/scripts/install-for-ci.sh | sh
+          - RefreshEnv.cmd
+          - $msys2 pacman -S --noconfirm --needed autoconf automake make zlib-devel mingw-w64-x86_64-gcc mingw-w64-i686-gcc
+          - $msys2 curl -L https://raw.githubusercontent.com/roswell/roswell/$ROSWELL_BRANCH/scripts/install-for-ci.sh | sh
           - export PATH=/c/Users/travis/.roswell/bin:$PATH
-          - $msysexec ros install snmsts/sn.github
+          - $msys2 ros install snmsts/sn.github
 
       - os: linux
         env:
@@ -86,7 +87,7 @@ script:
        -it $DOCKER bash \
        -c \"cd /tmp;env METHOD=default ros -l Lakefile\";
     else
-      METHOD=default $msysexec ros run -l Lakefile;
+      METHOD=default $msys2 ros run -l Lakefile;
     fi"
 after_success:
-  - METHOD=upload $msysexec ros run -l Lakefile
+  - METHOD=upload $msys2 ros run -l Lakefile
