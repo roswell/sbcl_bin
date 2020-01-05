@@ -15,7 +15,7 @@ matrix:
     include:
       - os: windows
         env:
-          - TARGET=x86-64
+          - TARGET=x86
           - LISP=sbcl-bin/2.0.0
         before_install:
           - choco list -localonly
