@@ -18,12 +18,15 @@ matrix:
           - TARGET=x86-64
           - GNUMAKE=/c/tools/msys64/usr/bin/make
           - LISP=sbcl-bin/2.0.0
+          - shell="cmd.exe //C RefreshEnv.cmd & C:/tools/msys64/msys2_shell.cmd -defterm -mingw64 -no-start -full-path -here -c \$\* --"
         install:
+          - choco uninstall -y mingw llvm wsl
           - choco install --no-progress msys2 --params "/NoUpdate"
-          - export shell="cmd.exe //C RefreshEnv.cmd & C:/tools/msys64/msys2_shell.cmd -defterm -mingw64 -no-start -full-path -here -c \$\* --"
-          - $shell pacman -S --noconfirm --needed make
+          - $shell pacman -S --noconfirm --needed autoconf automake make zlib-devel mingw-w64-x86_64-gcc mingw-w64-i686-gcc
           - curl -L https://raw.githubusercontent.com/roswell/roswell/$ROSWELL_BRANCH/scripts/install-for-ci.sh | sh
           - ros install snmsts/sn.github
+        script:
+          - METHOD=default $shell ros run -l Lakefile;
       - os: linux
         env:
          - TARGET=x86-64,x86
