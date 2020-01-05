@@ -32,9 +32,10 @@
     (:documentation
      "Takes a string or list of strings and runs it from a shell."))
 
-  (defmethod sh ((command string) &key echo)
+  (defmethod sh ((command string) &key (echo t))
     (when echo
-      (format *error-output* "~A" command))
+      (format *error-output* "sh:~A~%" command)
+      (force-output t))
     (multiple-value-bind (output error-output return-status)
         (uiop:run-program command :input :interactive
                           :output :interactive
