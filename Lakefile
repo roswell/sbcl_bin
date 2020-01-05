@@ -213,9 +213,9 @@
                           ))))
       (sh (format nil "cat ../patch/~A|patch -p0 -N" file)))
     (ignore-errors
-      (sh (format nil "bash make.sh --with-sb-core-compression --arch=~A '--xc-host=ros -L sbcl-bin without-roswell=t --no-rc run'"
+      (sh (format nil "bash make.sh --with-sb-core-compression --arch=~A \"--xc-host=ros -L sbcl-bin without-roswell=t --no-rc run\""
                   uname-m)))
-    (sh "bash run-sbcl.sh --eval '(progn (print *features*)(quit))'")
+    (sh "bash run-sbcl.sh --eval \"(progn (print *features*)(quit))\"")
     #-win32
     (progn
       (uiop:chdir release-dir)
