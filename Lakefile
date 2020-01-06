@@ -193,9 +193,11 @@
                   uris)))
 
 (defun build-sbcl-bin (version uname-m suffix)
+  (declare (ignorable suffix))
   (let ((release-dir (namestring (uiop:getcwd)))
         (uname (roswell.util:uname))
         (release (and version (< (length version) 20)))) ;; sha length is 40,version length is about 10.20 is enough.
+    (declare (ignorable release-dir uname))
     (sh "rm -rf sbcl")
     (sh (git-clone '("https://git.code.sf.net/p/sbcl/sbcl"
                      "https://github.com/sbcl/sbcl") version release))
@@ -213,8 +215,10 @@
                           ))))
       (sh (format nil "cat ../patch/~A|patch -p0 -N" file)))
     (ignore-errors
-      (sh (format nil "bash make.sh --with-sb-core-compression --arch=~A \"--xc-host=ros -L sbcl-bin without-roswell=t --no-rc run\""
-                  uname-m)))
+      (sh (format nil "bash make.sh ~A --arch=~A ~S"
+                  (if (find :win32 *features*) "" "--with-sb-core-compression")
+                  uname-m
+                  "--xc-host=ros -L sbcl-bin without-roswell=t --no-rc run")))
     (sh "bash run-sbcl.sh --eval \"(progn (print *features*)(quit))\"")
     #-win32
     (progn
