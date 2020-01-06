@@ -6,7 +6,7 @@ env:
     - PATH=~/.roswell/bin:$PATH
     - ROSWELL_BRANCH=master
     - ROSWELL_INSTALL_DIR=$HOME/.roswell
-    - LISP=sbcl-bin/1.4.2
+    - LISP=sbcl-bin/2.0.0
 
 os:
     - linux
@@ -16,7 +16,6 @@ matrix:
       - os: windows
         env:
           - TARGET=x86-64
-          - LISP=sbcl-bin/2.0.0
         before_install:
           - choco list -localonly
           - if [ ! -f C:/tools/msys64/msys2_shell.cmd ]; then rm -rf C:/tools/msys64; fi
