@@ -211,15 +211,19 @@
                    (and (find version '("1.3.15" "1.3.16") :test 'equal) (find :darwin *features*) (equal uname-m "x86-64")
                         '("darwin-1.3.15-16"))
                    (and (find :win32 *features*)
-                        '(;;"win32-posixwait"  applicable until 1.4.12
-                          ))))
+                        '("win32-posixwait") ;; applicable until 1.4.12
+                        nil)
+                   (when (uiop:getenv"PATCH")
+                     (split-sequence:split-sequence #\, (uiop:getenv"PATCH")))))
       (sh (format nil "cat ../patch/~A|patch -p0 -N" file)))
     (ignore-errors
-      (sh (format nil "bash make.sh ~A --arch=~A ~S"
-                  (if (find :win32 *features*) "" "--with-sb-core-compression")
+      (sh (format nil "bash make.sh ~{~A~^ ~} --arch=~A ~S"
+                  (if (uiop:getenv"OPTS")
+                      (split-sequence:split-sequence #\, (uiop:getenv"OPTS"))
+                      #-win32(list "--with-sb-core-compression"))
                   uname-m
                   "--xc-host=ros -L sbcl-bin without-roswell=t --no-rc run")))
-    (sh "bash run-sbcl.sh --eval \"(progn (print *features*)(quit))\"")
+    (sh "bash run-sbcl.sh --eval \"(progn (print *features*)(terpri)(quit))\"")
     #-win32
     (progn
       (uiop:chdir release-dir)
@@ -301,7 +305,7 @@
         (and (< (length ver) 20)
              (mirror-version ver))
         (mirror-newest)))
-  (let ((out "sbcl-bin_uri"))
+  (let ((out "sbcl-bin_uri.tsv"))
     (output-updated-tsv out)
     (github out *release* *user* *repo* t)))
 
