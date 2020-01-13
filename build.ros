@@ -1,0 +1,148 @@
+#!/bin/sh
+#|-*- mode:lisp -*-|#
+#|
+exec ros -Q -- $0 "$@"
+|#
+(progn ;;init forms
+  (ros:ensure-asdf)
+  ;;#+quicklisp(ql:quickload '() :silent t)
+  )
+
+(defpackage :ros.script.build.3787867962
+  (:use :cl))
+(in-package :ros.script.build.3787867962)
+
+(defvar *var* nil)
+(defvar *sh* nil)
+
+(defgeneric sh (command &key echo)
+  (:documentation
+   "Takes a string or list of strings and runs it from a shell."))
+
+(defmethod sh ((command string) &key (echo t))
+  (declare (ignorable echo))
+  ;;(push command *sh*)
+  (when echo
+      (format *error-output* "sh:~A~%" command)
+      (force-output t))
+    (multiple-value-bind (output error-output return-status)
+        (uiop:run-program command :input :interactive
+                          :output :interactive
+                          :error-output :interactive
+                          :ignore-error-status t)
+      (declare (ignore output error-output))
+      (unless (zerop return-status)
+        (error "Command ~S exited with error code ~A." command return-status))))
+
+(defmethod sh ((command list) &key echo)
+  (let ((command1 (format nil "~{~A~^ ~}" command)))
+    (sh command1 :echo echo)))
+
+(defun env (name)
+  (let ((val (ros:getenv name)))
+    (unless (zerop (length val))
+      val)))
+
+(defun version-target ()
+  (values (or (env "TRAVIS_TAG")
+              (env "APPVEYOR_REPO_TAG_NAME")
+              (env "VERSION")
+              (let ((branch (env "TRAVIS_BRANCH")))
+                (unless (equal "master" branch)
+                  branch)))
+          (or (env "ARCH")
+              (roswell.util:uname-m))
+          (or (env "SUFFIX")
+              "")))
+
+(defun archive-sbcl-bin (version uname-m suffix)
+  (let ((release-dir (namestring (uiop:getcwd)))
+        (uname (roswell.util:uname)))
+    (declare (ignorable release-dir uname))
+    #-win32
+    (progn
+      (sh (format nil "cd ~A" release-dir))
+      (sh (format nil "ln -s sbcl ~Asbcl-~A-~A-~A~A"
+                  release-dir
+                  version
+                  uname-m
+                  uname
+                  suffix))
+      (sh (format nil "sbcl/binary-distribution.sh sbcl-~A-~A-~A~A"
+                  version
+                  uname-m
+                  uname
+                  suffix))
+      (let ((path (format nil "sbcl-~A-~A-~A~A-binary.tar"
+                          version
+                          uname-m
+                          uname
+                          suffix)))
+        (sh (format nil "rm -f ~A.bz2" path))
+        (sh (format nil "bzip2 ~A" path))))
+    #+win32
+    (progn
+      (sh "bash make-windows-installer.sh")
+      (sh "cp output/*.msi .."))))
+
+(export
+ (defun default (&rest argv)
+   (declare (ignore argv))))
+
+(export
+ (defun uname (&rest argv)
+   (declare (ignore argv))
+   (format t "~A~%"
+           (or (env "ARCH")
+               (roswell.util:uname-m)))))
+
+(export
+ (defun branch (&rest argv)
+   (declare (ignore argv))
+   (let* ((version (version-target))
+          (release (and version (< (length version) 20))))
+     (format t "~:[master~;sbcl-~:*~A~]~%"
+             (and release version)))))
+
+(export
+ (defun version (&rest argv)
+   (declare (ignore argv))
+   (format t "~A~%" (version-target))))
+
+(export
+ (defun archive (&rest argv)
+   (declare(ignore argv))
+   (multiple-value-bind (ver target suffix) (version-target)
+     (loop for m in (uiop:split-string target :separator '(#\,))
+           do (format t "~S ~S ~S~%" ver m suffix)
+              (force-output)
+              (archive-sbcl-bin ver m suffix)))))
+
+(export
+ (defun nop (&rest argv)
+   (declare (ignore argv))
+   (print "nop!!")))
+
+(defun optp (arg)
+  (when (and arg
+             (loop for i across arg
+                   repeat 2
+                   always (eql i #\-)))
+    (subseq arg 2)))
+
+(defun main (&rest argv)
+  (loop
+    for opt = (optp (first argv))
+    while opt
+    when opt
+    do (setf *var* (acons opt (second argv) *var*)
+             argv (cdr argv))
+    do (setf argv (cdr argv))
+    finally (let ((symbol (read-from-string (if argv
+                                                (first argv)
+                                                "default"))))
+              (when (eql (nth-value 1 (find-symbol (string symbol))) :external)
+                (funcall symbol (rest argv)))))
+  (format t "~{~A~%~}" (reverse *sh*)))
+
+;;; vim: set ft=lisp lisp:

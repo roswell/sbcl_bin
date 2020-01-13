@@ -15,7 +15,7 @@ matrix:
     include:
       - os: windows
         env:
-          - TARGET=x86-64
+          - TARGETS=x86-64
         before_install:
           - choco list -localonly
           - if [ ! -f C:/tools/msys64/msys2_shell.cmd ]; then rm -rf C:/tools/msys64; fi
@@ -31,7 +31,7 @@ matrix:
           - $msys2 pacman --sync --clean --noconfirm
       - os: linux
         env:
-         - TARGET=x86-64,x86
+         - TARGETS=x86-64 x86
          - MIRROR=t
         addons:
           apt:
@@ -39,10 +39,10 @@ matrix:
               - lib32z1-dev
               - gcc-multilib
       - os: osx
-        env: TARGET=x86-64,x86
+        env: TARGETS=x86-64 x86
       - os: linux
         arch: arm64
-        env: TARGET=arm64
+        env: TARGETS=arm64
         addons:
           apt:
             packages:
@@ -90,7 +90,7 @@ script:
        -it $DOCKER bash \
        -c \"cd /tmp;env METHOD=default ros -l Lakefile\";
     else
-      METHOD=default $msys2 ros run -l Lakefile;
+      $msys2 make archives;
     fi"
 after_success:
   - METHOD=upload $msys2 ros run -l Lakefile
