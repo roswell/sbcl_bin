@@ -101,7 +101,8 @@ exec ros -Q -- $0 "$@"
  (defun branch (&rest argv)
    (declare (ignore argv))
    (let* ((version (version-target))
-          (release (and version (< (length version) 20))))
+          (release (and version (< (length version) 20)
+                        (not (equal version "99.99.99")))))
      (format t "~:[master~;sbcl-~:*~A~]~%"
              (and release version)))))
 
