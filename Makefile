@@ -33,4 +33,4 @@ docker:
 		-e SUFFIX=$(SUFFIX) \
 		-e "TARGETS=$(TARGETS)" \
 		-it $$DOCKER bash \
-		-c "cd /tmp;make multi-archive"
+		-c "cd /tmp;make archives"

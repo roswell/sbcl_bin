@@ -14,6 +14,7 @@ os:
 matrix:
     include:
       - os: windows
+        service: docker
         env:
           - TARGETS=x86-64
         before_install:
@@ -30,9 +31,7 @@ matrix:
         before_cache:
           - $msys2 pacman --sync --clean --noconfirm
       - os: linux
-        env:
-         - TARGETS="x86-64 x86"
-         - MIRROR=t
+        env: TARGETS="x86-64 x86"
         addons:
           apt:
             packages:
@@ -50,7 +49,7 @@ matrix:
       - os: linux
         service: docker
         env:
-          - TARGET=x86-64,x86
+          - TARGETS="x86-64 x86"
           - SUFFIX=-glibc2.10
           - DOCKER=docker.pkg.github.com/roswell/sbcl_bin/glibc2.10-sbcl1.5.7:1
       #- os: linux-ppc64le
@@ -59,7 +58,9 @@ matrix:
       - os: linux
         env: TARGET=x86-64
         stage: deploy
-        script: METHOD=upload-build-list ros run -l Lakefile
+        script:
+          - METHOD=mirror ros run -l Lakefile
+          - METHOD=upload-build-list ros run -l Lakefile
         after_success:
     exclude:
       - os: linux
@@ -79,16 +80,8 @@ install:
   - $msys2 ros install snmsts/sn.github
 
 script:
-  - if [ -n "$MIRROR" ]; then METHOD=mirror ros run -l Lakefile; fi
   - "if [ -n \"$DOCKER\" ]; then
-       docker run \
-       -v `pwd`:/tmp \
-       -e TARGET=$TARGET \
-       -e TRAVIS_BRANCH=$TRAVIS_BRANCH \
-       -e TRAVIS_TAG=$TRAVIS_TAG \
-       -e VERSION=$VERSION -e SUFFIX=$SUFFIX \
-       -it $DOCKER bash \
-       -c \"cd /tmp;env METHOD=default ros -l Lakefile\";
+      make docker;
     else
       $msys2 make archives;
     fi"
