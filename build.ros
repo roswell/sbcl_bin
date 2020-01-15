@@ -43,7 +43,7 @@ exec ros -Q -- $0 "$@"
     (unless (zerop (length val))
       val)))
 
-(defun version-target ()
+(defun version-target (&key (target :compiler))
   (values (or (env "TRAVIS_TAG")
               (env "APPVEYOR_REPO_TAG_NAME")
               (env "VERSION")
@@ -51,8 +51,15 @@ exec ros -Q -- $0 "$@"
                 (unless (equal "master" branch)
                   branch))
               "99.99.99")
-          (or (env "ARCH")
-              (roswell.util:uname-m))
+          (let ((m (or (env "ARCH")
+                       (roswell.util:uname-m))))
+            (cond ((and (equal m "armhf")
+                        (eql target :compiler))
+                   "arm")
+                  ((and (not (eql target :compiler))
+                        (equal m "arm"))
+                   "armhf")
+                  (t m)))
           (or (env "SUFFIX")
               "")))
 
@@ -95,7 +102,7 @@ exec ros -Q -- $0 "$@"
    (declare (ignore argv))
    (format t "~A~%"
            (or (env "ARCH")
-               (roswell.util:uname-m)))))
+               (nth-value 1 (version-target))))))
 
 (export
  (defun branch (&rest argv)
@@ -114,8 +121,8 @@ exec ros -Q -- $0 "$@"
 (export
  (defun archive (&rest argv)
    (declare(ignore argv))
-   (multiple-value-bind (ver target suffix) (version-target)
-     (loop for m in (uiop:split-string target :separator '(#\,))
+   (multiple-value-bind (ver target suffix) (version-target :target :archive)
+     (loop for m in (uiop:split-string target :separator '(#\, #\Space))
            do (format t "~S ~S ~S~%" ver m suffix)
               (force-output)
               (archive-sbcl-bin ver m suffix)))))

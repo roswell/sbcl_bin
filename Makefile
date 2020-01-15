@@ -5,13 +5,17 @@ ARCH ?= $(shell ros build.ros uname)
 SUFFIX ?=
 TARGETS ?=$(ARCH)
 SBCL_OPTIONS ?=--with-sb-core-compression
-compile:
+LISP_IMPL ?= ros -L sbcl-bin without-roswell=t --no-rc run
+
+show:
 	echo VERSION=$(VERSION) ARCH=$(ARCH) BRANCH=$(BRANCH)
+
+compile: show
 	rm -rf sbcl
 	git clone --depth 5 https://github.com/sbcl/sbcl --branch=$(BRANCH) || git clone --depth 5 https://git.code.sf.net/p/sbcl/sbcl --branch=$(BRANCH)
 	cd sbcl;rm -rf .git
 	cd sbcl;echo '"$(VERSION)"' > version.lisp-expr
-	cd sbcl;bash make.sh $(SBCL_OPTIONS) --arch=$(ARCH) "--xc-host=ros -L sbcl-bin without-roswell=t --no-rc run" || true
+	cd sbcl;bash make.sh $(SBCL_OPTIONS) --arch=$(ARCH) --xc-host="$(LISP_IMPL)" || true
 	cd sbcl;bash run-sbcl.sh --eval "(progn (print *features*)(terpri)(quit))"
 
 archive:
