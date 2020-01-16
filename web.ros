@@ -1,0 +1,126 @@
+#!/bin/sh
+#|-*- mode:lisp -*-|#
+#|
+exec ros -Q -- $0 "$@"
+|#
+(progn ;;init forms
+  (ros:ensure-asdf)
+  (ignore-errors
+    (load "roswell.github.utils.asd")
+    (ql:quickload '(:roswell.github.utils) :silent t))
+  #+quicklisp(ql:quickload '(:dexador :jonathan) :silent t))
+
+(defpackage :ros.script.web.3788143716
+  (:use :cl))
+(in-package :ros.script.web.3788143716)
+
+(defun env (name)
+  (let ((val (ros:getenv name)))
+    (unless (zerop (length val))
+      val)))
+
+(defun version-target ()
+  (values (or (env "TRAVIS_TAG")
+              (env "APPVEYOR_REPO_TAG_NAME")
+              (env "VERSION")
+              (let ((branch (env "TRAVIS_BRANCH")))
+                (unless (equal "master" branch)
+                  branch)))
+          (or (env "TARGET")
+              (roswell.util:uname-m))
+          (or (env "SUFFIX")
+              "")))
+
+(defun account ()
+  (values
+   (symbol-value (uiop:safe-read-from-string "roswell.github.utils:*user*"))
+   (symbol-value(uiop:safe-read-from-string "roswell.github.utils:*repo*"))))
+
+(export
+ (defun upload (files &key (interactive t))
+   (multiple-value-bind (version target suffix)
+       (version-target)
+     (multiple-value-bind (user repo)
+         (account)
+       (format t "version:~A target:~A suffix:~A user:~A repo:~A ~%" version target suffix
+               user repo)
+       (when (or (not interactive)
+                 (yes-or-no-p "upload files:~%~{~S~%~}~%~%OK?" files))
+         (dolist (file files)
+           (loop repeat 10
+                 until (ignore-errors
+                         (uiop:symbol-call :roswell.github.utils :github
+                                           file version user repo t))
+                 do (sleep 3))))))))
+
+(export
+ (defun upload-archive (args)
+   (declare (ignore args))
+   (multiple-value-bind (version target suffix)
+       (version-target)
+     (let* ((uname (roswell.util:uname))
+            (release (and version (< (length version) 20)))
+            (path (print (format nil "sbcl-~A-~A-~A~A-binary"
+                                 version
+                                 target
+                                 uname
+                                 suffix))))
+       (when release
+         (ql:quickload :sb-md5)
+         (let ((bz2 (format nil #-win32 "~A.tar.bz2" #+win32 "~A.msi" path)))
+           (cond ((probe-file bz2)
+                  (format t "~(~{~2,'0X~}~)"
+                          (map 'list #'identity (funcall (read-from-string "sb-md5:md5sum-file") bz2)))
+                  (multiple-value-bind (user repo)
+                      (account)
+                    (uiop:symbol-call :roswell.github.utils :github
+                                      bz2 version user repo t)))
+                 (t
+                  (format t "file not found:~A~%" bz2)
+                  (uiop:quit 1)))))))))
+
+(defun json-latests ()
+  (multiple-value-bind (user repo)
+      (account)
+    (jojo:parse (dex:get (format nil "https://api.github.com/repos/~A/~A/releases/latest" user repo)))))
+
+(defun latest-uris ()
+  (loop for asset in (getf (json-latests) :|assets|)
+        when (find (getf asset :|content_type|) '("application/x-bzip2" "application/x-msi") :test 'equal)
+        collect (getf asset :|browser_download_url|)))
+
+(export
+ (defun latests (args)
+   (declare (ignore args))
+   (format t "~{~A~%~}" (latest-uris))))
+
+(export
+ (defun version (args)
+   (declare (ignore args))
+   (format t "~A~%" (getf (json-latests) :|tag_name|))))
+
+(defvar *sh* nil)
+(defvar *var* nil)
+
+(defun optp (arg)
+  (when (and arg
+             (loop for i across arg
+                   repeat 2
+                   always (eql i #\-)))
+    (subseq arg 2)))
+
+(defun main (&rest argv)
+  (loop
+    for opt = (optp (first argv))
+    while opt
+    when opt
+    do (setf *var* (acons opt (second argv) *var*)
+             argv (cdr argv))
+    do (setf argv (cdr argv))
+    finally (let ((symbol (read-from-string (if argv
+                                                (first argv)
+                                                "default"))))
+              (when (eql (nth-value 1 (find-symbol (string symbol))) :external)
+                (funcall symbol (rest argv)))))
+  (format t "~{~A~%~}" (reverse *sh*)))
+;;; vim: set ft=lisp lisp:

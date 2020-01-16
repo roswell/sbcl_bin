@@ -1,3 +1,6 @@
+-include .env
+export $(shell sed 's/=.*//' .env)
+
 NOP := $(shell ros build.ros nop) # avoid messages compile.
 BRANCH ?= $(shell ros build.ros branch)
 VERSION ?= $(shell ros build.ros version)
@@ -8,7 +11,7 @@ SBCL_OPTIONS ?=--with-sb-core-compression
 LISP_IMPL ?= ros -L sbcl-bin without-roswell=t --no-rc run
 
 show:
-	echo VERSION=$(VERSION) ARCH=$(ARCH) BRANCH=$(BRANCH)
+	@echo VERSION=$(VERSION) ARCH=$(ARCH) BRANCH=$(BRANCH) SUFFIX=$(SUFFIX)
 
 compile: show
 	rm -rf sbcl
@@ -21,7 +24,6 @@ compile: show
 archive:
 	VERSION=$(VERSION) ARCH=$(ARCH) BRANCH=$(BRANCH) make compile
 	VERSION=$(VERSION) ARCH=$(ARCH) SUFFIX=$(SUFFIX) ros build.ros archive
-	echo VERSION=$(VERSION) ARCH=$(ARCH) BRANCH=$(BRANCH) SUFFIX=$(SUFFIX)
 
 archives:
 	for ar in $(TARGETS); do \
@@ -38,3 +40,18 @@ docker:
 		-e "TARGETS=$(TARGETS)" \
 		-it $$DOCKER bash \
 		-c "cd /tmp;make archives"
+
+latest-uris:
+	ros web.ros latests
+
+latest-version:
+	$(eval VERSION := $(shell ros web.ros version))
+	@echo "set version $(VERSION)"
+
+upload-archive: show
+	VERSION=$(VERSION) ARCH=$(ARCH) SUFFIX=$(SUFFIX) ros web.ros upload-archive
+
+upload-archives:
+	for ar in $(TARGETS); do \
+	  VERSION=$(VERSION) ARCH=$$ar SUFFIX=$(SUFFIX) make upload-archive; \
+	done
