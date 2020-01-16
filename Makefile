@@ -46,6 +46,7 @@ latest-uris:
 
 latest-version:
 	$(eval VERSION := $(shell ros web.ros version))
+	$(eval BRANCH := $(shell VERSION=$(VERSION) ros build.ros branch))
 	@echo "set version $(VERSION)"
 
 upload-archive: show
