@@ -86,4 +86,4 @@ script:
       $msys2 make archives;
     fi"
 after_success:
-  - METHOD=upload $msys2 ros run -l Lakefile
+  - make upload-archives
