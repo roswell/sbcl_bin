@@ -50,7 +50,7 @@ latest-version:
 	@echo "set version $(VERSION)"
 
 upload-archive: show
-	VERSION=$(VERSION) ARCH=$(ARCH) SUFFIX=$(SUFFIX) ros web.ros upload-archive
+	VERSION=$(VERSION) TARGET=$(ARCH) SUFFIX=$(SUFFIX) ros web.ros upload-archive
 
 upload-archives:
 	for ar in $(TARGETS); do \
