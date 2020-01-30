@@ -22,7 +22,10 @@ exec ros -Q -- $0 "$@"
 (defun version-target (&key (target :compiler))
   (values (or (env "TRAVIS_TAG")
               (env "APPVEYOR_REPO_TAG_NAME")
-              (env "VERSION")
+              (let ((version (env "VERSION")) )
+                (if (equal "99.99.99" version)
+                    nil
+                    version))
               (let ((branch (env "TRAVIS_BRANCH")))
                 (unless (equal "master" branch)
                   branch))
