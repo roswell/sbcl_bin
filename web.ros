@@ -26,7 +26,7 @@ exec ros -Q -- $0 "$@"
               (let ((branch (env "TRAVIS_BRANCH")))
                 (unless (equal "master" branch)
                   branch))
-              "99.99.99")
+              nil)
           (let ((m (or (env "ARCH")
                        (roswell.util:uname-m))))
             (cond ((and (equal m "armhf")

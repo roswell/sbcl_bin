@@ -16,6 +16,8 @@ show:
 compile: show
 	rm -rf sbcl
 	git clone --depth 5 https://github.com/sbcl/sbcl --branch=$(BRANCH) || git clone --depth 5 https://git.code.sf.net/p/sbcl/sbcl --branch=$(BRANCH)
+	cd sbcl;{ git describe  | sed -n -e 's/^.*-g//p' ; } 2>/dev/null > git_hash
+	cat sbcl/git_hash
 	cd sbcl;rm -rf .git
 	cd sbcl;echo '"$(VERSION)"' > version.lisp-expr
 	cd sbcl;bash make.sh $(SBCL_OPTIONS) --arch=$(ARCH) --xc-host="$(LISP_IMPL)" || true
