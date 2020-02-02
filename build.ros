@@ -64,12 +64,12 @@ exec ros -Q -- $0 "$@"
               "")))
 
 (defun archive-sbcl-bin (version uname-m suffix)
+  (declare (ignorable version uname-m suffix))
   (let ((release-dir (namestring (uiop:getcwd)))
         (uname (roswell.util:uname)))
     (declare (ignorable release-dir uname))
     #-win32
     (progn
-      (sh (format nil "cd ~A" release-dir))
       (sh (format nil "ln -s sbcl ~Asbcl-~A-~A-~A~A"
                   release-dir
                   version
@@ -90,6 +90,7 @@ exec ros -Q -- $0 "$@"
         (sh (format nil "bzip2 ~A" path))))
     #+win32
     (progn
+      (uiop:chdir (format nil "~A/sbcl/" release-dir))
       (sh "bash make-windows-installer.sh")
       (sh "cp output/*.msi .."))))
 
