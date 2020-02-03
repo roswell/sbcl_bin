@@ -86,4 +86,4 @@ script:
       $msys2 make archives;
     fi"
 after_success:
-  - make upload-archives
+  - $msys2 make upload-archives
