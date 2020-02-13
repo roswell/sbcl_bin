@@ -1,5 +1,4 @@
 language: c
-sudo: required
 
 env:
   global:
@@ -11,10 +10,10 @@ env:
 os:
     - linux
 
-matrix:
+jobs:
     include:
       - os: windows
-        service: docker
+        services: docker
         env:
           - TARGETS=x86
           - LISP=sbcl-bin
@@ -32,7 +31,7 @@ matrix:
         before_cache:
           - $msys2 pacman --sync --clean --noconfirm
       - os: windows
-        service: docker
+        services: docker
         env:
           - TARGETS=x86-64
         before_install:
@@ -65,7 +64,7 @@ matrix:
             packages:
               - libcurl4-openssl-dev
       - os: linux
-        service: docker
+        services: docker
         env:
           - TARGETS="x86-64 x86"
           - SUFFIX=-glibc2.10
