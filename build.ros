@@ -103,7 +103,8 @@ exec ros -Q -- $0 "$@"
    (declare (ignore argv))
    (format t "~A~%"
            (or (env "ARCH")
-               (nth-value 1 (version-target))))))
+               (nth-value 1 (version-target))))
+   (force-output)))
 
 (export
  (defun branch (&rest argv)
@@ -112,12 +113,14 @@ exec ros -Q -- $0 "$@"
           (release (and version (< (length version) 20)
                         (not (equal version "99.99.99")))))
      (format t "~:[master~;sbcl-~:*~A~]~%"
-             (and release version)))))
+             (and release version))
+     (force-output))))
 
 (export
  (defun version (&rest argv)
    (declare (ignore argv))
-   (format t "~A~%" (version-target))))
+   (format t "~A~%" (version-target))
+   (force-output)))
 
 (export
  (defun archive (&rest argv)
@@ -126,7 +129,8 @@ exec ros -Q -- $0 "$@"
      (loop for m in (uiop:split-string target :separator '(#\, #\Space))
            do (format t "~S ~S ~S~%" ver m suffix)
               (force-output)
-              (archive-sbcl-bin ver m suffix)))))
+              (archive-sbcl-bin ver m suffix)))
+   (force-output)))
 
 (export
  (defun nop (&rest argv)
