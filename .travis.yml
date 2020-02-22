@@ -7,9 +7,6 @@ env:
     - ROSWELL_INSTALL_DIR=$HOME/.roswell
     - LISP=sbcl-bin/2.0.0
 
-os:
-    - linux
-
 jobs:
     include:
       - os: windows
