@@ -41,12 +41,10 @@ jobs:
         env:
           - TARGETS=arm
           - SETARCH='setarch linux32 --verbose --32bit'
-        addons:
-          apt:
-            packages:
-              - crossbuild-essential-armhf
-              - libc6:armhf
-              - libcurl4-openssl-dev:armhf
+        before_install:
+          - sudo dpkg --add-architecture armhf
+          - sudo bash -c "rm -rf '${TRAVIS_ROOT}/var/lib/apt/lists/'* && exec apt-get update -yq"
+          - sudo -E apt-get -yq install crossbuild-essential-armhf libc6:armhf linux-libc-dev:armhf libcurl4-openssl-dev:armhf
       - os: linux
         arch: arm64
         env: TARGETS=arm64
