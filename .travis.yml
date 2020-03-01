@@ -7,8 +7,6 @@ env:
     - ROSWELL_INSTALL_DIR=$HOME/.roswell
     - LISP=sbcl-bin/2.0.0
 
-exclude:
-      - os: linux
 jobs:
     include:
       - os: windows
@@ -78,8 +76,6 @@ jobs:
           - METHOD=mirror ros run -l Lakefile
           - METHOD=upload-build-list ros run -l Lakefile
         after_success:
-    exclude:
-      - os: linux
 
 cache:
   directories:
