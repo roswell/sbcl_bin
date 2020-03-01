@@ -12,24 +12,6 @@ jobs:
       - os: windows
         services: docker
         env:
-          - TARGETS=x86
-          - LISP=sbcl-bin
-        before_install:
-          - choco list -localonly
-          - if [ ! -f C:/tools/msys64/msys2_shell.cmd ]; then rm -rf C:/tools/msys64; fi
-          - choco install --no-progress msys2 --params "/NoUpdate"
-          - powershell Install-WindowsFeature Net-Framework-Core
-          - choco install wixtoolset
-          - RefreshEnv.cmd
-          - export msys2="cmd.exe //C C:/tools/msys64/msys2_shell.cmd -defterm -mingw32 -no-start -full-path -here -c \$\* --"
-          - $msys2 pacman -S --noconfirm --needed autoconf automake make zlib-devel mingw-w64-x86_64-gcc mingw-w64-i686-gcc
-          - export PATH=/c/Users/travis/.roswell/bin:$PATH
-          - export WIX="/c/Program Files (x86)/WiX Toolset v3.11"
-        before_cache:
-          - $msys2 pacman --sync --clean --noconfirm
-      - os: windows
-        services: docker
-        env:
           - TARGETS=x86-64
         before_install:
           - choco list -localonly
@@ -38,12 +20,12 @@ jobs:
           - powershell Install-WindowsFeature Net-Framework-Core
           - choco install wixtoolset
           - RefreshEnv.cmd
-          - export msys2="cmd.exe //C C:/tools/msys64/msys2_shell.cmd -defterm -mingw64 -no-start -full-path -here -c \$\* --"
-          - $msys2 pacman -S --noconfirm --needed autoconf automake make zlib-devel mingw-w64-x86_64-gcc mingw-w64-i686-gcc
+          - export SETARCH="cmd.exe //C C:/tools/msys64/msys2_shell.cmd -defterm -mingw64 -no-start -full-path -here -c \$\* --"
+          - $SETARCH pacman -S --noconfirm --needed autoconf automake make zlib-devel mingw-w64-x86_64-gcc mingw-w64-i686-gcc
           - export PATH=/c/Users/travis/.roswell/bin:$PATH
           - export WIX="/c/Program Files (x86)/WiX Toolset v3.11"
         before_cache:
-          - $msys2 pacman --sync --clean --noconfirm
+          - $SETARCH pacman --sync --clean --noconfirm
       - os: linux
         env: TARGETS="x86-64 x86"
         addons:
@@ -53,6 +35,18 @@ jobs:
               - gcc-multilib
       - os: osx
         env: TARGETS="x86-64 x86"
+      - os: linux
+        arch: arm64
+        compiler: arm-linux-gnueabihf-gcc
+        env:
+          - TARGETS=arm
+          - SETARCH='setarch linux32 --verbose --32bit'
+        addons:
+          apt:
+            packages:
+              - crossbuild-essential-armhf
+              - libc6:armhf
+              - libcurl4-openssl-dev:armhf
       - os: linux
         arch: arm64
         env: TARGETS=arm64
@@ -87,14 +81,14 @@ install:
        docker login docker.pkg.github.com -u snmsts -p $GITHUB_OAUTH_TOKEN;
        docker pull $DOCKER;
     fi
-  - $msys2 curl -L https://raw.githubusercontent.com/roswell/roswell/$ROSWELL_BRANCH/scripts/install-for-ci.sh | sh
-  - $msys2 ros install snmsts/sn.github
+  - $SETARCH curl -L https://raw.githubusercontent.com/roswell/roswell/$ROSWELL_BRANCH/scripts/install-for-ci.sh | sh
+  - $SETARCH ros install snmsts/sn.github
 
 script:
   - "if [ -n \"$DOCKER\" ]; then
       make docker;
     else
-      $msys2 make archives;
+      $SETARCH make archives;
     fi"
 after_success:
-  - $msys2 make upload-archives
+  - $SETARCH make upload-archives
