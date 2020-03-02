@@ -37,6 +37,7 @@ jobs:
         env: TARGETS="x86-64 x86"
       - os: linux
         arch: arm64
+        compiler: arm-linux-gnueabihf-gcc
         env:
           - TARGETS=arm
           - SETARCH='setarch linux32 --verbose --32bit'
@@ -51,8 +52,6 @@ jobs:
           - $SETARCH uname -r
           - sudo -E dpkg --remove --force-all libcurl4-openssl-dev:arm64
           - sudo -E apt-get -yq install crossbuild-essential-armhf libc6:armhf linux-libc-dev:armhf libcurl4-openssl-dev:armhf zlib1g-dev:armhf
-          - sudo update-alternatives --install /usr/bin/cc cc /usr/bin/arm-linux-gnueabihf-gcc 100
-          - update-alternatives --display cc
       - os: linux
         arch: arm64
         env: TARGETS=arm64
