@@ -51,7 +51,7 @@ jobs:
           - $SETARCH uname -a
           - $SETARCH uname -r
           - sudo -E dpkg --remove --force-all libcurl4-openssl-dev:arm64
-          - sudo -E apt-get -yq install crossbuild-essential-armhf libc6:armhf linux-libc-dev:armhf libcurl4-openssl-dev:arm64 libcurl4-openssl-dev:armhf
+          - sudo -E apt-get -yq install crossbuild-essential-armhf libc6:armhf linux-libc-dev:armhf libcurl4-openssl-dev:armhf
       - os: linux
         arch: arm64
         env: TARGETS=arm64
