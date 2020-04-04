@@ -67,12 +67,16 @@ jobs:
           - DOCKER=docker.pkg.github.com/roswell/sbcl_bin/glibc2.10-sbcl1.5.7:1
       #- os: linux-ppc64le
       #  env: TARGET=ppc64le LISP=sbcl-bin/1.5.8
-
+      - os: linux
+        name: "mirror binary from sbcl.org and upload tsv"
+        env: TARGET=x86-64
+        script:
+          - METHOD=mirror ros run -l Lakefile
+        after_success:
       - os: linux
         env: TARGET=x86-64
         stage: deploy
         script:
-          - METHOD=mirror ros run -l Lakefile
           - METHOD=upload-build-list ros run -l Lakefile
         after_success:
 
