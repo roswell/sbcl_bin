@@ -79,6 +79,5 @@
   "fetch&upload"
   (format t "~A~%" uri)
   (finish-output)
-  (ignore-errors
-   (dex:fetch uri path :if-exists :supersede)
-   (github path *release* *user* *repo*)))
+  (dex:fetch uri path :if-exists :supersede)
+  (github path *release* *user* *repo*))
