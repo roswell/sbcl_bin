@@ -34,7 +34,7 @@ jobs:
               - lib32z1-dev
               - gcc-multilib
       - os: osx
-        env: TARGETS="x86-64 x86"
+        env: TARGETS="x86-64"
       - os: linux
         arch: arm64
         compiler: arm-linux-gnueabihf-gcc
