@@ -19,6 +19,9 @@
     "x86-darwin-binary.tar.bz2"
     "arm64-linux-binary.tar.bz2"))
 
+(defvar *eol-uris*
+  '("https://github.com/roswell/sbcl_bin/releases/download/2.0.9/sbcl-2.0.9-x86-darwin-binary.tar.bz2"))
+
 (defvar *tsv-headers*
   '("os""arch""version""variant""uri"))
 
@@ -108,7 +111,7 @@
   (flet ((sub (o)
            (format o "~{~A~^	~}~%" *tsv-headers*)
            (loop with latests
-                 for uri in (append (latest-uris) (mirror-uris))
+                 for uri in (append (latest-uris) *eol-uris* (mirror-uris))
                  for file = (first (last (uiop:split-string uri :separator '(#\/))))
                  for sep = (split-filename file)
                  for version = (second sep)
