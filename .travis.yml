@@ -37,23 +37,6 @@ jobs:
         env: TARGETS="x86-64"
       - os: linux
         arch: arm64
-        compiler: arm-linux-gnueabihf-gcc
-        env:
-          - TARGETS=arm
-          - SETARCH='setarch linux32 --verbose --32bit'
-        before_install:
-          - sudo dpkg --add-architecture armhf
-          - sudo bash -c "rm -rf '${TRAVIS_ROOT}/var/lib/apt/lists/'* && exec apt-get update -yq"
-          - dpkg -l
-          - dpkg --print-architecture
-          - dpkg --print-foreign-architectures
-          - setarch --list
-          - $SETARCH uname -a
-          - $SETARCH uname -r
-          - sudo -E dpkg --remove --force-all libcurl4-openssl-dev:arm64
-          - sudo -E apt-get -yq install crossbuild-essential-armhf libc6:armhf linux-libc-dev:armhf libcurl4-openssl-dev:armhf zlib1g-dev:armhf
-      - os: linux
-        arch: arm64
         env: TARGETS=arm64
         addons:
           apt:
