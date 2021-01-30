@@ -16,7 +16,9 @@ jobs:
   build:
     # The type of runner that the job will run on
     runs-on: ubuntu-latest
-
+    strategy:
+      matrix:
+        lisp: [sbcl-bin/2.0.0]
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
@@ -27,9 +29,13 @@ jobs:
           echo "$HOME/.roswell/bin" >> $GITHUB_PATH
           echo "ROSWELL_BRANCH=master" >> $GITHUB_ENV
           echo "ROSWELL_INSTALL_DIR=$HOME/.roswell" >> $GITHUB_ENV
-          echo "LISP=sbcl-bin/2.0.0" >> $GITHUB_ENV
 
-      - name: install
+      - name: Install Roswell
+        env:
+          LISP: ${{ matrix.lisp }}
         run: |
-          echo $PATH
-          echo $LISP
+          curl -L https://raw.githubusercontent.com/roswell/roswell/master/scripts/install-for-ci.sh | sh
+      - name: show roswell status
+        run: |
+          ros version
+          ros config
