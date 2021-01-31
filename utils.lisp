@@ -15,7 +15,7 @@
 
 (defvar *release* "files")
 (defvar *user*  (first *user/repo*))
-(defvar *repo* (subseq (second *user/repo*) 0 (- (length (second *user/repo*)) 4)))
+(defvar *repo* (second *user/repo*))
 
 (defun release-exist-p (tagname &key owner repo)
   (ignore-errors
