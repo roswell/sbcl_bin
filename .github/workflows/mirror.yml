@@ -36,7 +36,11 @@ jobs:
         run: |
           sudo apt-get -y install git build-essential automake libcurl4-openssl-dev
           curl -L https://raw.githubusercontent.com/roswell/roswell/master/scripts/install-for-ci.sh | sh
-      - name: show roswell status
+          ros install snmsts/sn.github
+
+      - name: mirror
+        env:
+          VERSION: ${{ secrets.VERSION }}
+          GITHUB_OAUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          ros version
-          ros config
+          METHOD=mirror ros run -l Lakefile

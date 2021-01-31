@@ -304,10 +304,12 @@
 
 (task "mirror" ()
   (let ((ver (version-target)))
+    (print (list *user* *repo* ver))
     (if ver
         (and (< (length ver) 20)
              (mirror-version ver))
         (mirror-newest)))
+  #+nil
   (let ((out "sbcl-bin_uri.tsv"))
     (output-updated-tsv out)
     (github out *release* *user* *repo* t)))
