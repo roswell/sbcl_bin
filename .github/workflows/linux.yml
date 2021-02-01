@@ -37,7 +37,7 @@ jobs:
         env:
           VERSION: ${{ secrets.VERSION }}
           GITHUB_OAUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          TARGET: ${{ matrix.target }}
+          ARCH: ${{ matrix.target }}
         run: |
-          make archives
-          make upload-archives
+          make archive
+          make upload-archive
