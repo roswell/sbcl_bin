@@ -13,7 +13,7 @@ jobs:
     strategy:
       matrix:
         lisp: [sbcl-bin/2.0.0]
-        TARGET:[x86-64, x86]
+        target:[x86-64, x86]
     environment: SET_VERSION
 
     steps:
@@ -37,6 +37,7 @@ jobs:
         env:
           VERSION: ${{ secrets.VERSION }}
           GITHUB_OAUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TARGET:${{ matrix.target }}
         run: |
           make archives
           make upload-archives
