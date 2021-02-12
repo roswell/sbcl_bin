@@ -29,7 +29,6 @@ jobs:
         env:
           LISP: ${{ matrix.lisp }}
         run: |
-          sudo apt-get -y install git build-essential automake libcurl4-openssl-dev lib32z1-dev gcc-multilib
           curl -L https://raw.githubusercontent.com/roswell/roswell/master/scripts/install-for-ci.sh | sh
           ros install snmsts/sn.github
 
