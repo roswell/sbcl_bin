@@ -29,6 +29,7 @@ jobs:
         env:
           LISP: ${{ matrix.lisp }}
         run: |
+          brew install automake autoconf
           curl -L https://raw.githubusercontent.com/roswell/roswell/master/scripts/install-for-ci.sh | sh
           ros install snmsts/sn.github
 
