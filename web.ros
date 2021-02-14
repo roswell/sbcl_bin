@@ -44,8 +44,8 @@ exec ros -Q -- $0 "$@"
 
 (defun account ()
   (values
-   (symbol-value (uiop:safe-read-from-string "roswell.github.utils:*user*"))
-   (symbol-value(uiop:safe-read-from-string "roswell.github.utils:*repo*"))))
+   (or (env "GH_USER") (symbol-value (uiop:safe-read-from-string "roswell.github.utils:*user*")))
+   (or (env "GH_REPO") (symbol-value(uiop:safe-read-from-string "roswell.github.utils:*repo*")))))
 
 (export
  (defun upload (files &key (interactive t))
@@ -90,25 +90,96 @@ exec ros -Q -- $0 "$@"
                   (format t "file not found:~A~%" bz2)
                   (uiop:quit 1)))))))))
 
-(defun json-latests ()
+(defun releases ()
+  (multiple-value-bind (user repo)
+      (account)
+    (jojo:parse (dex:get (format nil "https://api.github.com/repos/~A/~A/releases" user repo)))))
+
+(defun latest-relase ()
   (multiple-value-bind (user repo)
       (account)
     (jojo:parse (dex:get (format nil "https://api.github.com/repos/~A/~A/releases/latest" user repo)))))
 
-(defun latest-uris ()
-  (loop for asset in (getf (json-latests) :|assets|)
+(defun release-uris (&optional (release (latest-relase)))
+  (loop for asset in (getf release :|assets|)
         when (find (getf asset :|content_type|) '("application/x-bzip2" "application/x-msi") :test 'equal)
         collect (getf asset :|browser_download_url|)))
+
+(defun release-tag_name (&optional (release (latest-relase)))
+  (getf release :|tag_name|))
+
+(defun tsv-uri (&optional (release (latest-relase)))
+  (multiple-value-bind (user repo)
+      (account)
+    (format nil "https://github.com/~A/~A/releases/download/~A/sbcl-bin_uri.tsv"
+            user repo
+            (release-tag_name release))))
+
+(defun parse-tsv (string)
+  (mapcar (lambda (x) (uiop:split-string x :separator '(#\tab)))
+          (uiop:split-string string :separator '(#\lf))))
+
+(defun save-tsv (file tsv)
+  (with-open-file (out file :direction :output :if-exists :supersede)
+    (format out "~{~{~A~^	~}~^~%~}" tsv)))
+
+(defun modify-tsv (tsv release)
+  (loop with tag-name = (release-tag_name release)
+        with comp = (lambda (x) (ignore-errors (aref (nth-value 1 (ppcre:scan-to-strings "sbcl-[^-]*-([^/]*)$" x)) 0)))
+        for uri in (remove-if-not (lambda (x) (ppcre:scan "binary" x))
+                                  (release-uris release))
+        for found = (find uri tsv :test #'(lambda (x y)
+                                            (equal (funcall comp x)
+                                                   (funcall comp (fifth y)))))
+        do (if found
+               (setf (fifth found) uri
+                     (third found) tag-name)
+               (format t "unlisted uri: ~S~%" uri)))
+  tsv)
+
+(defun updated-tsv ()
+  (let* ((releases (releases))
+         (tsv (parse-tsv (dex:get (tsv-uri (second releases)) :force-string t))))
+    (mapc (lambda (x) (modify-tsv tsv x)) (reverse releases))
+    (setf (rest tsv) (sort (rest tsv) (complement #'uiop/version:version<) :key #'third))
+    tsv))
+
+(export
+ (defun tsv (args)
+   (declare (ignore args))
+   (save-tsv "sbcl-bin_uri.tsv" (updated-tsv))))
+
+(export
+ (defun upload-tsv (args)
+   (declare (ignore args))
+   (multiple-value-bind (version target suffix)
+       (version-target :target :archive)
+     (let* ((release (and version (< (length version) 20)))
+            (path "sbcl-bin_uri.tsv"))
+       (when release
+         (ql:quickload :sb-md5)
+         (cond ((probe-file path)
+                (format t "~(~{~2,'0X~}~)"
+                        (map 'list #'identity (funcall (read-from-string "sb-md5:md5sum-file") path)))
+                (multiple-value-bind (user repo)
+                    (account)
+                  (uiop:symbol-call :roswell.github.utils :github
+                                    path version user repo t)
+                  (uiop:symbol-call :roswell.github.utils :github
+                                    path "files" user repo t)))
+               (t
+                (format t "file not found:~A~%" path)
+                (uiop:quit 1))))))))
 
 (export
  (defun latests (args)
    (declare (ignore args))
-   (format t "~{~A~%~}" (latest-uris))))
+   (format t "~{~A~%~}" (release-uris))))
 
 (export
  (defun version (args)
    (declare (ignore args))
-   (format t "~A~%" (getf (json-latests) :|tag_name|))))
+   (format t "~A~%" (release-tag_name))))
 
 (defvar *sh* nil)
 (defvar *var* nil)

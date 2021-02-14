@@ -32,6 +32,9 @@ archives:
 	  VERSION=$(VERSION) ARCH=$$ar BRANCH=$(BRANCH) SUFFIX=$(SUFFIX) make archive; \
 	done
 
+tsv:
+	ros web.ros tsv
+
 docker:
 	docker run \
 		-v `pwd`:/tmp \
@@ -58,3 +61,6 @@ upload-archives:
 	for ar in $(TARGETS); do \
 	  VERSION=$(VERSION) ARCH=$$ar SUFFIX=$(SUFFIX) make upload-archive; \
 	done
+
+upload-tsv:
+	VERSION=$(VERSION) TARGET=$(ARCH) SUFFIX=$(SUFFIX) ros web.ros upload-tsv
