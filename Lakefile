@@ -19,12 +19,6 @@
     "x86-darwin-binary.tar.bz2"
     "arm64-linux-binary.tar.bz2"))
 
-(defvar *eol-uris*
-  '("https://github.com/roswell/sbcl_bin/releases/download/2.0.9/sbcl-2.0.9-x86-darwin-binary.tar.bz2"))
-
-(defvar *tsv-headers*
-  '("os""arch""version""variant""uri"))
-
 #-lparallel ;; missing functions from lake
 (progn
   (defmacro task (name ign &body body)
@@ -70,66 +64,6 @@
                  (find (first (last (split-sequence:split-sequence #\.(plump:get-attribute x "href"))))
                        '("bz2" "msi") :test 'equal))
              (plump:get-elements-by-tag-name p "a"))))))
-
-(defvar *replace-assoc*
-  '(("dragonfly" . "DFlyBSD")
-    ("powerpc" . "ppc")
-    ("mips" . "mipsbe")))
-
-(defun split-filename (name)
-  (labels ((% (l)
-             (cond ((null l) nil)
-                   ((and
-                     (equal (first l) "x86")
-                     (equal (second l) "64")
-                     (cons "x86-64" (% (cddr l)))))
-                   ((and
-                     (equal (first l) "debian")
-                     (equal (second l) "kfreebsd"))
-                    (cons "kFreBSD" (% (cddr l))))
-                   ((assoc (first l) *replace-assoc* :test 'equal)
-                    (cons (cdr (assoc (first l) *replace-assoc* :test 'equal)) (% (cdr l))))
-                   ((string= (first l) "openbsd" :end1 (min (length "openbsd") (length (first l))))
-                    (cons "OpenBSD" (% (cddr l))))
-                   (t (cons (first l) (% (cdr l)))))))
-    (% (uiop:split-string name :separator '(#\-)))))
-
-(defun latest-uris ()
-  (loop with html = (dex:get (format nil "https://api.github.com/repos/~A/~A/releases/latest" *user* *repo*))
-        for asset in (getf (funcall (read-from-string "jojo:parse") html) :|assets|)
-        when (find (getf asset :|content_type|) '("application/x-bzip2" "application/x-msi") :test 'equal)
-        collect (getf asset :|browser_download_url|)))
-
-(defun mirror-uris ()
-  (loop with uri = (format nil "https://github.com/~A/~A"  *user* *repo*)
-        with bin = (dex:get (format nil "~A/releases/download/files/mirror.html" uri) :force-binary t)
-        with lines = (babel:octets-to-string bin)
-        for line in (uiop:split-string lines :separator '(#\Newline))
-        collect (second (uiop:split-string line :separator '(#\")))))
-
-(defun output-updated-tsv (out)
-  (flet ((sub (o)
-           (format o "~{~A~^	~}~%" *tsv-headers*)
-           (loop with latests
-                 for uri in (append (latest-uris) *eol-uris* (mirror-uris))
-                 for file = (first (last (uiop:split-string uri :separator '(#\/))))
-                 for sep = (split-filename file)
-                 for version = (second sep)
-                 for os = (fourth sep)
-                 for arch = (third sep)
-                 for variant = (if (= (length sep) 5) "" (fifth sep))
-                 when (and (find (first (last sep)) '("binary.tar.bz2" "binary.msi") :test 'equal)
-                           (not (find (list os arch variant) latests :test 'equalp)))
-                 do (push (list os arch variant) latests)
-                    (format o "~{~A~^	~}~%" `(,os ,arch ,version ,variant ,uri)))))
-    (cond ((eql out t)
-           (sub *standard-output*))
-          ((eql out nil)
-           (with-output-to-string (o)
-             (sub o)))
-          (t
-           (with-open-file (o (pathname out) :direction :output :if-exists :supersede)
-             (sub o))))))
 
 (defun mirror-version (version)
   (loop with releases = (releases-list *user* *repo*)
@@ -308,11 +242,7 @@
     (if ver
         (and (< (length ver) 20)
              (mirror-version ver))
-        (mirror-newest)))
-  #+nil
-  (let ((out "sbcl-bin_uri.tsv"))
-    (output-updated-tsv out)
-    (github out *release* *user* *repo* t)))
+        (mirror-newest))))
 
 (task "upload-build-list" ()
   (multiple-value-bind (ver) (version-target)
@@ -327,9 +257,6 @@
         (output-html path out ver)
         (ignore-errors
           (github out *release* *user* *repo* t))))))
-
-(task "tsv" ()
-   (output-updated-tsv "sbcl-bin_uri"))
 
 #-lparallel
 (unwind-protect
