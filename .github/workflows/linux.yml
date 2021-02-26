@@ -39,5 +39,8 @@ jobs:
           GITHUB_OAUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           ARCH: ${{ matrix.target }}
         run: |
-          make archive
-          make upload-archive
+          if [ "$VERSION" = "" ]; then
+            make latest-version archive upload-archive;
+          else
+            make archive upload-archive;
+          fi
