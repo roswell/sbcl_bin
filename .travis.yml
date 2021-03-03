@@ -16,16 +16,17 @@ jobs:
         before_install:
           - choco list -localonly
           - if [ ! -f C:/tools/msys64/msys2_shell.cmd ]; then rm -rf C:/tools/msys64; fi
-          - choco install --no-progress msys2 --params "/NoUpdate"
+          - choco uninstall -y mingw
+          - choco upgrade --no-progress -y msys2
           - powershell Install-WindowsFeature Net-Framework-Core
           - choco install wixtoolset
-          - RefreshEnv.cmd
-          - export SETARCH="cmd.exe //C C:/tools/msys64/msys2_shell.cmd -defterm -mingw64 -no-start -full-path -here -c \$\* --"
-          - $SETARCH pacman -S --noconfirm --needed autoconf automake make zlib-devel mingw-w64-x86_64-gcc mingw-w64-i686-gcc
-          - export PATH=/c/Users/travis/.roswell/bin:$PATH
+          - export MSYS2="set PATH=%PATH%;C:\\Users\\travis\\.roswell\\bin & cmd //C RefreshEnv.cmd & set MSYS=winsymlinks:nativestrict & C:\\tools\\msys64\\msys2_shell.cmd -defterm -no-start"
+          - export MINGW64="$MSYS2 -mingw64 -full-path -here -c "\"\$@"\" --"
+          - export MSYS2="$MSYS2 -msys2 -c "\"\$@"\" --"
+          - $MSYS2 pacman -S --noconfirm --needed autoconf automake make zlib-devel mingw-w64-x86_64-gcc mingw-w64-i686-gcc
           - export WIX="/c/Program Files (x86)/WiX Toolset v3.11"
         before_cache:
-          - $SETARCH pacman --sync --clean --noconfirm
+          - $MSYS2 pacman --sync --clean --noconfirm
       - os: linux
         env: TARGETS="x86-64 x86"
         addons:
@@ -73,14 +74,14 @@ install:
        docker login docker.pkg.github.com -u snmsts -p $GITHUB_OAUTH_TOKEN;
        docker pull $DOCKER;
     fi
-  - $SETARCH curl -L https://raw.githubusercontent.com/roswell/roswell/$ROSWELL_BRANCH/scripts/install-for-ci.sh | sh
-  - $SETARCH ros install snmsts/sn.github
+  - curl -L https://raw.githubusercontent.com/roswell/roswell/$ROSWELL_BRANCH/scripts/install-for-ci.sh | $MINGW64 sh
+  - $MINGW64 ros install snmsts/sn.github
 
 script:
   - "if [ -n \"$DOCKER\" ]; then
       make docker;
     else
-      $SETARCH make archives;
+      $MINGW64 make archives;
     fi"
 after_success:
-  - $SETARCH make upload-archives
+  - $MINGW64 make upload-archives
