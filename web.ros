@@ -78,16 +78,17 @@ exec ros -Q -- $0 "$@"
                                  suffix))))
        (when release
          (ql:quickload :sb-md5)
-         (let ((bz2 (format nil #-win32 "~A.tar.bz2" #+win32 "~A.msi" path)))
-           (cond ((probe-file bz2)
+         (let ((file (or (env "FILE")
+                        (format nil #-win32 "~A.tar.bz2" #+win32 "~A.msi" path))))
+           (cond ((probe-file file)
                   (format t "~(~{~2,'0X~}~)"
-                          (map 'list #'identity (funcall (read-from-string "sb-md5:md5sum-file") bz2)))
+                          (map 'list #'identity (funcall (read-from-string "sb-md5:md5sum-file") file)))
                   (multiple-value-bind (user repo)
                       (account)
                     (uiop:symbol-call :roswell.github.utils :github
-                                      bz2 version user repo t)))
+                                      file version user repo t)))
                  (t
-                  (format t "file not found:~A~%" bz2)
+                  (format t "file not found:~A~%" file)
                   (uiop:quit 1)))))))))
 
 (defun releases ()
