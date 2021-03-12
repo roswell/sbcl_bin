@@ -39,7 +39,7 @@ jobs:
           GITHUB_OAUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           ARCH: ${{ matrix.target }}
         run: |
-          if [ "$VERSION" != "" ]; then
+          if [ "$VERSION" = "" ]; then
             make latest-version archive upload-archive;
           else
             make archive upload-archive;
