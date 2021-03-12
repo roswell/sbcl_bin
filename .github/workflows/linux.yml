@@ -9,7 +9,7 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-18.04
     strategy:
       matrix:
         lisp: [sbcl-bin/2.0.0]
@@ -39,7 +39,7 @@ jobs:
           GITHUB_OAUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           ARCH: ${{ matrix.target }}
         run: |
-          if [ "$VERSION" = "" ]; then
+          if [ "$VERSION" != "" ]; then
             make latest-version archive upload-archive;
           else
             make archive upload-archive;
