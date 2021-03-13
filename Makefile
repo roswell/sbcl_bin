@@ -43,7 +43,7 @@ docker:
 		-e BRANCH=$(BRANCH) \
 		-e SUFFIX=$(SUFFIX) \
 		-e "TARGETS=$(TARGETS)" \
-		-it $$DOCKER bash \
+		$$DOCKER bash \
 		-c "cd /tmp;make archives"
 
 latest-uris:
