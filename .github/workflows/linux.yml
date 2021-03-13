@@ -2,7 +2,6 @@ name: linux
 
 on:
   schedule:
-    # * is a special character in YAML so you have to quote this string
     - cron:  '0 1 * * *'
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
@@ -24,6 +23,7 @@ jobs:
           echo "$HOME/.roswell/bin" >> $GITHUB_PATH
           echo "ROSWELL_BRANCH=master" >> $GITHUB_ENV
           echo "ROSWELL_INSTALL_DIR=$HOME/.roswell" >> $GITHUB_ENV
+          echo "DOCKER=docker.pkg.github.com/roswell/sbcl_bin/glibc2.19-sbcl2.0.0:1" >> $GITHUB_ENV
 
       - name: Install Roswell
         env:
@@ -32,15 +32,28 @@ jobs:
           sudo apt-get -y install git build-essential automake libcurl4-openssl-dev lib32z1-dev gcc-multilib
           curl -L https://raw.githubusercontent.com/roswell/roswell/master/scripts/install-for-ci.sh | sh
           ros install snmsts/sn.github
-
-      - name: build & upload
+          if [ -n "$DOCKER" ]; then
+             docker login docker.pkg.github.com -u snmsts -p $GITHUB_OAUTH_TOKEN;
+             docker pull $DOCKER;
+          fi
+      - name: build
+        env:
+          VERSION: ${{ secrets.VERSION }}
+          TARGETS: ${{ matrix.target }}
+        run: |
+          if [ "$VERSION" = "" ]; then
+            make latest-version docker;
+          else
+            make docker;
+          fi
+      - name: upload
         env:
           VERSION: ${{ secrets.VERSION }}
           GITHUB_OAUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           ARCH: ${{ matrix.target }}
         run: |
           if [ "$VERSION" = "" ]; then
-            make latest-version archive upload-archive;
+            make latest-version upload-archive;
           else
-            make archive upload-archive;
+            make upload-archive;
           fi
