@@ -8,7 +8,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        image: [glibc2.10-sbcl1.5.7, glibc2.19-sbcl2.0.0]
+        image: [glibc2.19-sbcl2.0.0]
     environment: SET_VERSION
 
     steps:
