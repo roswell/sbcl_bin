@@ -12,7 +12,7 @@ jobs:
     strategy:
       matrix:
         lisp: [sbcl-bin/2.0.0]
-        target: [x86-64, x86]
+        target: [x86-64]
     environment: SET_VERSION
 
     steps:
