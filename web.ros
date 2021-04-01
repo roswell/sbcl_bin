@@ -164,14 +164,15 @@ exec ros -Q -- $0 "$@"
                                    (map 'list #'identity (funcall (read-from-string "sb-md5:md5sum-file") path))))
                       (old (format nil "~(~{~2,'0X~}~)"
                                    (map 'list #'identity (funcall (read-from-string "sb-md5:md5sum-string")
-                                                          (dex:get "https://github.com/roswell/sbcl_bin/releases/download/files/sbcl-bin_uri.tsv"
-                                                                   :force-string t))))))
+                                                                  (dex:get "https://github.com/roswell/sbcl_bin/releases/download/files/sbcl-bin_uri.tsv"
+                                                                           :force-string t))))))
                   (format t "new:~A~%old:~A~%" new old)
-                  (unless (equal new old)
-                    (multiple-value-bind (user repo)
-                        (account)
+                  (multiple-value-bind (user repo)
+                      (account)
+                    (when version
                       (uiop:symbol-call :roswell.github.utils :github
-                                        path version user repo t)
+                                        path version user repo t))
+                    (unless (equal new old)
                       (uiop:symbol-call :roswell.github.utils :github
                                         path "files" user repo t)))))
                (t
