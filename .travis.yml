@@ -27,14 +27,12 @@ jobs:
         before_cache:
           - $SETARCH pacman --sync --clean --noconfirm
       - os: linux
-        env: TARGETS="x86-64 x86"
+        env: TARGETS=x86
         addons:
           apt:
             packages:
               - lib32z1-dev
               - gcc-multilib
-      - os: osx
-        env: TARGETS="x86-64"
       - os: linux
         arch: arm64
         env: TARGETS=arm64
@@ -50,12 +48,6 @@ jobs:
           - DOCKER=docker.pkg.github.com/roswell/sbcl_bin/glibc2.10-sbcl1.5.7:1
       #- os: linux-ppc64le
       #  env: TARGET=ppc64le LISP=sbcl-bin/1.5.8
-      - os: linux
-        name: "mirror binary from sbcl.org and upload tsv"
-        env: TARGET=x86-64
-        script:
-          - METHOD=mirror ros run -l Lakefile
-        after_success:
       - os: linux
         env: TARGET=x86-64
         stage: deploy
