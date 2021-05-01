@@ -43,6 +43,7 @@ docker:
 		-e BRANCH=$(BRANCH) \
 		-e SUFFIX=$(SUFFIX) \
 		-e CFLAGS=$(CFLAGS) \
+		-e LINKFLAGS=$(LINKFLAGS) \
 		-e TARGET=$(TARGET) \
 		$$DOCKER bash \
 		-c "cd /tmp;make archive"

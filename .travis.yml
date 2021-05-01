@@ -6,6 +6,7 @@ env:
     - ROSWELL_BRANCH=master
     - ROSWELL_INSTALL_DIR=$HOME/.roswell
     - LISP=sbcl-bin/2.0.0
+    - GH_REPO=sbcl_bin
 
 jobs:
     include:
@@ -28,14 +29,14 @@ jobs:
         env:
           - TARGET=x86-64
           - SUFFIX=-glibc2.10
-          - CFLAGS=-lrt
+          - LINKFLAGS=-lrt
           - DOCKER=docker.pkg.github.com/roswell/sbcl_bin/glibc2.10-sbcl1.5.7:1
       - os: linux
         services: docker
         env:
           - TARGET=x86
           - SUFFIX=-glibc2.10
-          - CFLAGS=-lrt
+          - LINKFLAGS=-lrt
           - DOCKER=docker.pkg.github.com/roswell/sbcl_bin/glibc2.10-sbcl1.5.7:1
       #- os: linux-ppc64le
       #  env: TARGET=ppc64le LISP=sbcl-bin/1.5.8
