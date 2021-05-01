@@ -11,7 +11,7 @@ env:
 jobs:
     include:
       - os: linux
-        env: TARGET=x86
+        env: ARCH=x86
         addons:
           apt:
             packages:
@@ -19,7 +19,7 @@ jobs:
               - gcc-multilib
       - os: linux
         arch: arm64
-        env: TARGET=arm64
+        env: ARCH=arm64
         addons:
           apt:
             packages:
@@ -27,14 +27,14 @@ jobs:
       - os: linux
         services: docker
         env:
-          - TARGET=x86-64
+          - ARCH=x86-64
           - SUFFIX=-glibc2.10
           - LINKFLAGS=-lrt
           - DOCKER=docker.pkg.github.com/roswell/sbcl_bin/glibc2.10-sbcl1.5.7:1
       - os: linux
         services: docker
         env:
-          - TARGET=x86
+          - ARCH=x86
           - SUFFIX=-glibc2.10
           - LINKFLAGS=-lrt
           - DOCKER=docker.pkg.github.com/roswell/sbcl_bin/glibc2.10-sbcl1.5.7:1
