@@ -14,7 +14,7 @@ jobs:
         lisp: [sbcl-bin/2.0.0]
         target: [x86-64, x86]
         suffix: []
-        docker: docker.pkg.github.com/roswell/sbcl_bin/glibc2.19-sbcl2.0.0:1
+        docker: [docker.pkg.github.com/roswell/sbcl_bin/glibc2.19-sbcl2.0.0:1]
         include:
           - lisp: sbcl-bin/2.0.0
             target: x86-64
