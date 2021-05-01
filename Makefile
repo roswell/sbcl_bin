@@ -42,9 +42,10 @@ docker:
 		-e VERSION=$(VERSION) \
 		-e BRANCH=$(BRANCH) \
 		-e SUFFIX=$(SUFFIX) \
-		-e "TARGETS=$(TARGETS)" \
+		-e CFLAGS=$(CFLAGS) \
+		-e TARGET=$(TARGET) \
 		$$DOCKER bash \
-		-c "cd /tmp;make archives"
+		-c "cd /tmp;make archive"
 
 latest-uris:
 	ros web.ros latests

@@ -9,25 +9,8 @@ env:
 
 jobs:
     include:
-      - os: windows
-        services: docker
-        env:
-          - TARGETS=x86-64
-        before_install:
-          - choco list -localonly
-          - if [ ! -f C:/tools/msys64/msys2_shell.cmd ]; then rm -rf C:/tools/msys64; fi
-          - choco install --no-progress msys2 --params "/NoUpdate"
-          - powershell Install-WindowsFeature Net-Framework-Core
-          - choco install wixtoolset
-          - RefreshEnv.cmd
-          - export SETARCH="cmd.exe //C C:/tools/msys64/msys2_shell.cmd -defterm -mingw64 -no-start -full-path -here -c \$\* --"
-          - $SETARCH pacman -S --noconfirm --needed autoconf automake make zlib-devel mingw-w64-x86_64-gcc mingw-w64-i686-gcc
-          - export PATH=/c/Users/travis/.roswell/bin:$PATH
-          - export WIX="/c/Program Files (x86)/WiX Toolset v3.11"
-        before_cache:
-          - $SETARCH pacman --sync --clean --noconfirm
       - os: linux
-        env: TARGETS=x86
+        env: TARGET=x86
         addons:
           apt:
             packages:
@@ -35,7 +18,7 @@ jobs:
               - gcc-multilib
       - os: linux
         arch: arm64
-        env: TARGETS=arm64
+        env: TARGET=arm64
         addons:
           apt:
             packages:
@@ -43,22 +26,23 @@ jobs:
       - os: linux
         services: docker
         env:
-          - TARGETS="x86-64 x86"
+          - TARGET=x86-64
           - SUFFIX=-glibc2.10
+          - CFLAGS=-lrt
+          - DOCKER=docker.pkg.github.com/roswell/sbcl_bin/glibc2.10-sbcl1.5.7:1
+      - os: linux
+        services: docker
+        env:
+          - TARGET=x86
+          - SUFFIX=-glibc2.10
+          - CFLAGS=-lrt
           - DOCKER=docker.pkg.github.com/roswell/sbcl_bin/glibc2.10-sbcl1.5.7:1
       #- os: linux-ppc64le
       #  env: TARGET=ppc64le LISP=sbcl-bin/1.5.8
-      - os: linux
-        env: TARGET=x86-64
-        stage: deploy
-        script:
-          - METHOD=upload-build-list ros run -l Lakefile
-        after_success:
 
 cache:
   directories:
     - $HOME/.roswell
-    - /C/tools/msys64
 
 install:
   - if [ -n "$DOCKER" ]; then
@@ -69,10 +53,11 @@ install:
   - $SETARCH ros install snmsts/sn.github
 
 script:
-  - "if [ -n \"$DOCKER\" ]; then
+  - if [ -n "$DOCKER" ]; then
       make docker;
+      make latest-version docker;
     else
-      $SETARCH make archives;
-    fi"
+      $SETARCH make latest-version archive;
+    fi
 after_success:
-  - $SETARCH make upload-archives
+  - $SETARCH make latest-version upload-archive
