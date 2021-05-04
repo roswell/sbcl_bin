@@ -6,15 +6,15 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        image: [glibc2.19-sbcl2.0.0]
     environment: SET_VERSION
 
     steps:
       - uses: actions/checkout@v2
-      - name: build
-        env:
-          IMAGE: ${{ matrix.image }}
-        run: |
-          docker build tools-for-build/$IMAGE/
+      - uses: docker/setup-buildx-action@v1
+      - name: Build and push Docker images
+        uses: docker/build-push-action@v2
+        id: docker_build
+        with:
+          context: tools-for-build/musl1.2.2-sbcl2.0.5/
+          tags: docker.pkg.github.com/roswell/sbcl_bin/musl1.2.2-sbcl2.0.5:1
+          push: true
