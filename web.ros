@@ -40,7 +40,9 @@ exec ros -Q -- $0 "$@"
                    "armhf")
                   (t m)))
           (or (env "SUFFIX")
-              "")))
+              "")
+          (or (env "UNAME")
+              (roswell.util:uname))))
 
 (defun account ()
   (values
@@ -49,11 +51,11 @@ exec ros -Q -- $0 "$@"
 
 (export
  (defun upload (files &key (interactive t))
-   (multiple-value-bind (version target suffix)
+   (multiple-value-bind (version target suffix uname)
        (version-target)
      (multiple-value-bind (user repo)
          (account)
-       (format t "version:~A target:~A suffix:~A user:~A repo:~A ~%" version target suffix
+       (format t "version:~A target:~A suffix:~A uname:~A user:~A repo:~A ~%" version target suffix uname
                user repo)
        (when (or (not interactive)
                  (yes-or-no-p "upload files:~%~{~S~%~}~%~%OK?" files))
@@ -67,10 +69,9 @@ exec ros -Q -- $0 "$@"
 (export
  (defun upload-archive (args)
    (declare (ignore args))
-   (multiple-value-bind (version target suffix)
+   (multiple-value-bind (version target suffix uname)
        (version-target :target :archive)
-     (let* ((uname (roswell.util:uname))
-            (release (and version (< (length version) 20)))
+     (let* ((release (and version (< (length version) 20)))
             (path (print (format nil "sbcl-~A-~A-~A~A-binary"
                                  version
                                  target
