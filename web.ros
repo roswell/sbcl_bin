@@ -80,14 +80,15 @@ exec ros -Q -- $0 "$@"
        (when release
          (ql:quickload :sb-md5)
          (let ((file (or (env "FILE")
-                        (format nil #-win32 "~A.tar.bz2" #+win32 "~A.msi" path))))
+                        (format nil (if (equal uname "windows") "~A.msi" "~A.tar.bz2")
+                                path))))
            (cond ((probe-file file)
                   (format t "~(~{~2,'0X~}~)"
                           (map 'list #'identity (funcall (read-from-string "sb-md5:md5sum-file") file)))
                   (multiple-value-bind (user repo)
                       (account)
                     (uiop:symbol-call :roswell.github.utils :github
-                                      file version user repo t)))
+                                      file version user repo nil)))
                  (t
                   (format t "file not found:~A~%" file)
                   (uiop:quit 1)))))))))
@@ -151,31 +152,40 @@ exec ros -Q -- $0 "$@"
    (declare (ignore args))
    (save-tsv "sbcl-bin_uri.tsv" (updated-tsv))))
 
+(defun current-tsv (&optional (version "files"))
+  (dex:get (format nil "https://github.com/roswell/sbcl_bin/releases/download/~A/sbcl-bin_uri.tsv" version)
+           :force-string t))
+
+(export
+ (defun tsv-current (args)
+   (declare (ignore args))
+   (multiple-value-bind (version)
+       (version-target :target :archive)
+     (with-open-file (o "sbcl-bin_uri.tsv" :direction :output :if-exists :supersede)
+       (format o "~A" (current-tsv (or version "files")))))))
+
 (export
  (defun upload-tsv (args)
    (declare (ignore args))
-   (multiple-value-bind (version target suffix)
+   (multiple-value-bind (version)
        (version-target :target :archive)
-     (let* ((release (and version (< (length version) 20)))
-            (path "sbcl-bin_uri.tsv"))
+     (let ((path "sbcl-bin_uri.tsv"))
        (progn
          (ql:quickload :sb-md5)
          (cond ((probe-file path)
-                (let ((new (format nil "~(~{~2,'0X~}~)"
-                                   (map 'list #'identity (funcall (read-from-string "sb-md5:md5sum-file") path))))
-                      (old (format nil "~(~{~2,'0X~}~)"
-                                   (map 'list #'identity (funcall (read-from-string "sb-md5:md5sum-string")
-                                                                  (dex:get "https://github.com/roswell/sbcl_bin/releases/download/files/sbcl-bin_uri.tsv"
-                                                                           :force-string t))))))
+                (let* ((version (or version "files"))
+                       (new (format nil "~(~{~2,'0X~}~)"
+                                    (map 'list #'identity (funcall (read-from-string "sb-md5:md5sum-file") path))))
+                       (old (ignore-errors
+                              (format nil "~(~{~2,'0X~}~)"
+                                      (map 'list #'identity (funcall (read-from-string "sb-md5:md5sum-string")
+                                                                     (current-tsv version)))))))
                   (format t "new:~A~%old:~A~%" new old)
                   (multiple-value-bind (user repo)
                       (account)
-                    (when version
-                      (uiop:symbol-call :roswell.github.utils :github
-                                        path version user repo t))
                     (unless (equal new old)
                       (uiop:symbol-call :roswell.github.utils :github
-                                        path "files" user repo t)))))
+                                        path version user repo t)))))
                (t
                 (format t "file not found:~A~%" path)
                 (uiop:quit 1))))))))
