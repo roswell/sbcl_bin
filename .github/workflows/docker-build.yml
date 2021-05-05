@@ -5,19 +5,23 @@ on:
 
 env:
   DOCKER_BUILDKIT: 1
-  IMAGE_NAME: musl1.2.2-sbcl2.0.5
-  IMAGE_TAG: 1
 
 jobs:
   build:
     runs-on: ubuntu-latest
-    environment: SET_VERSION
+    environment: DOCKER_IMAGE
 
     steps:
       - uses: actions/checkout@v2
       - name: Login GitHub Registry
         run: echo ${{ secrets.GITHUB_TOKEN }} | docker login docker.pkg.github.com -u snmsts --password-stdin
       - name: Build image
+        env:
+          IMAGE_NAME: ${{ secrets.IMAGE_NAME }}
+          IMAGE_TAG: ${{ secrets.IMAGE_TAG }}
         run: docker build -t docker.pkg.github.com/${{ github.repository }}/${IMAGE_NAME}:${IMAGE_TAG} ./tools-for-build/${IMAGE_NAME}
       - name: Push image to GitHub Registry
+        env:
+          IMAGE_NAME: ${{ secrets.IMAGE_NAME }}
+          IMAGE_TAG: ${{ secrets.IMAGE_TAG }}
         run: docker push docker.pkg.github.com/${{ github.repository }}/${IMAGE_NAME}:${IMAGE_TAG}
