@@ -25,6 +25,7 @@ jobs:
           bit: 32
           target: x86
     env:
+      LISP: sbcl-bin/2.1.3
       RESULT_NAME: windows-${{ matrix.arch2 }}
       RESULT_PATH: windows-${{ matrix.arch2 }}
       RESULT_PATH_SUB: roswell
