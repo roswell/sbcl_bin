@@ -44,7 +44,7 @@ jobs:
         path-type: inherit
         release: true
         update: true
-        install: 'base-devel mingw-w64-${{ matrix.arch }}-toolchain curl'
+        install: 'base-devel mingw-w64-${{ matrix.arch }}-toolchain curl unzip'
     - name: Run MSYS2 once
       shell: msys2 {0}
       run: |
