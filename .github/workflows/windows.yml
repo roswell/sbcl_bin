@@ -29,7 +29,7 @@ jobs:
       RESULT_PATH: windows-${{ matrix.arch2 }}
       RESULT_PATH_SUB: roswell
       SBCL_OPTIONS: 
-      ARCH=${{ matrix.target }}
+      ARCH: ${{ matrix.target }}
       VERSION: ${{ secrets.VERSION }}
       GITHUB_OAUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
