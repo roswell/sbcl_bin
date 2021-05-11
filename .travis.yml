@@ -7,6 +7,7 @@ env:
     - ROSWELL_INSTALL_DIR=$HOME/.roswell
     - LISP=sbcl-bin/2.0.0
     - GH_REPO=sbcl_bin
+    - MAKE=make
 
 jobs:
     include:
@@ -18,7 +19,9 @@ jobs:
             packages:
               - libcurl4-openssl-dev
       - os: freebsd
-        env: LISP=sbcl-bin/2.1.2
+        env:
+          - LISP=sbcl-bin/2.1.2
+          - MAKE=gmake
 
       #- os: linux
       #  services: docker
@@ -44,9 +47,9 @@ install:
 
 script:
   - if [ -n "$DOCKER" ]; then
-      make latest-version docker;
+      $MAKE latest-version docker;
     else
-      $SETARCH make latest-version archive;
+      $SETARCH $MAKE latest-version archive;
     fi
 after_success:
-  - $SETARCH make latest-version upload-archive
+  - $SETARCH $MAKE latest-version upload-archive
