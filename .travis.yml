@@ -22,6 +22,11 @@ jobs:
         env:
           - LISP=sbcl-bin/2.1.2
           - MAKE=gmake
+      - os: freebsd
+        env:
+          - LISP=sbcl-bin/2.1.2
+          - MAKE=gmake
+          - ARCH=x86
 
       #- os: linux
       #  services: docker
