@@ -44,7 +44,12 @@ jobs:
         run: |
           echo "$HOME/.roswell/bin" >> $GITHUB_PATH
           echo "ROSWELL_BRANCH=release" >> $GITHUB_ENV
-
+      - name: checkenv
+        run: |
+          uname -s
+          uname -m
+          echo $ROSWELL_INSTALL_DIR
+          echo $ROSWELL_BRANCH
       - name: Install Roswell
         env:
           LISP: ${{ matrix.lisp }}
