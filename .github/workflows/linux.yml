@@ -43,7 +43,7 @@ jobs:
       - name: setenv
         run: |
           echo "$HOME/.roswell/bin" >> $GITHUB_PATH
-          echo "ROSWELL_BRANCH=master" >> $GITHUB_ENV
+          echo "ROSWELL_BRANCH=release" >> $GITHUB_ENV
           echo "ROSWELL_INSTALL_DIR=$HOME/.roswell" >> $GITHUB_ENV
 
       - name: Install Roswell
