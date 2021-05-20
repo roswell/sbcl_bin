@@ -17,11 +17,11 @@ jobs:
         run: echo ${{ secrets.GITHUB_TOKEN }} | docker login docker.pkg.github.com -u snmsts --password-stdin
       - name: Build image
         env:
-          IMAGE_NAME: ${{ secrets.IMAGE_NAME }}
-          IMAGE_TAG: ${{ secrets.IMAGE_TAG }}
-        run: docker build -t docker.pkg.github.com/${{ github.repository }}/${IMAGE_NAME}:${IMAGE_TAG} ./tools-for-build/${IMAGE_NAME}
+          IMAGE: ${{ secrets.IMAGE }}
+        run: |
+          echo building $(cat ./scripts/Docker/$IMAGE/Name) ...
+          docker build -t docker.pkg.github.com/${{ github.repository }}/$(cat ./scripts/Docker/$IMAGE/Name) ./scripts/Docker/$IMAGE
       - name: Push image to GitHub Registry
         env:
-          IMAGE_NAME: ${{ secrets.IMAGE_NAME }}
-          IMAGE_TAG: ${{ secrets.IMAGE_TAG }}
-        run: docker push docker.pkg.github.com/${{ github.repository }}/${IMAGE_NAME}:${IMAGE_TAG}
+          IMAGE: ${{ secrets.IMAGE }}
+        run: docker push docker.pkg.github.com/${{ github.repository }}/$(cat ./scripts/Docker/$IMAGE/Name)

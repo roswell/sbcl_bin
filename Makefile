@@ -9,6 +9,7 @@ SUFFIX ?=
 TARGETS ?=$(ARCH)
 SBCL_OPTIONS ?=--with-sb-core-compression
 LISP_IMPL ?= ros -L sbcl-bin without-roswell=t --no-rc run
+DOCKER_REPO ?= docker.pkg.github.com/roswell/sbcl_bin
 
 show:
 	@echo VERSION=$(VERSION) ARCH=$(ARCH) BRANCH=$(BRANCH) SUFFIX=$(SUFFIX)
@@ -35,6 +36,12 @@ archives:
 tsv:
 	ros web.ros tsv
 
+build-docker:
+	docker build -t $(DOCKER_REPO)/$$(cat ./tools-for-build/$(IMAGE)/Name) ./tools-for-build/$(IMAGE)
+push-docker:
+	docker push $(DOCKER_REPO)/$$(cat ./tools-for-build/$(IMAGE)/Name);
+pull-docker:
+	docker pull $(DOCKER_REPO)/$$(cat ./tools-for-build/$(IMAGE)/Name);
 docker:
 	docker run \
 		-v `pwd`:/tmp \
@@ -45,7 +52,8 @@ docker:
 		-e CFLAGS=$(CFLAGS) \
 		-e LINKFLAGS=$(LINKFLAGS) \
 		-e TARGET=$(TARGET) \
-		$$DOCKER bash \
+		$(DOCKER_REPO)/$$(cat ./tools-for-build/$(IMAGE)/Name) \
+		bash \
 		-c "cd /tmp;make archive"
 
 latest-uris:
