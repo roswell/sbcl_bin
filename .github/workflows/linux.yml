@@ -18,6 +18,14 @@ jobs:
         include:
           - lisp: sbcl-bin/2.0.0
             target: x86-64
+            image: 'glibc2.31-sbcl2.1.4'
+            suffix: -glibc2.31
+          - lisp: sbcl-bin/2.0.0
+            target: x86
+            image: 'glibc2.31-sbcl2.1.4'
+            suffix: -glibc2.31
+          - lisp: sbcl-bin/2.0.0
+            target: x86-64
             image: 'musl1.2.2-sbcl2.0.5'
             suffix: -musl
           - lisp: sbcl-bin/2.0.0
