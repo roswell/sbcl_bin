@@ -17,6 +17,7 @@ jobs:
         env:
           - ARCH=arm64
           - IMAGE=musl1.2.2-sbcl2.0.5
+          - SUFFIX=-musl
         addons:
           apt:
             packages:
@@ -61,7 +62,7 @@ install:
   - $SETARCH ros install snmsts/sn.github
 
 script:
-  - if [ -n "$DOCKER" ]; then
+  - if [ -n "$IMAGE" ]; then
       $MAKE latest-version docker;
     else
       $SETARCH $MAKE latest-version archive;
