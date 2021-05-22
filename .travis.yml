@@ -55,7 +55,7 @@ cache:
 install:
   - if [ -n "$IMAGE" ]; then
        docker login docker.pkg.github.com -u snmsts -p $GITHUB_OAUTH_TOKEN;
-       make pull-docker || make build-docker push-docker
+       $MAKE pull-docker || make build-docker push-docker;
     fi
   - $SETARCH curl -L https://raw.githubusercontent.com/roswell/roswell/$ROSWELL_BRANCH/scripts/install-for-ci.sh | sh
   - $SETARCH ros install snmsts/sn.github
