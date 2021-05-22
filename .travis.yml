@@ -13,6 +13,16 @@ jobs:
     include:
       - os: linux
         arch: arm64
+        services: docker
+        env:
+          - ARCH=arm64
+          - IMAGE=musl1.2.2-sbcl2.0.5
+        addons:
+          apt:
+            packages:
+              - libcurl4-openssl-dev
+      - os: linux
+        arch: arm64
         env: ARCH=arm64
         addons:
           apt:
@@ -43,9 +53,9 @@ cache:
     - $HOME/.roswell
 
 install:
-  - if [ -n "$DOCKER" ]; then
+  - if [ -n "$IMAGE" ]; then
        docker login docker.pkg.github.com -u snmsts -p $GITHUB_OAUTH_TOKEN;
-       docker pull $DOCKER;
+       make pull-docker || make build-docker push-docker
     fi
   - $SETARCH curl -L https://raw.githubusercontent.com/roswell/roswell/$ROSWELL_BRANCH/scripts/install-for-ci.sh | sh
   - $SETARCH ros install snmsts/sn.github
