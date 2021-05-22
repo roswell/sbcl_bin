@@ -55,6 +55,7 @@ cache:
 
 install:
   - if [ -n "$IMAGE" ]; then
+       echo $IMAGE:`uname -m` > tools-for-build/$IMAGE/Name
        docker login docker.pkg.github.com -u snmsts -p $GITHUB_OAUTH_TOKEN;
        $MAKE pull-docker || make build-docker push-docker;
     fi
