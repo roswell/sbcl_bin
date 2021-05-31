@@ -14,13 +14,16 @@ exec ros -Q -- $0 "$@"
   (:use :cl))
 (in-package :ros.script.web.3788143716)
 
+(defvar *version* nil)
+
 (defun env (name)
   (let ((val (ros:getenv name)))
     (unless (zerop (length val))
       val)))
 
 (defun version-target (&key (target :compiler))
-  (values (or (env "TRAVIS_TAG")
+  (values (or *version*
+              (env "TRAVIS_TAG")
               (env "APPVEYOR_REPO_TAG_NAME")
               (let ((version (env "VERSION")) )
                 (if (equal "99.99.99" version)
@@ -141,8 +144,14 @@ exec ros -Q -- $0 "$@"
   tsv)
 
 (defun updated-tsv ()
-  (let* ((releases (releases))
-         (tsv (parse-tsv (dex:get (tsv-uri (second releases)) :force-string t))))
+  (let ((releases (releases))
+        (tsv (or (ignore-errors (parse-tsv (dex:get (tsv-uri (second releases)) :force-string t)))
+                 ;; download second new release's tsv or upload current tsv.
+                 (let ((*version* (release-tag_name (second releases)))
+                       (result (parse-tsv (tsv-get "files"))))
+                   (save-tsv "sbcl-bin_uri.tsv" result)
+                   (upload-tsv nil)
+                   result))))
     (mapc (lambda (x) (modify-tsv tsv x)) (reverse releases))
     (setf (rest tsv) (sort (rest tsv) (complement #'uiop/version:version<) :key #'third))
     tsv))
@@ -152,17 +161,17 @@ exec ros -Q -- $0 "$@"
    (declare (ignore args))
    (save-tsv "sbcl-bin_uri.tsv" (updated-tsv))))
 
-(defun current-tsv (&optional (version "files"))
+(defun tsv-get (&optional (version "files"))
   (dex:get (format nil "https://github.com/roswell/sbcl_bin/releases/download/~A/sbcl-bin_uri.tsv" version)
            :force-string t))
 
 (export
- (defun tsv-current (args)
+ (defun get-tsv (args)
    (declare (ignore args))
    (multiple-value-bind (version)
        (version-target :target :archive)
      (with-open-file (o "sbcl-bin_uri.tsv" :direction :output :if-exists :supersede)
-       (format o "~A" (current-tsv (or version "files")))))))
+       (format o "~A" (tsv-get (or version "files")))))))
 
 (export
  (defun upload-tsv (args)
@@ -179,7 +188,7 @@ exec ros -Q -- $0 "$@"
                        (old (ignore-errors
                               (format nil "~(~{~2,'0X~}~)"
                                       (map 'list #'identity (funcall (read-from-string "sb-md5:md5sum-string")
-                                                                     (current-tsv version)))))))
+                                                                     (tsv-get version)))))))
                   (format t "new:~A~%old:~A~%" new old)
                   (multiple-value-bind (user repo)
                       (account)
