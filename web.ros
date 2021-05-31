@@ -144,14 +144,14 @@ exec ros -Q -- $0 "$@"
   tsv)
 
 (defun updated-tsv ()
-  (let ((releases (releases))
-        (tsv (or (ignore-errors (parse-tsv (dex:get (tsv-uri (second releases)) :force-string t)))
-                 ;; download second new release's tsv or upload current tsv.
-                 (let ((*version* (release-tag_name (second releases)))
-                       (result (parse-tsv (tsv-get "files"))))
-                   (save-tsv "sbcl-bin_uri.tsv" result)
-                   (upload-tsv nil)
-                   result))))
+  (let* ((releases (releases))
+         (tsv (or (ignore-errors (parse-tsv (dex:get (tsv-uri (second releases)) :force-string t)))
+                  ;; download second new release's tsv or upload current tsv.
+                  (let ((*version* (release-tag_name (second releases)))
+                        (result (parse-tsv (tsv-get "files"))))
+                    (save-tsv "sbcl-bin_uri.tsv" result)
+                    (upload-tsv nil)
+                    result))))
     (mapc (lambda (x) (modify-tsv tsv x)) (reverse releases))
     (setf (rest tsv) (sort (rest tsv) (complement #'uiop/version:version<) :key #'third))
     tsv))
