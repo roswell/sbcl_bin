@@ -94,21 +94,29 @@
     (loop with releases = (progn
                             (format t "fetching releases-list ~A ~A" *user* *repo*)(force-output)
                             (prog1 (releases-list *user* *repo*)
-                              (format t "done~%")(force-output)))
+                              (format t " done~%")(force-output)))
           for uri = (read-line in nil nil)
           while uri
           for path = (file-namestring (quri:uri-path (quri:uri uri)))
           for *release* = (second (split-sequence:split-sequence #\- (pathname-name path)))
           do (format t "~%~a " uri)
              (force-output)
-             (if (find path (getf (find *release*
-                                        releases
-                                        :key (lambda (x) (getf x :|tag_name|))
-                                        :test 'equal) :|assets|)
-                       :key (lambda (x) (getf x :|name|))
-                       :test #'equal)
-                 (format t "skip")
-                 (fetch-upload path uri (second (split-sequence:split-sequence #\- (pathname-name path)))))
+             (cond ((find-if (let ((y (ignore-errors
+                                        (subseq (pathname-name path)
+                                                (1+ (position #\- (pathname-name path) :start 5))))))
+                               (lambda (x)
+                                 (equal x y)))
+                             *ci-supported*)
+                    (ensure-release-exists (second (split-sequence:split-sequence #\- (pathname-name path))))
+                    (format t "skip[ci]"))
+                   ((find path (getf (find *release*
+                                           releases
+                                           :key (lambda (x) (getf x :|tag_name|))
+                                           :test 'equal) :|assets|)
+                          :key (lambda (x) (getf x :|name|))
+                          :test #'equal)
+                    (format t "skip[exist]"))
+                   (t (fetch-upload path uri (second (split-sequence:split-sequence #\- (pathname-name path))))))
              (force-output)))
   (let ((path "sbcl-bin.html")
         (out "mirror.html"))
