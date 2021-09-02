@@ -101,21 +101,23 @@
           for *release* = (second (split-sequence:split-sequence #\- (pathname-name path)))
           do (format t "~%~a " uri)
              (force-output)
-             (cond ((find-if (let ((y (ignore-errors
-                                        (subseq (pathname-name path)
-                                                (1+ (position #\- (pathname-name path) :start 5))))))
-                               (lambda (x)
-                                 (equal x y)))
-                             *ci-supported*)
-                    (ensure-release-exists (second (split-sequence:split-sequence #\- (pathname-name path))))
-                    (format t "skip[ci]"))
-                   ((find path (getf (find *release*
+             (cond ((find path (getf (find *release*
                                            releases
                                            :key (lambda (x) (getf x :|tag_name|))
                                            :test 'equal) :|assets|)
                           :key (lambda (x) (getf x :|name|))
                           :test #'equal)
                     (format t "skip[exist]"))
+                   ((find-if (let ((y (ignore-errors
+                                        (subseq path
+                                                (1+ (position #\- path :start 5))))))
+                               (lambda (x)
+                                 (equal x y)))
+                             *ci-supported*)
+                    (ensure-release-exists (second (split-sequence:split-sequence #\- (pathname-name path)))
+                                           :owner *user*
+                                           :repo *repo*)
+                    (format t "skip[ci]"))
                    (t (fetch-upload path uri (second (split-sequence:split-sequence #\- (pathname-name path))))))
              (force-output)))
   (let ((path "sbcl-bin.html")
