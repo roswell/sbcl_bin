@@ -29,6 +29,7 @@ jobs:
           LISP: ${{ matrix.lisp }}
         run: |
           brew install automake autoconf
+          brew uninstall zstd
           curl -L https://raw.githubusercontent.com/roswell/roswell/master/scripts/install-for-ci.sh | sh
           ros install snmsts/sn.github
 
