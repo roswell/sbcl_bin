@@ -18,7 +18,6 @@ jobs:
       - name: Build image
         env:
           IMAGE: ${{ secrets.IMAGE }}
-tools-for-build/
         run: |
           echo building $(cat ./tools-for-build/$IMAGE/Name) ...
           docker build -t docker.pkg.github.com/${{ github.repository }}/$(cat ./tools-for-build/$IMAGE/Name) ./tools-for-build/$IMAGE
