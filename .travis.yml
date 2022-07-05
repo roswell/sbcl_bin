@@ -24,7 +24,9 @@ jobs:
               - libcurl4-openssl-dev
       - os: linux
         arch: arm64
-        env: ARCH=arm64
+        env:
+          - ARCH=arm64
+          - IMAGE=glibc2.19-sbcl2.0.0
         addons:
           apt:
             packages:
