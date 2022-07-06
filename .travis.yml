@@ -61,6 +61,11 @@ install:
        docker login docker.pkg.github.com -u snmsts -p $GITHUB_OAUTH_TOKEN;
        $MAKE pull-docker || make build-docker push-docker;
     fi
+  - if [[ "${TRAVIS_OS_NAME}" == "freebsd" ]]; then
+       cd /tmp; git clone https://github.com/facebook/zstd;
+       cd /tmp/zstd/lib; git checkout v1.5.2; gmake PREFIX=/usr install-includes install-static; gmake clean;
+       gmake PREFIX=/usr LIBDIR=/usr/lib32 CFLAGS=-m32 install-static; gmake clean;
+    fi
   - $SETARCH curl -L https://raw.githubusercontent.com/roswell/roswell/$ROSWELL_BRANCH/scripts/install-for-ci.sh | sh
   - $SETARCH ros install snmsts/sn.github
 
