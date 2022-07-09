@@ -56,6 +56,7 @@ cache:
     - $HOME/.roswell
 
 install:
+  - pwd
   - if [ -n "$IMAGE" ]; then
        bash -c "echo -n `cat tools-for-build/$IMAGE/Name`;uname -m" > tools-for-build/$IMAGE/Name;
        docker login docker.pkg.github.com -u snmsts -p $GITHUB_OAUTH_TOKEN;
@@ -63,13 +64,15 @@ install:
     fi
   - if [[ "${TRAVIS_OS_NAME}" == "freebsd" ]]; then
        cd /tmp; git clone https://github.com/facebook/zstd;
-       cd /tmp/zstd/lib; git checkout v1.5.2; gmake PREFIX=/usr install-includes install-static; gmake clean;
-       gmake PREFIX=/usr LIBDIR=/usr/lib32 CFLAGS=-m32 install-static; gmake clean;
+       cd /tmp/zstd/lib; git checkout v1.5.2;
+       sudo gmake PREFIX=/usr install-includes install-static clean;
+       sudo gmake PREFIX=/usr LIBDIR=/usr/lib32 CFLAGS=-m32 install-static clean;
     fi
   - $SETARCH curl -L https://raw.githubusercontent.com/roswell/roswell/$ROSWELL_BRANCH/scripts/install-for-ci.sh | sh
   - $SETARCH ros install snmsts/sn.github
 
 script:
+  - pwd
   - if [ -n "$IMAGE" ]; then
       $MAKE latest-version docker;
     else
