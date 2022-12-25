@@ -1,4 +1,4 @@
-name: osx
+name: freebsd
 
 on:
   schedule:
