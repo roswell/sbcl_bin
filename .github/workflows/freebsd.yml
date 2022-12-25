@@ -9,6 +9,13 @@ on:
 jobs:
   build:
     runs-on: macos-12
+    env:
+      VERSION: ${{ secrets.VERSION }}
+      ARCH: ${{ matrix.target }}
+      SUFFIX: ${{ matrix.suffix }}
+      LINKFLAGS: ${{ matrix.linkflags }}
+      ROSWELL_BRANCH: master
+
     strategy:
       matrix:
         include:
@@ -25,18 +32,18 @@ jobs:
         id: test
         uses: vmactions/freebsd-vm@v0
         with:
-          envs: 'MYTOKEN MYTOKEN2'
+          release: 12.3
+          envs: 'VERSION ARCH IMAGE SUFFIX LINKFLAGS'
           usesh: true
           prepare: |
-            pkg install -y bash roswell autoconf texinfo perl5 gmake gcc libffi
-          run: |
-            bash -c "cd /tmp; git clone https://github.com/facebook/zstd";
+            pkg install -y bash roswell autoconf texinfo perl5 gmake gcc libffi git
+            bash -c "cd /tmp; git clone https://github.com/facebook/zstd"
             bash -c "cd /tmp/zstd/lib; git checkout v1.5.2;
               sudo gmake PREFIX=/usr install-includes install-static clean;
-              sudo gmake PREFIX=/usr LIBDIR=/usr/lib32 CFLAGS=-m32 install-static clean";
-
-            pwd
+              sudo gmake PREFIX=/usr LIBDIR=/usr/lib32 CFLAGS=-m32 install-static clean"
+            ros install snmsts/sn.github
+          run: |
+            gmake latest-version archive
             ls -lah
             whoami
-            env
             freebsd-version
