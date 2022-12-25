@@ -1,0 +1,42 @@
+name: osx
+
+on:
+  schedule:
+    - cron:  '0 1 * * *'
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: macos-12
+    strategy:
+      matrix:
+        include:
+          - lisp: sbcl-bin/2.0.0
+            target: x86-64
+          - lisp: sbcl-bin/2.0.0
+            target: x86
+  
+    environment: SET_VERSION
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Test in FreeBSD
+        id: test
+        uses: vmactions/freebsd-vm@v0
+        with:
+          envs: 'MYTOKEN MYTOKEN2'
+          usesh: true
+          prepare: |
+            pkg install -y bash roswell autoconf texinfo perl5 gmake gcc libffi
+          run: |
+            bash -c "cd /tmp; git clone https://github.com/facebook/zstd";
+            bash -c "cd /tmp/zstd/lib; git checkout v1.5.2;
+              sudo gmake PREFIX=/usr install-includes install-static clean;
+              sudo gmake PREFIX=/usr LIBDIR=/usr/lib32 CFLAGS=-m32 install-static clean";
+
+            pwd
+            ls -lah
+            whoami
+            env
+            freebsd-version
