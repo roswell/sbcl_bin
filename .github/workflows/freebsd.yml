@@ -15,8 +15,11 @@ jobs:
       SUFFIX: ${{ matrix.suffix }}
       LINKFLAGS: ${{ matrix.linkflags }}
       ROSWELL_BRANCH: master
+      GH_USER: roswell
+      GH_REPO: sbcl_bin
 
     strategy:
+      fail-fast: false
       matrix:
         include:
           - lisp: sbcl-bin/2.0.0
@@ -33,7 +36,7 @@ jobs:
         uses: vmactions/freebsd-vm@v0
         with:
           release: 12.3
-          envs: 'VERSION ARCH IMAGE SUFFIX LINKFLAGS'
+          envs: 'VERSION ARCH IMAGE SUFFIX LINKFLAGS GH_USER GH_REPO'
           usesh: true
           prepare: |
             pkg install -y bash roswell autoconf texinfo perl5 gmake gcc libffi git
