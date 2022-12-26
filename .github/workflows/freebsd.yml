@@ -42,8 +42,8 @@ jobs:
             pkg install -y bash roswell autoconf texinfo perl5 gmake gcc libffi git
             bash -c "cd /tmp; git clone https://github.com/facebook/zstd"
             bash -c "cd /tmp/zstd/lib; git checkout v1.5.2"
-            bash -c "cd /tmp/zstd/lib; sudo gmake PREFIX=/usr install-includes install-static clean"
-            bash -c "cd /tmp/zstd/lib; sudo gmake PREFIX=/usr LIBDIR=/usr/lib32 CFLAGS=-m32 install-static clean"
+            bash -c "cd /tmp/zstd/lib; gmake PREFIX=/usr install-includes install-static clean"
+            bash -c "cd /tmp/zstd/lib; gmake PREFIX=/usr LIBDIR=/usr/lib32 CFLAGS=-m32 install-static clean"
             ros install snmsts/sn.github
           run: |
             gmake latest-version archive
