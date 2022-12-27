@@ -64,7 +64,7 @@ jobs:
           GITHUB_OAUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           if [ "$VERSION" = "" ]; then
-            TARGET=freebsd make latest-version upload-archive;
+            ARCH=freebsd make latest-version upload-archive;
           else
-            TARGET=freebsd make upload-archive;
+            ARCH=freebsd make upload-archive;
           fi
