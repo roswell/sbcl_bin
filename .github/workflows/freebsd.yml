@@ -63,6 +63,7 @@ jobs:
         env:
           GITHUB_OAUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
+          find . -name "*.tar.bz2" |xargs -i cp -p {} .
           if [ "$VERSION" = "" ]; then
             ARCH=freebsd make latest-version upload-archive;
           else
