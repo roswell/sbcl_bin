@@ -52,12 +52,18 @@ jobs:
             else
               gmake archive;
             fi
+      - name: Install Roswell
+        env:
+          LISP: ${{ matrix.lisp }}
+        run: |
+          curl -L https://raw.githubusercontent.com/roswell/roswell/master/scripts/install-for-ci.sh | sh
+          ros install snmsts/sn.github
       - name: upload
         env:
           GITHUB_OAUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           if [ "$VERSION" = "" ]; then
-            make latest-version upload-archive;
+            TARGET=freebsd make latest-version upload-archive;
           else
-            make upload-archive;
+            TARGET=freebsd make upload-archive;
           fi
