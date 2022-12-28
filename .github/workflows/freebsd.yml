@@ -17,6 +17,7 @@ jobs:
       ROSWELL_BRANCH: master
       GH_USER: roswell
       GH_REPO: sbcl_bin
+      GITHUB_OAUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
     strategy:
       fail-fast: false
@@ -36,7 +37,7 @@ jobs:
         uses: vmactions/freebsd-vm@v0
         with:
           release: 12.3
-          envs: 'VERSION ARCH IMAGE SUFFIX LINKFLAGS GH_USER GH_REPO'
+          envs: 'VERSION ARCH IMAGE SUFFIX LINKFLAGS GH_USER GH_REPO GITHUB_OAUTH_TOKEN'
           usesh: true
           prepare: |
             pkg install -y bash roswell autoconf texinfo perl5 gmake gcc libffi git
@@ -48,24 +49,7 @@ jobs:
             ros install snmsts/sn.github
           run: |
             if [ "$VERSION" = "" ]; then
-              gmake latest-version archive;
+              gmake latest-version archive upload-archive;
             else
-              gmake archive;
+              gmake archive upload-archive;
             fi
-      - name: Install Roswell
-        env:
-          LISP: ${{ matrix.lisp }}
-        run: |
-          brew install automake autoconf
-          curl -L https://raw.githubusercontent.com/roswell/roswell/master/scripts/install-for-ci.sh | sh
-          ros install snmsts/sn.github
-      - name: upload
-        env:
-          GITHUB_OAUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          find . -name "*.tar.bz2" |xargs -J% cp -p % .
-          if [ "$VERSION" = "" ]; then
-            ARCH=freebsd make latest-version upload-archive;
-          else
-            ARCH=freebsd make upload-archive;
-          fi
