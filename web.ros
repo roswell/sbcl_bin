@@ -108,7 +108,7 @@ exec ros -Q -- $0 "$@"
 
 (defun release-uris (&optional (release (latest-relase)))
   (loop for asset in (getf release :|assets|)
-        when (find (getf asset :|content_type|) '("application/x-bzip2" "application/x-msi") :test 'equal)
+        ;;when (find (getf asset :|content_type|) '("application/x-bzip2" "application/x-msi") :test 'equal)
         collect (getf asset :|browser_download_url|)))
 
 (defun release-tag_name (&optional (release (latest-relase)))
