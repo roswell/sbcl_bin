@@ -39,12 +39,12 @@ jobs:
             suffix: -musl1.1
           - lisp: sbcl-bin/2.0.0
             target: x86-64
-            image: 'glibc2.10-sbcl1.5.7'
+            image: 'glibc2.10-sbcl2.0.5'
             suffix: -glibc2.10
             linkflags: -lrt
           - lisp: sbcl-bin/2.0.0
             target: x86
-            image: 'glibc2.10-sbcl1.5.7'
+            image: 'glibc2.10-sbcl2.0.5'
             suffix: -glibc2.10
             linkflags: -lrt
 
