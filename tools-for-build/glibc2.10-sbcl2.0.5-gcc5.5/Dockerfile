@@ -5,6 +5,7 @@ run yum -y install libcurl-devel zlib-devel glibc-devel.i686 libgcc.i686 zlib-de
 run yum -y install epel-release;yum -y install libzstd-devel
 run cd /tmp; git clone https://github.com/facebook/zstd; \
     cd /tmp/zstd/lib; git checkout v1.4.5; \
+    rm /usr/lib64/libzstd.so*; \
     make PREFIX=/usr LIBDIR=/usr/lib64 install-static; make clean; \
     make PREFIX=/usr LIBDIR=/usr/lib CFLAGS=-m32 install-static; make clean; \
     cd /tmp;rm -rf /tmp/zstd;
