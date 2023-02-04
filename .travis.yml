@@ -31,15 +31,6 @@ jobs:
           apt:
             packages:
               - libcurl4-openssl-dev
-      - os: freebsd
-        env:
-          - LISP=sbcl-bin/2.1.2
-          - MAKE=gmake
-      - os: freebsd
-        env:
-          - LISP=sbcl-bin/2.1.2
-          - MAKE=gmake
-          - ARCH=x86
 
       #- os: linux
       #  services: docker
@@ -61,12 +52,6 @@ install:
        bash -c "echo -n `cat tools-for-build/$IMAGE/Name`;uname -m" > tools-for-build/$IMAGE/Name;
        docker login docker.pkg.github.com -u snmsts -p $GITHUB_OAUTH_TOKEN;
        $MAKE pull-docker || make build-docker push-docker;
-    fi
-  - if [[ "${TRAVIS_OS_NAME}" == "freebsd" ]]; then
-       bash -c "cd /tmp; git clone https://github.com/facebook/zstd";
-       bash -c "cd /tmp/zstd/lib; git checkout v1.5.2;
-         sudo gmake PREFIX=/usr install-includes install-static clean;
-         sudo gmake PREFIX=/usr LIBDIR=/usr/lib32 CFLAGS=-m32 install-static clean";
     fi
   - $SETARCH curl -L https://raw.githubusercontent.com/roswell/roswell/$ROSWELL_BRANCH/scripts/install-for-ci.sh | sh
   - $SETARCH ros install snmsts/sn.github
