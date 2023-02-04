@@ -49,7 +49,7 @@ jobs:
             ros install snmsts/sn.github
           run: |
             if [ "$VERSION" = "" ]; then
-              gmake latest-version archive upload-archive;
+              gmake latest-version compile archive upload-archive;
             else
-              gmake archive upload-archive;
+              gmake compile archive upload-archive;
             fi

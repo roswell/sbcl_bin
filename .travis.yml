@@ -61,7 +61,7 @@ script:
   - if [ -n "$IMAGE" ]; then
       $MAKE latest-version docker;
     else
-      $SETARCH $MAKE latest-version archive;
+      $SETARCH $MAKE latest-version compile archive;
     fi
 after_success:
   - $SETARCH $MAKE latest-version upload-archive

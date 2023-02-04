@@ -25,13 +25,7 @@ compile: show
 	cd sbcl;bash run-sbcl.sh --eval "(progn (print *features*)(terpri)(quit))"
 
 archive:
-	VERSION=$(VERSION) ARCH=$(ARCH) BRANCH=$(BRANCH) make compile
 	VERSION=$(VERSION) ARCH=$(ARCH) SUFFIX=$(SUFFIX) ros build.ros archive
-
-archives:
-	for ar in $(TARGETS); do \
-	  VERSION=$(VERSION) ARCH=$$ar BRANCH=$(BRANCH) SUFFIX=$(SUFFIX) make archive; \
-	done
 
 tsv:
 	ros web.ros tsv
@@ -54,7 +48,7 @@ docker:
 		-e TARGET=$(TARGET) \
 		$(DOCKER_REPO)/$$(cat ./tools-for-build/$(IMAGE)/Name) \
 		bash \
-		-c "cd /tmp;make archive"
+		-c "cd /tmp;make compile archive"
 
 latest-uris:
 	ros web.ros latests
@@ -66,11 +60,6 @@ latest-version:
 
 upload-archive: show
 	VERSION=$(VERSION) TARGET=$(ARCH) SUFFIX=$(SUFFIX) ros web.ros upload-archive
-
-upload-archives:
-	for ar in $(TARGETS); do \
-	  VERSION=$(VERSION) ARCH=$$ar SUFFIX=$(SUFFIX) make upload-archive; \
-	done
 
 upload-tsv:
 	VERSION=$(VERSION) TARGET=$(ARCH) SUFFIX=$(SUFFIX) ros web.ros upload-tsv

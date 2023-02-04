@@ -40,7 +40,7 @@ jobs:
           ARCH: ${{ matrix.target }}
         run: |
           if [ "$VERSION" = "" ]; then
-            make latest-version archive upload-archive;
+            make latest-version compile archive upload-archive;
           else
-            make archive upload-archive;
+            make compile archive upload-archive;
           fi

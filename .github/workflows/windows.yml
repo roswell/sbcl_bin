@@ -61,9 +61,9 @@ jobs:
       shell: msys2 {0}
       run: |
         if [ "$VERSION" = "" ]; then
-          make latest-version archive;
+          make latest-version compile archive;
         else
-          make archive;
+          make compile archive;
         fi
     - name: upload
       shell: msys2 {0}
