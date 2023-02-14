@@ -63,3 +63,9 @@ upload-archive: show
 
 upload-tsv:
 	VERSION=$(VERSION) TARGET=$(ARCH) SUFFIX=$(SUFFIX) ros web.ros upload-tsv
+
+download-tsv:
+	VERSION=$(VERSION) ros web.ros get-tsv
+
+table:
+	ros build.ros table
