@@ -168,14 +168,14 @@ exec ros -Q -- $0 "$@"
           unless newversion
           do (setf newversion version)
           unless variant
-          do (let ((diff (cond ((equalp version newversion) 5)
-                               ((and (= (first version) (first newversion))
+          do (let ((diff (cond ((equalp version newversion) 100) ;;exact the newest
+                               ((and (= (first version) (first newversion));; old release in this year.
                                      (= (second version) (second newversion)))
-                                3)
-                               ((and (= (first version) (first newversion))
+                                30)
+                               ((and (= (first version) (first newversion)) ;; not ancient.
                                      )
-                                1)
-                               (t 0))))
+                                10)
+                               (t 1)))) ;;ancient
                (incf (gethash os osh 0) diff)
                (incf (gethash cpu cpuh 0) diff)))
     (values
