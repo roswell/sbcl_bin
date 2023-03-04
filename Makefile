@@ -68,4 +68,4 @@ download-tsv:
 	VERSION=$(VERSION) ros web.ros get-tsv
 
 table:
-	ros build.ros table
+	ros web.ros table
