@@ -219,12 +219,17 @@ exec ros -Q -- $0 "$@"
                (loop for table2 in table
                      do (format o "|")
                         (loop for table3 in table2
-                              do (format o "[~A~A](~A)<br />"
+                              for version = (uiop:split-string (third table3) :separator  '(#\.))
+                              for version1 = (first version)
+                              for obsolate = (equal version1 "1")
+                              do (format o "~A[~A~A](~A)~A<br />"
+                                         (if obsolate "~~" "")
                                          (third table3)
                                          (if (zerop (length (fourth table3)))
                                              ""
                                              (format nil "(~A)"(fourth table3)))
-                                         (fifth table3))))
+                                         (fifth table3)
+                                         (if obsolate "~~" ""))))
                (format o "|~%")))))
 
 (export
