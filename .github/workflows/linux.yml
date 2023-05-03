@@ -19,12 +19,6 @@ jobs:
         docker-platform: [linux/amd64]
         include:
           - lisp: sbcl-bin/2.0.0
-            target: arm64
-            image: 'glibc2.19-sbcl2.0.0'
-            docker-platform: 'linux/arm64'
-            docker-image-suffix: aarch64
-            suffix: ''
-          - lisp: sbcl-bin/2.0.0
             target: x86-64
             image: 'glibc2.31-sbcl2.1.4'
             docker-platform: 'linux/amd64'
@@ -66,10 +60,6 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@v2
-        with:
-            platforms: linux/arm64
       - name: setenv
         run: |
           echo "$HOME/.roswell/bin" >> $GITHUB_PATH
