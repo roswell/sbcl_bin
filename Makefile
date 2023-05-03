@@ -10,6 +10,8 @@ TARGETS ?=$(ARCH)
 SBCL_OPTIONS ?=--with-sb-core-compression
 LISP_IMPL ?= ros -L sbcl-bin without-roswell=t --no-rc run
 DOCKER_REPO ?= docker.pkg.github.com/roswell/sbcl_bin
+DOCKER_PLATFORM ?= linux/amd64
+DOCKER_IMAGE_SUFFIX ?=
 
 show:
 	@echo VERSION=$(VERSION) ARCH=$(ARCH) BRANCH=$(BRANCH) SUFFIX=$(SUFFIX)
@@ -31,13 +33,14 @@ tsv:
 	ros web.ros tsv
 
 build-docker:
-	docker build -t $(DOCKER_REPO)/$$(cat ./tools-for-build/$(IMAGE)/Name) ./tools-for-build/$(IMAGE)
+	docker build --platform $(DOCKER_PLATFORM) -t $(DOCKER_REPO)/$$(cat ./tools-for-build/$(IMAGE)/Name)$(DOCKER_IMAGE_SUFFIX) ./tools-for-build/$(IMAGE)
 push-docker:
-	docker push $(DOCKER_REPO)/$$(cat ./tools-for-build/$(IMAGE)/Name);
+	docker push $(DOCKER_REPO)/$$(cat ./tools-for-build/$(IMAGE)/Name)$(DOCKER_IMAGE_SUFFIX);
 pull-docker:
-	docker pull $(DOCKER_REPO)/$$(cat ./tools-for-build/$(IMAGE)/Name);
+	docker pull $(DOCKER_REPO)/$$(cat ./tools-for-build/$(IMAGE)/Name)$(DOCKER_IMAGE_SUFFIX);
 docker:
 	docker run \
+		--platform $(DOCKER_PLATFORM) \
 		-v `pwd`:/tmp \
 		-e ARCH=$(ARCH) \
 		-e VERSION=$(VERSION) \
@@ -46,7 +49,7 @@ docker:
 		-e CFLAGS=$(CFLAGS) \
 		-e LINKFLAGS=$(LINKFLAGS) \
 		-e TARGET=$(TARGET) \
-		$(DOCKER_REPO)/$$(cat ./tools-for-build/$(IMAGE)/Name) \
+		$(DOCKER_REPO)/$$(cat ./tools-for-build/$(IMAGE)/Name)$(DOCKER_IMAGE_SUFFIX) \
 		bash \
 		-c "cd /tmp;make compile archive"
 

@@ -18,6 +18,12 @@ jobs:
         image: ['glibc2.19-sbcl2.0.0']
         include:
           - lisp: sbcl-bin/2.0.0
+            target: arm64
+            image: 'glibc2.19-sbcl2.0.0'
+            docker_platform: 'linux/arm64'
+            docker_image_suffix: aarch64
+            suffix: ['']
+          - lisp: sbcl-bin/2.0.0
             target: x86-64
             image: 'glibc2.31-sbcl2.1.4'
             suffix: -glibc2.31
@@ -68,6 +74,8 @@ jobs:
           LISP: ${{ matrix.lisp }}
           GITHUB_OAUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           IMAGE: ${{ matrix.image }}
+          DOCKER_PLATFORM: ${{ matrix.docker_platform }}
+          DOCKER_IMAGE_SUFFIX: ${{ matrix.docker_image_suffix }}
         run: |
           curl -L https://raw.githubusercontent.com/roswell/roswell/master/scripts/install-for-ci.sh | sh
           ros install snmsts/sn.github
@@ -82,6 +90,8 @@ jobs:
           IMAGE: ${{ matrix.image }}
           SUFFIX: ${{ matrix.suffix }}
           LINKFLAGS: ${{ matrix.linkflags }}
+          DOCKER_PLATFORM: ${{ matrix.docker_platform }}
+          DOCKER_IMAGE_SUFFIX: ${{ matrix.docker_image_suffix }}
         run: |
           if [ "$VERSION" = "" ]; then
             make latest-version docker;
