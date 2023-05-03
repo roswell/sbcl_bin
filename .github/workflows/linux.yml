@@ -16,7 +16,7 @@ jobs:
         target: [x86-64, x86]
         suffix: ['']
         image: ['glibc2.19-sbcl2.0.0']
-        docker_platform: 'linux/amd64'
+        docker_platform: linux/amd64
         include:
           - lisp: sbcl-bin/2.0.0
             target: arm64
