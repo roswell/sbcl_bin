@@ -27,9 +27,9 @@ jobs:
       - name: Install Roswell
         env:
           LISP: ${{ matrix.lisp }}
-          CFLAGS: -mmacosx-version-min=10.6
-          CXXFLAGS: -mmacosx-version-min=10.6
-          LDFLAGS: -mmacosx-version-min=10.6
+          CFLAGS: -mmacosx-version-min=10.9
+          CXXFLAGS: -mmacosx-version-min=10.9
+          LDFLAGS: -mmacosx-version-min=10.9
         run: |
           brew install automake autoconf
           curl -L https://raw.githubusercontent.com/roswell/roswell/master/scripts/install-for-ci.sh | sh
@@ -43,9 +43,9 @@ jobs:
           VERSION: ${{ secrets.VERSION }}
           GITHUB_OAUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           ARCH: ${{ matrix.target }}
-          CFLAGS: -mmacosx-version-min=10.6
-          CXXFLAGS: -mmacosx-version-min=10.6
-          LDFLAGS: -mmacosx-version-min=10.6
+          CFLAGS: -mmacosx-version-min=10.9
+          CXXFLAGS: -mmacosx-version-min=10.9
+          LDFLAGS: -mmacosx-version-min=10.9
         run: |
           if [ "$VERSION" = "" ]; then
             make latest-version compile archive upload-archive;
