@@ -5,7 +5,7 @@ env:
     - PATH=~/.roswell/bin:$PATH
     - ROSWELL_BRANCH=master
     - ROSWELL_INSTALL_DIR=$HOME/.roswell
-    - LISP=sbcl-bin/2.0.0
+    - LISP=sbcl-bin/2.2.0
     - GH_REPO=sbcl_bin
     - MAKE=make
 jobs:
