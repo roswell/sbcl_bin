@@ -77,7 +77,7 @@ exec ros -Q -- $0 "$@"
                   uname-m
                   uname
                   suffix))
-      (sh (format nil "sbcl/binary-distribution.sh sbcl-~A-~A-~A~A"
+      (sh (format nil "bash sbcl/binary-distribution.sh sbcl-~A-~A-~A~A"
                   version
                   uname-m
                   uname
