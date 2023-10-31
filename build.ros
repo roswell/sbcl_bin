@@ -68,9 +68,10 @@ exec ros -Q -- $0 "$@"
   (let ((release-dir (namestring (uiop:getcwd)))
         (uname (roswell.util:uname)))
     (declare (ignorable release-dir uname))
-    #-win32
     (progn
-      (sh (format nil "ln -s sbcl ~Asbcl-~A-~A-~A~A"
+      (sh (format nil
+                  #-win32 "ln -s sbcl ~Asbcl-~A-~A-~A~A"
+                  #+win32 "cp -r sbcl ~Asbcl-~A-~A-~A~A"
                   release-dir
                   version
                   uname-m

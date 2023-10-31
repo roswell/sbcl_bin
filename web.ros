@@ -82,19 +82,24 @@ exec ros -Q -- $0 "$@"
                                  suffix))))
        (when release
          (ql:quickload :sb-md5)
-         (let ((file (or (env "FILE")
-                        (format nil (if (equal uname "windows") "~A.msi" "~A.tar.bz2")
-                                path))))
-           (cond ((probe-file file)
-                  (format t "~(~{~2,'0X~}~)"
-                          (map 'list #'identity (funcall (read-from-string "sb-md5:md5sum-file") file)))
-                  (multiple-value-bind (user repo)
-                      (account)
-                    (uiop:symbol-call :roswell.github.utils :github
-                                      file version user repo nil)))
-                 (t
-                  (format t "file not found:~A~%" file)
-                  (uiop:quit 1)))))))))
+         (loop with file-not-found = nil
+               for file in (or (when (env "FILE")
+                                 (list (env "FILE")))
+                               `(,(format nil "~A.tar.bz2" path)
+                                 ,@(when (equal uname "windows") 
+                                     (list (format nil "~A.msi" path)))))
+               do (cond ((probe-file file)
+                         (format t "~(~{~2,'0X~}~)"
+                                 (map 'list #'identity (funcall (read-from-string "sb-md5:md5sum-file") file)))
+                         (multiple-value-bind (user repo)
+                             (account)
+                           (uiop:symbol-call :roswell.github.utils :github
+                                             file version user repo nil)))
+                        (t
+                         (format t "file not found:~A~%" file)
+                         (setf file-not-found t)))
+               finally (when file-not-found
+                         (uiop:quit 1))))))))
 
 (defun releases ()
   (multiple-value-bind (user repo)
