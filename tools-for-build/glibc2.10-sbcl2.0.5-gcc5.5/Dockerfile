@@ -24,7 +24,7 @@ run cd /tmp;curl -O http://mirrors.kernel.org/gnu/gcc/gcc-5.5.0/gcc-5.5.0.tar.gz
 run cd /tmp; git clone https://github.com/roswell/roswell; \
     cd /tmp/roswell;./bootstrap;./configure --with-sbcl-bin-variant='-glibc2.10';make; make install; \
     cd /tmp;rm -rf /tmp/roswell; \
-    ros install sbcl-bin/2.0.5
+    ros install sbcl-bin/2.3.11
 run ln -s libcrypto.so.10 /usr/lib64/libcrypto.so; \
     ros dist use quicklisp 2021-08-07 ; \
     ros install snmsts/sn.github
