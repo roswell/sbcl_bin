@@ -73,15 +73,22 @@ jobs:
       - name: Install Roswell
         env:
           LISP: ${{ matrix.lisp }}
-          GITHUB_OAUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          IMAGE: ${{ matrix.image }}
-          DOCKER_PLATFORM: ${{ matrix.docker-platform }}
-          DOCKER_IMAGE_SUFFIX: ${{ matrix.docker-image-suffix }}
         run: |
           curl -L https://raw.githubusercontent.com/roswell/roswell/master/scripts/install-for-ci.sh | sh
           ros install snmsts/sn.github
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v2
+        with:
+          registry: docker.pkg.github.com
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: pull or build&push docker image
+        env:
+          DOCKER_PLATFORM: ${{ matrix.docker-platform }}
+          DOCKER_IMAGE_SUFFIX: ${{ matrix.docker-image-suffix }}
+          IMAGE: ${{ matrix.image }}
+        run: |
           if [ -n "$IMAGE" ]; then
-             docker login docker.pkg.github.com -u snmsts -p $GITHUB_OAUTH_TOKEN;
              make pull-docker || make build-docker push-docker
           fi
       - name: build
