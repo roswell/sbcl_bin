@@ -9,7 +9,7 @@ SUFFIX ?=
 TARGETS ?=$(ARCH)
 SBCL_OPTIONS ?=--fancy
 LISP_IMPL ?= ros -L sbcl-bin without-roswell=t --no-rc run
-DOCKER_REPO ?= docker.pkg.github.com/roswell/sbcl_bin
+DOCKER_REPO ?= ghcr.io/roswell/sbcl_bin
 DOCKER_PLATFORM ?= linux/amd64
 DOCKER_IMAGE_SUFFIX ?=
 DOCKER_ACTION ?= docker-default-action
