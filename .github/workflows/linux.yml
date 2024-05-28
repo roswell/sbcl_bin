@@ -55,11 +55,25 @@ jobs:
             lisp: sbcl-bin/2.0.0
             target: x86
             linkflags: -lrt
+          - image: 'glibc2.19-sbcl2.0.0'
+            docker-platform: 'linux/arm64'
+            docker-image-suffix: 'aarch64'
+            lisp: sbcl-bin/2.2.0
+            target: arm64
+          - image: 'musl1.2.2-sbcl2.0.5'
+            docker-platform: 'linux/arm64'
+            docker-image-suffix: 'aarch64'
+            lisp: sbcl-bin/2.2.0
+            target: arm64
 
     environment: SET_VERSION
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+        with:
+          image: tonistiigi/binfmt:qemu-v8.1.5
       - name: setenv
         run: |
           echo "$HOME/.roswell/bin" >> $GITHUB_PATH
