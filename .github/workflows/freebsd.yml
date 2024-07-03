@@ -40,6 +40,7 @@ jobs:
           envs: 'VERSION ARCH IMAGE SUFFIX LINKFLAGS GH_USER GH_REPO GITHUB_OAUTH_TOKEN'
           usesh: true
           prepare: |
+            pkg-static bootstrap -f
             pkg install -y bash roswell autoconf texinfo perl5 gmake gcc libffi git
             bash -c "cd /tmp; git clone https://github.com/facebook/zstd"
             bash -c "cd /tmp/zstd/lib; git checkout v1.5.2"
