@@ -36,7 +36,7 @@ jobs:
         id: test
         uses: vmactions/freebsd-vm@v1
         with:
-          release: 12.3
+          release: 12.4
           envs: 'VERSION ARCH IMAGE SUFFIX LINKFLAGS GH_USER GH_REPO GITHUB_OAUTH_TOKEN'
           usesh: true
           prepare: |
