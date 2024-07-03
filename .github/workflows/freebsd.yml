@@ -8,7 +8,7 @@ on:
 
 jobs:
   build:
-    runs-on: macos-12
+    runs-on: ubuntu-latest
     env:
       VERSION: ${{ secrets.VERSION }}
       ARCH: ${{ matrix.target }}
@@ -31,10 +31,10 @@ jobs:
     environment: SET_VERSION
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
       - name: Test in FreeBSD
         id: test
-        uses: vmactions/freebsd-vm@v0
+        uses: vmactions/freebsd-vm@v1
         with:
           release: 12.3
           envs: 'VERSION ARCH IMAGE SUFFIX LINKFLAGS GH_USER GH_REPO GITHUB_OAUTH_TOKEN'
