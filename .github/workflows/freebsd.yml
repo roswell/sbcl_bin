@@ -18,7 +18,6 @@ jobs:
       GH_USER: roswell
       GH_REPO: sbcl_bin
       GITHUB_OAUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      ASSUME_ALWAYS_YES: yes
 
     strategy:
       fail-fast: false
@@ -37,11 +36,10 @@ jobs:
         id: test
         uses: vmactions/freebsd-vm@v1
         with:
-          release: 12.4
-          envs: 'VERSION ARCH IMAGE SUFFIX LINKFLAGS GH_USER GH_REPO GITHUB_OAUTH_TOKEN ASSUME_ALWAYS_YES'
+          release: 13.3
+          envs: 'VERSION ARCH IMAGE SUFFIX LINKFLAGS GH_USER GH_REPO GITHUB_OAUTH_TOKEN'
           usesh: true
           prepare: |
-            pkg-static bootstrap -f
             pkg install -y bash roswell autoconf texinfo perl5 gmake gcc libffi git
             bash -c "cd /tmp; git clone https://github.com/facebook/zstd"
             bash -c "cd /tmp/zstd/lib; git checkout v1.5.2"
