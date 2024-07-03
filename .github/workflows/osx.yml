@@ -37,7 +37,7 @@ jobs:
           ros install snmsts/sn.github
           bash -c "cd /tmp; git clone https://github.com/facebook/zstd"
           bash -c "cd /tmp/zstd/lib; git checkout v1.5.2"
-          bash -c "cd /tmp/zstd/lib; make PREFIX=/usr/local install-includes install-static clean"
+          bash -c "cd /tmp/zstd/lib; sudo make PREFIX=/usr/local install-includes install-static clean"
           rm /usr/local/lib/libzstd*.dylib
       - name: build & upload
         env:
