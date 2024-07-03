@@ -18,6 +18,7 @@ jobs:
       GH_USER: roswell
       GH_REPO: sbcl_bin
       GITHUB_OAUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      ASSUME_ALWAYS_YES: yes
 
     strategy:
       fail-fast: false
@@ -37,7 +38,7 @@ jobs:
         uses: vmactions/freebsd-vm@v1
         with:
           release: 12.4
-          envs: 'VERSION ARCH IMAGE SUFFIX LINKFLAGS GH_USER GH_REPO GITHUB_OAUTH_TOKEN'
+          envs: 'VERSION ARCH IMAGE SUFFIX LINKFLAGS GH_USER GH_REPO GITHUB_OAUTH_TOKEN ASSUME_ALWAYS_YES'
           usesh: true
           prepare: |
             pkg-static bootstrap -f
