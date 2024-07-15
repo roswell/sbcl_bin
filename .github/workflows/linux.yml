@@ -12,13 +12,23 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        target: [x86-64, x86, arm64]
-        suffix: ''
-        lisp: 'sbcl-bin/2.0.0'
-        image: 'glibc2.19-sbcl2.0.0'
-        docker-platform: ${{ matrix.target == 'arm64' && 'linux/arm64' || 'linux/amd64' }}
-        docker-image-suffix: ${{ matrix.target == 'arm64' && 'aarch64' || '' }}
         include:
+          - target: x86-64
+            lisp: 'sbcl-bin/2.0.0'
+            image: 'glibc2.19-sbcl2.0.0'
+            docker-platform: 'linux/amd64'
+            docker-image-suffix: ''
+          - target: x86
+            lisp: 'sbcl-bin/2.0.0'
+            image: 'glibc2.19-sbcl2.0.0'
+            docker-platform: 'linux/amd64'
+            docker-image-suffix: ''
+          - target: arm64
+            lisp: 'sbcl-bin/2.0.0'
+            image: 'glibc2.19-sbcl2.0.0'
+            docker-platform: 'linux/arm64'
+            docker-image-suffix: 'aarch64'
+          # with suffix x86-64
           - target: x86-64
             suffix: -glibc2.31
             lisp: sbcl-bin/2.0.0
@@ -40,6 +50,7 @@ jobs:
             lisp: sbcl-bin/2.0.0
             image: 'musl1.2.2-sbcl2.0.5'
             docker-platform: 'linux/amd64'
+          # with suffix x86
           - target: x86
             suffix: -glibc2.31
             lisp: sbcl-bin/2.0.0
@@ -66,6 +77,7 @@ jobs:
             lisp: sbcl-bin/2.0.0
             image: 'i386-musl1.1.24-sbcl2.0.5'
             docker-platform: 'linux/386'
+          # with suffix arm64
           - target: arm64
             suffix: -musl
             lisp: sbcl-bin/2.2.0
