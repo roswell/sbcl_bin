@@ -41,7 +41,7 @@ jobs:
           usesh: true
           prepare: |
             pkg install -y bash roswell autoconf texinfo perl5 gmake gcc libffi git
-            bash -c "cd /;find . | grep libzstd.so.1"
+            bash -c "cd /;find . -type f -name 'libzstd.so*' | xargs rm"
             bash -c "cd /tmp; git clone https://github.com/facebook/zstd"
             bash -c "cd /tmp/zstd/lib; git checkout v1.5.2"
             bash -c "cd /tmp/zstd/lib; gmake PREFIX=/usr install-includes install-static clean"
