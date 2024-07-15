@@ -10,34 +10,6 @@ env:
     - MAKE=make
 jobs:
     include:
-      - os: linux
-        dist: focal
-        arch: arm64
-        services: docker
-        env:
-          - ARCH=arm64
-          - IMAGE=musl1.2.2-sbcl2.0.5
-          - SUFFIX=-musl
-          - DOCKER_PLATFORM=linux/arm64
-          - DOCKER_IMAGE_SUFFIX=aarch64
-        addons:
-          apt:
-            packages:
-              - libcurl4-openssl-dev
-      - os: linux
-        dist: focal
-        arch: arm64
-        services: docker
-        env:
-          - ARCH=arm64
-          - IMAGE=glibc2.19-sbcl2.0.0
-          - DOCKER_PLATFORM=linux/arm64
-          - DOCKER_IMAGE_SUFFIX=aarch64
-        addons:
-          apt:
-            packages:
-              - libcurl4-openssl-dev
-
       #- os: linux-ppc64le
       #  env: TARGET=ppc64le LISP=sbcl-bin/1.5.8
 
