@@ -106,7 +106,7 @@ jobs:
           if [ -n "$IMAGE" ]; then
              make pull-docker || make build-docker push-docker
           fi
-      - name: build
+      - name: build & upload
         env:
           VERSION: ${{ secrets.VERSION }}
           ARCH: ${{ matrix.target }}
@@ -117,19 +117,7 @@ jobs:
           DOCKER_IMAGE_SUFFIX: ${{ matrix.docker-image-suffix }}
         run: |
           if [ "$VERSION" = "" ]; then
-            make latest-version docker;
+            make latest-version docker upload-archive;
           else
-            make docker;
-          fi
-      - name: upload
-        env:
-          GITHUB_OAUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          VERSION: ${{ secrets.VERSION }}
-          ARCH: ${{ matrix.target }}
-          SUFFIX: ${{ matrix.suffix }}
-        run: |
-          if [ "$VERSION" = "" ]; then
-            make latest-version upload-archive;
-          else
-            make upload-archive;
+            make docker upload-archive;
           fi

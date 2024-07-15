@@ -23,8 +23,9 @@ compile: show sbcl
 	cd sbcl;{ git describe  | sed -n -e 's/^.*-g//p' ; } 2>/dev/null > git_hash
 	cat sbcl/git_hash
 	cd sbcl;echo '"$(VERSION)"' > version.lisp-expr
-	cd sbcl;bash make.sh $(SBCL_OPTIONS) --arch=$(ARCH) --xc-host="$(LISP_IMPL)" || true
-	cd sbcl;bash run-sbcl.sh --eval "(progn (print *features*)(terpri)(quit))"
+	mv sbcl/.git sbcl/_git
+	cd sbcl;bash make.sh $(SBCL_OPTIONS) --arch=$(ARCH) --xc-host="$(LISP_IMPL)" || mv _git .git
+	cd sbcl;bash run-sbcl.sh --eval "(progn (print *features*)(print (lisp-implementation-version))(terpri)(quit))"
 
 archive:
 	VERSION=$(VERSION) ARCH=$(ARCH) SUFFIX=$(SUFFIX) ros build.ros archive
