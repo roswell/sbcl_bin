@@ -35,8 +35,8 @@ jobs:
           brew install automake autoconf
           curl -L https://raw.githubusercontent.com/roswell/roswell/master/scripts/install-for-ci.sh | sh
           ros install snmsts/sn.github
-          bash -c "cd /tmp; git clone --depth 5 https://github.com/facebook/zstd --branch=v1.5.2"
-          bash -c "cd /tmp/zstd/lib; sudo make PREFIX=/usr/local install-includes install-static clean"
+          make zstd
+          bash -c "cd zstd/lib; sudo make PREFIX=/usr/local install-includes install-static clean"
           rm -f /usr/local/lib/libzstd*.dylib /opt/homebrew/lib/libzstd*.dylib
       - name: build & upload
         env:
