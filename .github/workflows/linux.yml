@@ -92,7 +92,7 @@ jobs:
           curl -L https://raw.githubusercontent.com/roswell/roswell/master/scripts/install-for-ci.sh | sh
           ros install snmsts/sn.github
       - name: Login to GitHub Container Registry
-        uses: docker/login-action@v2
+        uses: docker/login-action@v3
         with:
           registry: docker.pkg.github.com
           username: ${{ github.actor }}
