@@ -126,6 +126,7 @@ jobs:
           fi
       - name: build & upload
         env:
+          GITHUB_OAUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           VERSION: ${{ secrets.VERSION }}
           ARCH: ${{ matrix.target }}
           IMAGE: ${{ matrix.image }}
