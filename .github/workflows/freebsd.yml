@@ -41,13 +41,13 @@ jobs:
           usesh: true
           prepare: |
             pkg install -y bash roswell autoconf texinfo perl5 gmake gcc libffi git
-            bash -c "cd /;find . -type f -name 'libzstd.so*' | xargs rm"
             bash -c "cd /tmp; git clone https://github.com/facebook/zstd"
             bash -c "cd /tmp/zstd/lib; git checkout v1.5.2"
             bash -c "cd /tmp/zstd/lib; gmake PREFIX=/usr install-includes install-static clean"
             bash -c "cd /tmp/zstd/lib; gmake PREFIX=/usr LIBDIR=/usr/lib32 CFLAGS=-m32 install-static clean"
             ros install ${{ matrix.lisp }}
             ros install snmsts/sn.github
+            bash -c "cd /;find . -type f -name 'libzstd.so*' | xargs rm"
           run: |
             if [ "$VERSION" = "" ]; then
               gmake latest-version compile archive upload-archive;
