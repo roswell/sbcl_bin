@@ -1,2 +1,4 @@
 #!/bin/sh
-echo "setup for glibc2.19-sbcl2.0.0"
+make zstd
+bash -c "cd zstd;make PREFIX=/usr install-includes install-static; make clean"
+bash -c "cd zstd;make PREFIX=/usr LIBDIR=/usr/lib32 CFLAGS=-m32 install-static; make clean"
