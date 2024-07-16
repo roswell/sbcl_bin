@@ -52,7 +52,7 @@ docker:
 		-e TARGET=$(TARGET) \
 		$(DOCKER_REPO)/$$(cat ./tools-for-build/$(IMAGE)/Name)$(DOCKER_IMAGE_SUFFIX) \
 		bash \
-		-c "cd /tmp;make $(DOCKER_ACTION)"
+		-c "cd /tmp;./tools-for-build/$(IMAGE)/setup;make $(DOCKER_ACTION)"
 
 docker-default-action: compile archive
 
