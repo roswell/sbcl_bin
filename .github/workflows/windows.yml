@@ -36,7 +36,7 @@ jobs:
 
     steps:
     - run: git config --global core.autocrlf false
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     - uses: msys2/setup-msys2@v2.17.0
       with:
         msystem: MINGW${{ matrix.bit }}

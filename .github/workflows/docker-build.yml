@@ -12,7 +12,7 @@ jobs:
     environment: DOCKER_IMAGE
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
       - name: Login GitHub Registry
         run: echo ${{ secrets.GITHUB_TOKEN }} | docker login docker.pkg.github.com -u snmsts --password-stdin
       - name: Build image
