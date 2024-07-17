@@ -39,9 +39,10 @@ push-docker:
 	docker push $(DOCKER_REPO)/$$(cat ./tools-for-build/$(IMAGE)/Name)$(DOCKER_IMAGE_SUFFIX);
 pull-docker:
 	docker pull $(DOCKER_REPO)/$$(cat ./tools-for-build/$(IMAGE)/Name)$(DOCKER_IMAGE_SUFFIX);
-docker:
+docker: zstd
 	docker run \
-                --platform $(DOCKER_PLATFORM) \
+		--rm \
+		--platform $(DOCKER_PLATFORM) \
 		-v `pwd`:/tmp \
 		-e ARCH=$(ARCH) \
 		-e VERSION=$(VERSION) \

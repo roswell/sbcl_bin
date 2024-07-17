@@ -1,4 +1,3 @@
 #!/bin/sh
-make zstd
 bash -c "cd zstd/lib;make PREFIX=/usr install-includes install-static; make clean"
 bash -c "cd zstd/lib;make PREFIX=/usr LIBDIR=/usr/lib32 CFLAGS=-m32 install-static; make clean"
