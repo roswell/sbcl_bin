@@ -13,11 +13,13 @@ DOCKER_REPO ?= docker.pkg.github.com/roswell/sbcl_bin
 DOCKER_PLATFORM ?= linux/amd64
 DOCKER_IMAGE_SUFFIX ?=
 DOCKER_ACTION ?= docker-default-action
-
+ZSTD_BRANCH ?= v1.5.6
 show:
 	@echo VERSION=$(VERSION) ARCH=$(ARCH) BRANCH=$(BRANCH) SUFFIX=$(SUFFIX)
 sbcl:
 	git clone --depth 5 https://github.com/sbcl/sbcl --branch=$(BRANCH) || git clone --depth 5 https://git.code.sf.net/p/sbcl/sbcl --branch=$(BRANCH)
+zstd:
+	git clone --depth 5 https://github.com/facebook/zstd --branch=$(ZSTD_BRANCH)
 
 compile: show sbcl
 	cd sbcl;{ git describe  | sed -n -e 's/^.*-g//p' ; } 2>/dev/null > git_hash
@@ -82,5 +84,3 @@ precompile-freebsd:
 
 postcompile-freebsd:
 	mv /tmp/libzstd.so* /usr/local/lib
-zstd:
-	git clone --depth 5 https://github.com/facebook/zstd --branch=v1.5.6
