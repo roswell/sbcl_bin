@@ -41,12 +41,12 @@ jobs:
           usesh: true
           prepare: |
             pkg install -y bash roswell autoconf texinfo perl5 gmake gcc libffi git
-            gmake zstd
-            bash -c "cd zstd/lib; gmake PREFIX=/usr install-includes install-static clean"
-            bash -c "cd zstd/lib; gmake PREFIX=/usr LIBDIR=/usr/lib32 CFLAGS=-m32 install-static clean"
             ros install ${{ matrix.lisp }}
             ros install snmsts/sn.github
           run: |
+            gmake zstd
+            bash -c "cd zstd/lib; gmake PREFIX=/usr install-includes install-static clean"
+            bash -c "cd zstd/lib; gmake PREFIX=/usr LIBDIR=/usr/lib32 CFLAGS=-m32 install-static clean"
             if [ "$VERSION" = "" ]; then
               gmake latest-version sbcl precompile-freebsd compile postcompile-freebsd archive upload-archive;
             else
