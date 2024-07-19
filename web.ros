@@ -137,7 +137,8 @@ exec ros -Q -- $0 "$@"
 (defun modify-tsv (tsv release)
   (loop with tag-name = (release-tag_name release)
         with comp = (lambda (x) (ignore-errors (aref (nth-value 1 (ppcre:scan-to-strings "sbcl-[^-]*-([^/]*)$" x)) 0)))
-        for uri in (remove-if-not (lambda (x) (ppcre:scan "binary" x))
+        for uri in (remove-if-not (lambda (x)
+                                    (ppcre:scan "binary" x))
                                   (release-uris release))
         for found = (find uri tsv :test #'(lambda (x y)
                                             (equal (funcall comp x)
@@ -302,9 +303,16 @@ exec ros -Q -- $0 "$@"
                               do (format o "~A[~A~A](~A)~A<br />"
                                          (if obsolate "~~" "")
                                          (third table3)
-                                         (if (zerop (length (fourth table3)))
-                                             ""
-                                             (format nil "(~A)"(fourth table3)))
+                                         (cond
+                                           ((zerop (length (fourth table3)))
+                                            (if (equal "msi" (pathname-type (fifth table3)))
+                                                "(msi)"
+                                                ""))
+                                           (t (format nil "(~A~A)"
+                                                      (fourth table3)
+                                                      (if (equal "msi" (pathname-type (fifth table3)))
+                                                          " msi"
+                                                          ""))))
                                          (fifth table3)
                                          (if obsolate "~~" ""))))
                (format o "|~%")))))
