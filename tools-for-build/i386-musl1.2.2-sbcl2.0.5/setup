@@ -1,0 +1,2 @@
+#!/bin/sh
+bash -c "cd zstd/lib;make PREFIX=/usr install-includes install-static; make clean"
