@@ -80,7 +80,7 @@ jobs:
         include:
         - arch: i686
           arch2: i686
-          bit: 32
+          bit: 64
           target: x86
     env:
       LISP: sbcl-bin
@@ -97,7 +97,7 @@ jobs:
     steps:
     - run: git config --global core.autocrlf false
     - uses: actions/checkout@v4
-    - uses: jeremyd2019/setup-msys2@v2_build32
+    - uses: msys2/setup-msys2@v2.17.0
       with:
         msystem: MINGW${{ matrix.bit }}
         path-type: inherit
@@ -121,9 +121,9 @@ jobs:
       shell: msys2 {0}
       run: |
         if [ "$VERSION" = "" ]; then
-          make latest-version compile archive;
+          PATH=/mingw32/bin:$PATH make latest-version compile archive;
         else
-          make compile archive;
+          PATH=/mingw32/bin:$PATH make compile archive;
         fi
     - name: upload
       shell: msys2 {0}
