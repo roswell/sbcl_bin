@@ -4,6 +4,7 @@ export $(shell sed 's/=.*//' .env)
 NOP := $(shell ros build.ros nop) # avoid messages compile.
 BRANCH ?= $(shell ros build.ros branch)
 VERSION ?= $(shell ros build.ros version)
+VERSION_SUFFIX ?= .roswell
 ARCH ?= $(shell ros build.ros uname)
 SUFFIX ?=
 TARGETS ?=$(ARCH)
@@ -14,6 +15,9 @@ DOCKER_PLATFORM ?= linux/amd64
 DOCKER_IMAGE_SUFFIX ?=
 DOCKER_ACTION ?= docker-default-action
 ZSTD_BRANCH ?= v1.5.6
+clean:
+	rm -rf zstd
+	ls |grep sbcl |xargs rm -rf
 show:
 	@echo VERSION=$(VERSION) ARCH=$(ARCH) BRANCH=$(BRANCH) SUFFIX=$(SUFFIX)
 sbcl:
@@ -21,12 +25,16 @@ sbcl:
 zstd:
 	git clone --depth 5 https://github.com/facebook/zstd --branch=$(ZSTD_BRANCH)
 
+sbcl/version.lisp-expr: sbcl
+	cd sbcl;echo '"$(VERSION)$(VERSION_SUFFIX)$(SUFFIX)"' > version.lisp-expr
+
 compile: show sbcl
 	cd sbcl;{ git describe  | sed -n -e 's/^.*-g//p' ; } 2>/dev/null > git_hash
 	cat sbcl/git_hash
-	cd sbcl;echo '"$(VERSION)"' > version.lisp-expr
+	rm -f sbcl/version.lisp-expr; $(MAKE) sbcl/version.lisp-expr
 	mv sbcl/.git sbcl/_git
 	cd sbcl;bash make.sh $(SBCL_OPTIONS) --arch=$(ARCH) --xc-host="$(LISP_IMPL)" || mv _git .git
+	cd sbcl;bash make-shared-library.sh || true
 	cd sbcl;bash run-sbcl.sh --eval "(progn (print *features*)(print (lisp-implementation-version))(terpri)(quit))"
 
 archive:
