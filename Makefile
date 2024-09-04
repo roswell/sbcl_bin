@@ -20,6 +20,8 @@ clean:
 	ls |grep sbcl |xargs rm -rf
 show:
 	@echo VERSION=$(VERSION) ARCH=$(ARCH) BRANCH=$(BRANCH) SUFFIX=$(SUFFIX)
+	cc -x c -v -E /dev/null || true
+	cc -print-search-dirs || true
 sbcl:
 	git clone --depth 5 https://github.com/sbcl/sbcl --branch=$(BRANCH) || git clone --depth 5 https://git.code.sf.net/p/sbcl/sbcl --branch=$(BRANCH)
 zstd:
