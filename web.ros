@@ -272,18 +272,33 @@ exec ros -Q -- $0 "$@"
           collect
              (loop for arch in arch-
                    collect
-                      (sort
-                       (remove-if-not (lambda (x)
-                                        (and (equal (first x) os)
-                                             (equal (second x) arch)))
-                                      table)
-                       (lambda (x y)
-                         (if (string= (third x)
-                                      (third y))
-                             (< (length(fourth x))
-                                (length(fourth y)))
-                             (string> (third x)
-                                      (third y)))))))))
+                      (flet ((remove-version (x)
+                               (remove-if (lambda (x) (or (digit-char-p x) (eql x #\.))) x))
+                             (keep-version (x)
+                               (remove-if-not (lambda (x) (or (digit-char-p x) (eql x #\.))) x)))
+                        (sort
+                         (remove-if-not (lambda (x)
+                                          (and (equal (first x) os)
+                                               (equal (second x) arch)))
+                                        table)
+                         (lambda (x y)
+                           (cond
+                             ;; sort by version the newer come first
+                             ((string/= (third x)
+                                        (third y))
+                              (uiop:version<
+                               (third y) (third x)))
+                             ;; sort by variant name
+                             ((string/= (remove-version (fourth x))
+                                        (remove-version (fourth y)))
+                              (string< (remove-version (fourth x))
+                                       (remove-version (fourth y))))
+                             ;; sort by variant version
+                             ((string/= (keep-version (fourth x))
+                                        (keep-version (fourth y)))
+                              (uiop:version<
+                               (keep-version (fourth y))
+                               (keep-version (fourth x))))))))))))
 
 (defun table-md (stream)
   (let ((o stream))
