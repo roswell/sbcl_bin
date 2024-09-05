@@ -12,7 +12,7 @@ jobs:
     env:
       VERSION: ${{ secrets.VERSION }}
       ARCH: ${{ matrix.target }}
-      SUFFIX: ${{ matrix.nosuffix == 'yes' && '' || format('-{0}', matrix.release) }}
+      SUFFIX: ${{ matrix.suffix == 'no' && '' || format('-{0}', matrix.release) }}
       LINKFLAGS: ${{ matrix.linkflags }}
       ROSWELL_BRANCH: master
       GH_USER: roswell
@@ -22,18 +22,19 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
+        release: ['13.2', '13.3', '14.0', '14.1']
         target: [x86-64, x86]
+        suffix: [yes]
         lisp: [sbcl-bin/2.2.9]
-        release: [13.2, 13.3, 14.0, 14.1]
         include:
-          - target: x86-64
+          - release: 13.3
+            target: x86-64
+            suffix: no
             lisp: sbcl-bin/2.2.9
-            release: 13.3
-            nosuffix: 'yes'
-          - target: x86
+          - release: 13.3
+            target: x86
+            suffix: no
             lisp: sbcl-bin/2.2.9
-            release: 13.3
-            nosuffix: 'yes'
     environment: SET_VERSION
 
     steps:
