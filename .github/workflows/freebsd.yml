@@ -22,10 +22,10 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
+        target: [x86-64, x86]
+        lisp: [sbcl-bin/2.2.9]
+        release: [13.2, 13.3, 14.0, 14.1]
         include:
-          target: [x86-64, x86]
-          lisp: [sbcl-bin/2.2.9]
-          release: [13.2, 13.3, 14.0, 14.1]
           - target: x86-64
             lisp: sbcl-bin/2.2.9
             release: 13.3
