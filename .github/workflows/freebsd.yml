@@ -12,7 +12,7 @@ jobs:
     env:
       VERSION: ${{ secrets.VERSION }}
       ARCH: ${{ matrix.target }}
-      SUFFIX: ${{ matrix.suffix == 'no' && '' || format('-{0}', matrix.release) }}
+      SUFFIX: ${{ matrix.suffix == 'yes' && format('-{0}', matrix.release) || ''}}
       LINKFLAGS: ${{ matrix.linkflags }}
       ROSWELL_BRANCH: master
       GH_USER: roswell
