@@ -64,7 +64,7 @@ jobs:
             sudo bash -c "cd zstd/lib; gmake PREFIX=/usr install-includes install-static clean"
             sudo bash -c "cd zstd/lib; gmake PREFIX=/usr LIBDIR=/usr/lib32 CFLAGS=-m32 install-static clean || true"
             if [ "$VERSION" = "" ]; then
-              gmake latest-version sbcl precompile-freebsd compile postcompile-freebsd archive upload-archive;
+              sudo gmake latest-version sbcl precompile-freebsd compile postcompile-freebsd archive upload-archive;
             else
-              gmake sbcl precompile-freebsd compile postcompile-freebsd archive upload-archive;
+              sudo gmake sbcl precompile-freebsd compile postcompile-freebsd archive upload-archive;
             fi
