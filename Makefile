@@ -38,7 +38,7 @@ compile: show sbcl
 	cd sbcl;bash make.sh $(SBCL_OPTIONS) --arch=$(ARCH) --xc-host="$(LISP_IMPL)" || mv _git .git
 	cd sbcl;bash make-shared-library.sh || true
 	cd sbcl;bash run-sbcl.sh --eval "(progn (print *features*)(print (lisp-implementation-version))(terpri)(quit))"
-	ldd sbcl/src/runtime/sbcl || true
+	ldd sbcl/src/runtime/sbcl || otool -L sbcl/src/runtime/sbcl || true
 
 archive:
 	VERSION=$(VERSION) ARCH=$(ARCH) SUFFIX=$(SUFFIX) ros build.ros archive
@@ -78,7 +78,7 @@ latest-version:
 	$(eval BRANCH := $(shell VERSION=$(VERSION) ros build.ros branch))
 	@echo "set version $(VERSION)"
 
-upload-archive: show
+upload-archive:
 	VERSION=$(VERSION) TARGET=$(ARCH) SUFFIX=$(SUFFIX) ros web.ros upload-archive
 
 upload-tsv:
