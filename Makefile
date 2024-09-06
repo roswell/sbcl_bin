@@ -46,6 +46,15 @@ archive:
 tsv:
 	ros web.ros tsv
 
+debug-docker:
+	docker run \
+		--rm \
+		-it \
+		--platform $(DOCKER_PLATFORM) \
+		-v `pwd`:/tmp \
+		$(DOCKER_REPO)/$$(cat ./tools-for-build/$(IMAGE)/Name)$(DOCKER_IMAGE_SUFFIX) \
+		bash
+
 build-docker:
 	docker build --platform $(DOCKER_PLATFORM) -t $(DOCKER_REPO)/$$(cat ./tools-for-build/$(IMAGE)/Name)$(DOCKER_IMAGE_SUFFIX) ./tools-for-build/$(IMAGE)
 push-docker:
