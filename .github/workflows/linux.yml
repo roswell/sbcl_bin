@@ -28,11 +28,11 @@ jobs:
             image: 'glibc2.19-sbcl2.0.0'
             docker-platform: 'linux/arm64'
             docker-image-suffix: 'aarch64'
-          - target: riscv64
-            lisp: 'sbcl-bin/2.0.0'
-            image: 'glibc2.31-sbcl2.1.4'
-            docker-platform: 'linux/riscv64'
-            docker-image-suffix: 'riscv64'
+          #- target: riscv64
+          #  lisp: 'sbcl-bin/2.0.0'
+          #  image: 'glibc2.31-sbcl2.1.4'
+          #  docker-platform: 'linux/riscv64'
+          #  docker-image-suffix: 'riscv64'
           # with suffix x86-64
           - target: x86-64
             suffix: -glibc2.39
