@@ -23,9 +23,9 @@ jobs:
       fail-fast: false
       matrix:
         release: ['13.2', '13.3', '14.0', '14.1']
-        target: [x86-64, x86]
+        target: [x86-64, x86, arm64]
         suffix: [yes]
-        lisp: [sbcl-bin/2.2.9]
+        lisp: [sbcl-bin/2.3.0]
         include:
           - release: 13.3
             target: x86-64
@@ -39,21 +39,23 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
-      - name: Test in FreeBSD
-        id: test
-        uses: vmactions/freebsd-vm@v1
+      - name: Test on FreeBSD
+        uses: cross-platform-actions/action@v0.25.0
         with:
-          release: ${{ matrix.release }}
-          envs: 'VERSION ARCH IMAGE SUFFIX LINKFLAGS GH_USER GH_REPO GITHUB_OAUTH_TOKEN'
-          usesh: true
-          prepare: |
+          environment_variables: VERSION ARCH IMAGE SUFFIX LINKFLAGS GH_USER GH_REPO GITHUB_OAUTH_TOKEN
+          operating_system: freebsd
+          architecture: ${{ matrix.target == 'x86' && 'x86-64' || matrix.target }}
+          version: ${{ matrix.release }}
+          shell: bash
+          memory: 5G
+          cpu_count: 4
+          run: |
             pkg install -y bash roswell autoconf texinfo perl5 gmake gcc libffi git
             ros install ${{ matrix.lisp }}
             ros install snmsts/sn.github
-          run: |
             gmake zstd
             bash -c "cd zstd/lib; gmake PREFIX=/usr install-includes install-static clean"
-            bash -c "cd zstd/lib; gmake PREFIX=/usr LIBDIR=/usr/lib32 CFLAGS=-m32 install-static clean"
+            bash -c "cd zstd/lib; gmake PREFIX=/usr LIBDIR=/usr/lib32 CFLAGS=-m32 install-static clean || true"
             if [ "$VERSION" = "" ]; then
               gmake latest-version sbcl precompile-freebsd compile postcompile-freebsd archive upload-archive;
             else
