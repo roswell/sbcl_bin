@@ -64,9 +64,9 @@ jobs:
             gmake zstd
             sudo bash -c 'cd zstd/lib; gmake PREFIX=/usr CFLAGS="-fPIC" install-includes install-static clean'
             if [ "$VERSION" = "" ]; then
-              gmake latest-version sbcl precompile-freebsd compile postcompile-freebsd archive upload-archive;
+              sudo -E gmake latest-version sbcl precompile-freebsd compile postcompile-freebsd archive upload-archive;
             else
-              gmake sbcl precompile-freebsd compile postcompile-freebsd archive upload-archive;
+              sudo -E gmake sbcl precompile-freebsd compile postcompile-freebsd archive upload-archive;
             fi
       - if: ${{ matrix.target == 'x86' }}
         name: Test on FreeBSD
