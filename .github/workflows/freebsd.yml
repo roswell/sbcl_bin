@@ -43,7 +43,8 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
-      - name: Test on FreeBSD
+      - if: ${{ matrix.target != 'x86' }}
+        name: Test on FreeBSD
         uses: cross-platform-actions/action@v0.25.0
         with:
           environment_variables: VERSION ARCH IMAGE SUFFIX LINKFLAGS GH_USER GH_REPO GITHUB_OAUTH_TOKEN
@@ -61,11 +62,27 @@ jobs:
             ros install ${{ matrix.lisp }}
             ros install snmsts/sn.github
             gmake zstd
-            if [ "$ARCH" = "x86" ]; then
-              sudo bash -c 'cd zstd/lib; gmake PREFIX=/usr LIBDIR=/usr/lib32 CFLAGS="-m32 -fPIC" install-includes install-static clean'
+            sudo bash -c 'cd zstd/lib; gmake PREFIX=/usr CFLAGS="-fPIC" install-includes install-static clean'
+            if [ "$VERSION" = "" ]; then
+              gmake latest-version sbcl precompile-freebsd compile postcompile-freebsd archive upload-archive;
             else
-              sudo bash -c 'cd zstd/lib; gmake PREFIX=/usr CFLAGS="-fPIC" install-includes install-static clean'
+              gmake sbcl precompile-freebsd compile postcompile-freebsd archive upload-archive;
             fi
+      - if: ${{ matrix.target == 'x86' }}
+        name: Test on FreeBSD
+        id: test
+        uses: vmactions/freebsd-vm@v1
+        with:
+          release: ${{ matrix.release }}
+          envs: 'VERSION ARCH IMAGE SUFFIX LINKFLAGS GH_USER GH_REPO GITHUB_OAUTH_TOKEN'
+          usesh: true
+          prepare: |
+            pkg install -y bash roswell autoconf texinfo perl5 gmake gcc libffi git
+            ros install ${{ matrix.lisp }}
+            ros install snmsts/sn.github
+          run: |
+            gmake zstd
+            bash -c 'cd zstd/lib; gmake PREFIX=/usr LIBDIR=/usr/lib32 CFLAGS="-m32 -fPIC" install-includes install-static clean'
             if [ "$VERSION" = "" ]; then
               gmake latest-version sbcl precompile-freebsd compile postcompile-freebsd archive upload-archive;
             else
