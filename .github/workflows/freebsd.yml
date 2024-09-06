@@ -47,10 +47,13 @@ jobs:
           architecture: ${{ matrix.target == 'x86' && 'x86-64' || matrix.target }}
           version: ${{ matrix.release }}
           shell: bash
-          memory: 5G
-          cpu_count: 4
           run: |
-            pkg install -y bash roswell autoconf texinfo perl5 gmake gcc libffi git
+            uname -a
+            freebsd-version
+            whoami
+            pwd
+            sudo env IGNORE_OSVERSION=yes pkg update -f
+            sudo pkg install -y bash roswell autoconf texinfo perl5 gmake gcc libffi git
             ros install ${{ matrix.lisp }}
             ros install snmsts/sn.github
             gmake zstd
