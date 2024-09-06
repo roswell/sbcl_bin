@@ -91,7 +91,7 @@ table:
 	ros web.ros table
 
 precompile-freebsd:
-	mv /usr/local/lib/libzstd.so* /tmp
+	sudo mv /usr/local/lib/libzstd.so* /tmp
 
 postcompile-freebsd:
-	mv /tmp/libzstd.so* /usr/local/lib
+	sudo mv /tmp/libzstd.so* /usr/local/lib

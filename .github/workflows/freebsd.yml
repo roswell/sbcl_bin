@@ -25,7 +25,7 @@ jobs:
         release: ['13.2', '13.3', '14.0', '14.1']
         target: [x86-64, x86, arm64]
         suffix: [yes]
-        lisp: [sbcl-bin/2.2.9]
+        lisp: [sbcl-bin/2.4.8]
         include:
           - release: 13.3
             target: x86-64
@@ -61,10 +61,13 @@ jobs:
             ros install ${{ matrix.lisp }}
             ros install snmsts/sn.github
             gmake zstd
-            sudo bash -c "cd zstd/lib; gmake PREFIX=/usr install-includes install-static clean"
-            sudo bash -c "cd zstd/lib; gmake PREFIX=/usr LIBDIR=/usr/lib32 CFLAGS=-m32 install-static clean || true"
-            if [ "$VERSION" = "" ]; then
-              sudo -E gmake latest-version sbcl precompile-freebsd compile postcompile-freebsd archive upload-archive;
+            if [ "$ARCH" = "x86" ]; then
+              sudo bash -c 'cd zstd/lib; gmake PREFIX=/usr LIBDIR=/usr/lib32 CFLAGS="-m32 -fPIC" install-includes install-static clean'
             else
-              sudo -E gmake sbcl precompile-freebsd compile postcompile-freebsd archive upload-archive;
+              sudo bash -c 'cd zstd/lib; gmake PREFIX=/usr CFLAGS="-fPIC" install-includes install-static clean'
+            fi
+            if [ "$VERSION" = "" ]; then
+              gmake latest-version sbcl precompile-freebsd compile postcompile-freebsd archive upload-archive;
+            else
+              gmake sbcl precompile-freebsd compile postcompile-freebsd archive upload-archive;
             fi
