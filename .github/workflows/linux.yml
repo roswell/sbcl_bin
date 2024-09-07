@@ -15,17 +15,17 @@ jobs:
         include:
           - target: x86-64
             lisp: 'sbcl-bin/2.0.0'
-            image: 'glibc2.19-sbcl2.0.0'
+            image: 'glibc2.19'
             docker-platform: 'linux/amd64'
             docker-image-suffix: ''
           - target: x86
             lisp: 'sbcl-bin/2.0.0'
-            image: 'glibc2.19-sbcl2.0.0'
+            image: 'glibc2.19'
             docker-platform: 'linux/amd64'
             docker-image-suffix: ''
           - target: arm64
             lisp: 'sbcl-bin/2.0.0'
-            image: 'glibc2.19-sbcl2.0.0'
+            image: 'glibc2.19'
             docker-platform: 'linux/arm64'
             docker-image-suffix: 'aarch64'
           #- target: riscv64
@@ -47,7 +47,7 @@ jobs:
           - target: x86-64
             suffix: -glibc2.19
             lisp: sbcl-bin/2.0.0
-            image: 'glibc2.19-sbcl2.0.0'
+            image: 'glibc2.19'
             docker-platform: 'linux/amd64'
           - target: x86-64
             suffix: -glibc2.10
@@ -74,7 +74,7 @@ jobs:
           - target: x86
             suffix: -glibc2.19
             lisp: sbcl-bin/2.0.0
-            image: 'glibc2.19-sbcl2.0.0'
+            image: 'glibc2.19'
             docker-platform: 'linux/amd64'
           - target: x86
             suffix: -glibc2.10
