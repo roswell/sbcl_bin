@@ -88,6 +88,7 @@ jobs:
             docker-platform: 'linux/386'
             image: 'musl1.2.2'
             docker-build-options: '--build-arg WRAPPER=linux32'
+            docker-image-suffix: 'x86'
           - target: x86
             suffix: -musl1.1
             lisp: sbcl-bin/2.0.0
