@@ -52,7 +52,7 @@ jobs:
           - target: x86-64
             suffix: -glibc2.10
             lisp: sbcl-bin/2.0.0
-            image: 'glibc2.10-sbcl2.0.5-gcc5.5'
+            image: 'glibc2.10-64'
             docker-platform: 'linux/amd64'
             linkflags: -lrt
           - target: x86-64
@@ -79,7 +79,7 @@ jobs:
           - target: x86
             suffix: -glibc2.10
             lisp: sbcl-bin/2.0.0
-            image: 'glibc2.10-sbcl2.0.5'
+            image: 'glibc2.10'
             docker-platform: 'linux/amd64'
             linkflags: -lrt
           - target: x86
