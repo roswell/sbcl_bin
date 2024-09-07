@@ -30,7 +30,7 @@ jobs:
             docker-image-suffix: 'aarch64'
           #- target: riscv64
           #  lisp: 'sbcl-bin/2.0.0'
-          #  image: 'glibc2.31-sbcl2.1.4'
+          #  image: 'glibc2.31'
           #  docker-platform: 'linux/riscv64'
           #  docker-image-suffix: 'riscv64'
           # with suffix x86-64
@@ -42,7 +42,7 @@ jobs:
           - target: x86-64
             suffix: -glibc2.31
             lisp: sbcl-bin/2.0.0
-            image: 'glibc2.31-sbcl2.1.4'
+            image: 'glibc2.31'
             docker-platform: 'linux/amd64'
           - target: x86-64
             suffix: -glibc2.19
@@ -69,7 +69,7 @@ jobs:
           - target: x86
             suffix: -glibc2.31
             lisp: sbcl-bin/2.0.0
-            image: 'glibc2.31-sbcl2.1.4'
+            image: 'glibc2.31'
             docker-platform: 'linux/amd64'
           - target: x86
             suffix: -glibc2.19
