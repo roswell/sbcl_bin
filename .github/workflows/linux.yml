@@ -92,8 +92,10 @@ jobs:
           - target: x86
             suffix: -musl1.1
             lisp: sbcl-bin/2.0.0
-            image: 'i386-musl1.1.24-sbcl2.0.5'
+            image: 'musl1.1.24'
             docker-platform: 'linux/386'
+            docker-build-options: '--build-arg WRAPPER=linux32'
+            docker-image-suffix: 'x86'
           # with suffix arm64
           - target: arm64
             suffix: -musl
