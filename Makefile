@@ -12,6 +12,7 @@ SBCL_OPTIONS ?=--fancy
 LISP_IMPL ?= ros -L sbcl-bin without-roswell=t --no-rc run
 DOCKER_REPO ?= docker.pkg.github.com/roswell/sbcl_bin
 DOCKER_PLATFORM ?= linux/amd64
+DOCKER_BUILD_OPTIONS ?=
 DOCKER_IMAGE_SUFFIX ?=
 DOCKER_ACTION ?= docker-default-action
 ZSTD_BRANCH ?= v1.5.6
@@ -56,7 +57,7 @@ debug-docker:
 		bash
 
 build-docker:
-	docker build --platform $(DOCKER_PLATFORM) -t $(DOCKER_REPO)/$$(cat ./tools-for-build/$(IMAGE)/Name)$(DOCKER_IMAGE_SUFFIX) ./tools-for-build/$(IMAGE)
+	docker build --platform $(DOCKER_PLATFORM) -t $(DOCKER_REPO)/$$(cat ./tools-for-build/$(IMAGE)/Name)$(DOCKER_IMAGE_SUFFIX) $(DOCKER_BUILD_OPTIONS) ./tools-for-build/$(IMAGE)
 push-docker:
 	docker push $(DOCKER_REPO)/$$(cat ./tools-for-build/$(IMAGE)/Name)$(DOCKER_IMAGE_SUFFIX);
 pull-docker:
