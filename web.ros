@@ -6,7 +6,8 @@ exec ros -Q -- $0 "$@"
 (progn ;;init forms
   (ros:ensure-asdf)
   (ignore-errors
-    (load "roswell.github.utils.asd")
+    (load "roswell.github.utils.asd"))
+  (ignore-errors
     (ql:quickload '(:roswell.github.utils) :silent t))
   #+quicklisp(ql:quickload '(:dexador :jonathan) :silent t))
 
