@@ -52,6 +52,10 @@ exec ros -Q -- $0 "$@"
    (or (env "GH_USER") (symbol-value (uiop:safe-read-from-string "roswell.github.utils:*user*")))
    (or (env "GH_REPO") (symbol-value(uiop:safe-read-from-string "roswell.github.utils:*repo*")))))
 
+(defun tsv-filename ()
+  (or (env "TSV_FILE")
+      "sbcl-bin_uri.tsv"))
+
 (export
  (defun upload (files &key (interactive t))
    (multiple-value-bind (version target suffix uname)
@@ -122,9 +126,10 @@ exec ros -Q -- $0 "$@"
 (defun tsv-uri (&optional (release (latest-relase)))
   (multiple-value-bind (user repo)
       (account)
-    (format nil "https://github.com/~A/~A/releases/download/~A/sbcl-bin_uri.tsv"
+    (format nil "https://github.com/~A/~A/releases/download/~A/~A"
             user repo
-            (release-tag_name release))))
+            (release-tag_name release)
+            (tsv-filename))))
 
 (defun parse-tsv (string)
   (mapcar (lambda (x) (uiop:split-string x :separator '(#\tab)))
@@ -155,7 +160,7 @@ exec ros -Q -- $0 "$@"
                   ;; download second new release's tsv or upload current tsv.
                   (let ((*version* (release-tag_name (second releases)))
                         (result (parse-tsv (tsv-get "files"))))
-                    (save-tsv "sbcl-bin_uri.tsv" result)
+                    (save-tsv (tsv-filename) result)
                     (upload-tsv nil)
                     result))))
     (mapc (lambda (x) (modify-tsv tsv x)) (reverse releases))
@@ -165,18 +170,21 @@ exec ros -Q -- $0 "$@"
 (export
  (defun tsv (args)
    (declare (ignore args))
-   (save-tsv "sbcl-bin_uri.tsv" (updated-tsv))))
+   (save-tsv (tsv-filename) (updated-tsv))))
 
 (defun tsv-get (&optional (version "files"))
-  (dex:get (format nil "https://github.com/roswell/sbcl_bin/releases/download/~A/sbcl-bin_uri.tsv" version)
-           :force-string t))
+  (multiple-value-bind (user repo)
+      (account)
+    (dex:get (format nil "https://github.com/~A/~A/releases/download/~A/~A"
+                     user repo version (tsv-filename))
+             :force-string t)))
 
 (export
  (defun get-tsv (args)
    (declare (ignore args))
    (multiple-value-bind (version)
        (version-target :target :archive)
-     (with-open-file (o "sbcl-bin_uri.tsv" :direction :output :if-exists :supersede)
+     (with-open-file (o (tsv-filename) :direction :output :if-exists :supersede)
        (format o "~A" (tsv-get (or version "files")))))))
 
 (export
@@ -184,7 +192,7 @@ exec ros -Q -- $0 "$@"
    (declare (ignore args))
    (multiple-value-bind (version)
        (version-target :target :archive)
-     (let ((path "sbcl-bin_uri.tsv"))
+     (let ((path (tsv-filename)))
        (progn
          (ql:quickload :sb-md5)
          (cond ((probe-file path)
