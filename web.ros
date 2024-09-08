@@ -214,6 +214,27 @@ exec ros -Q -- $0 "$@"
                 (uiop:quit 1))))))))
 
 (export
+ (defun upload-hash (args)
+   (declare (ignore args))
+   (multiple-value-bind (version)
+       (version-target :target :archive)
+     (let ((path "hash"))
+       (progn
+         (cond ((probe-file path)
+                (multiple-value-bind (user repo)
+                    (account)
+                  (uiop:symbol-call :roswell.github.utils
+                                    :ensure-release-exists
+                                    version
+                                    :owner user
+                                    :repo repo)
+                  (uiop:symbol-call :roswell.github.utils :github
+                                    path version user repo nil)))
+               (t
+                (format t "file not found:~A~%" path)
+                (uiop:quit 1))))))))
+
+(export
  (defun latests (args)
    (declare (ignore args))
    (format t "~{~A~%~}" (release-uris))))
@@ -222,6 +243,11 @@ exec ros -Q -- $0 "$@"
  (defun version (args)
    (declare (ignore args))
    (format t "~A~%" (release-tag_name))))
+
+(export
+ (defun os (args)
+   (declare (ignore args))
+   (format t "~A~%" (roswell.util:uname))))
 
 (defvar *sh* nil)
 (defvar *var* nil)
