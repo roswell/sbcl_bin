@@ -1,3 +1,4 @@
+#sbcl_bin
 -include .env
 export $(shell sed 's/=.*//' .env)
 
@@ -10,12 +11,17 @@ SUFFIX ?=
 TARGETS ?=$(ARCH)
 SBCL_OPTIONS ?=--fancy
 LISP_IMPL ?= ros -L sbcl-bin without-roswell=t --no-rc run
+
 DOCKER_REPO ?= docker.pkg.github.com/roswell/sbcl_bin
 DOCKER_PLATFORM ?= linux/amd64
 DOCKER_BUILD_OPTIONS ?=
 DOCKER_IMAGE_SUFFIX ?=
 DOCKER_ACTION ?= docker-default-action
+
 ZSTD_BRANCH ?= v1.5.6
+
+TSV_FILE ?= sbcl-bin_uri.tsv
+
 clean:
 	rm -rf zstd
 	ls |grep sbcl |xargs rm -rf
@@ -45,8 +51,9 @@ archive:
 	VERSION=$(VERSION) ARCH=$(ARCH) SUFFIX=$(SUFFIX) ros build.ros archive
 
 tsv:
-	ros web.ros tsv
+	TSV_FILE=$(TSV_FILE) ros web.ros tsv
 
+#docker
 debug-docker:
 	docker run \
 		--rm \
@@ -92,13 +99,18 @@ upload-archive:
 	VERSION=$(VERSION) TARGET=$(ARCH) SUFFIX=$(SUFFIX) ros web.ros upload-archive
 
 upload-tsv:
-	VERSION=$(VERSION) TARGET=$(ARCH) SUFFIX=$(SUFFIX) ros web.ros upload-tsv
+	TSV_FILE=$(TSV_FILE) VERSION=$(VERSION) ros web.ros upload-tsv
 
 download-tsv:
 	VERSION=$(VERSION) ros web.ros get-tsv
 
 table:
 	ros web.ros table
+# mirror
+mirror-uris:
+	curl -L http://sbcl.org/platform-table.html | grep http|awk -F '"' '{print $$2}'|grep binary > $@
+tag:
+	METHOD=mirror ros run -l Lakefile
 
 precompile-freebsd:
 	mv /usr/local/lib/libzstd.so* /tmp
