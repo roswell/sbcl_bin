@@ -80,28 +80,30 @@ exec ros -Q -- $0 "$@"
    (multiple-value-bind (version target suffix uname)
        (version-target :target :archive)
      (let* ((release (and version (< (length version) 20)))
-            (path (print (format nil "sbcl-~A-~A-~A~A-binary"
-                                 version
-                                 target
-                                 uname
-                                 suffix))))
+            (path (format nil "sbcl-~A-~A-~A~A-binary"
+                          version
+                          target
+                          uname
+                          suffix)))
        (when release
          (ql:quickload :sb-md5)
          (loop with file-not-found = nil
                for file in (or (when (env "FILE")
                                  (list (env "FILE")))
                                `(,(format nil "~A.tar.bz2" path)
-                                 ,@(when (equal uname "windows") 
+                                 ,@(when (equal uname "windows")
                                      (list (format nil "~A.msi" path)))))
-               do (cond ((probe-file file)
+               do (format t "upload file:~A " file)
+                  (cond ((probe-file file)
                          (format t "~(~{~2,'0X~}~)"
                                  (map 'list #'identity (funcall (read-from-string "sb-md5:md5sum-file") file)))
                          (multiple-value-bind (user repo)
                              (account)
                            (uiop:symbol-call :roswell.github.utils :github
-                                             file version user repo nil)))
+                                             file version user repo nil))
+                         (format t "done~%"))
                         (t
-                         (format t "file not found:~A~%" file)
+                         (format t "not found~%")
                          (setf file-not-found t)))
                finally (when file-not-found
                          (uiop:quit 1))))))))
@@ -369,7 +371,7 @@ exec ros -Q -- $0 "$@"
 (export
  (defun table (&rest argv)
    (declare (ignore argv))
-   (table-uri-tsv (or (ros:getenv "TSV_FILE") "sbcl-bin_uri.tsv"))
+   (table-uri-tsv (or (env "TSV_FILE") "sbcl-bin_uri.tsv"))
    (with-open-file (o "table.md"
                       :direction :output
                       :if-exists :supersede)
