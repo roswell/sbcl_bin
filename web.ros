@@ -156,38 +156,12 @@ exec ros -Q -- $0 "$@"
                (format t "unlisted uri: ~S~%" uri)))
   tsv)
 
-(defun updated-tsv ()
-  (let* ((releases (releases))
-         (tsv (or (ignore-errors (parse-tsv (dex:get (tsv-uri (second releases)) :force-string t)))
-                  ;; download second new release's tsv or upload current tsv.
-                  (let ((*version* (release-tag_name (second releases)))
-                        (result (parse-tsv (tsv-get "files"))))
-                    (save-tsv (tsv-filename) result)
-                    (upload-tsv nil)
-                    result))))
-    (mapc (lambda (x) (modify-tsv tsv x)) (reverse releases))
-    (setf (rest tsv) (sort (rest tsv) (complement #'uiop/version:version<) :key #'third))
-    tsv))
-
-(export
- (defun tsv (args)
-   (declare (ignore args))
-   (save-tsv (tsv-filename) (updated-tsv))))
-
 (defun tsv-get (&optional (version "files"))
   (multiple-value-bind (user repo)
       (account)
     (dex:get (format nil "https://github.com/~A/~A/releases/download/~A/~A"
                      user repo version (tsv-filename))
              :force-string t)))
-
-(export
- (defun get-tsv (args)
-   (declare (ignore args))
-   (multiple-value-bind (version)
-       (version-target :target :archive)
-     (with-open-file (o (tsv-filename) :direction :output :if-exists :supersede)
-       (format o "~A" (tsv-get (or version "files")))))))
 
 (export
  (defun upload-tsv (args)
@@ -214,6 +188,32 @@ exec ros -Q -- $0 "$@"
                (t
                 (format t "file not found:~A~%" path)
                 (uiop:quit 1))))))))
+
+(defun updated-tsv ()
+  (let* ((releases (releases))
+         (tsv (or (ignore-errors (parse-tsv (dex:get (tsv-uri (second releases)) :force-string t)))
+                  ;; download second new release's tsv or upload current tsv.
+                  (let ((*version* (release-tag_name (second releases)))
+                        (result (parse-tsv (tsv-get "files"))))
+                    (save-tsv (tsv-filename) result)
+                    (upload-tsv nil)
+                    result))))
+    (mapc (lambda (x) (modify-tsv tsv x)) (reverse releases))
+    (setf (rest tsv) (sort (rest tsv) (complement #'uiop/version:version<) :key #'third))
+    tsv))
+
+(export
+ (defun tsv (args)
+   (declare (ignore args))
+   (save-tsv (tsv-filename) (updated-tsv))))
+
+(export
+ (defun get-tsv (args)
+   (declare (ignore args))
+   (multiple-value-bind (version)
+       (version-target :target :archive)
+     (with-open-file (o (tsv-filename) :direction :output :if-exists :supersede)
+       (format o "~A" (tsv-get (or version "files")))))))
 
 (export
  (defun upload-hash (args)
