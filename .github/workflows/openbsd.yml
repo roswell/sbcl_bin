@@ -24,11 +24,11 @@ jobs:
           - target: x86-64
             release: 7.5
             lisp: sbcl-bin/2.4.0
-            os:openbsd
+            os: openbsd
           - target: arm64
             release: 7.5
             lisp: sbcl-bin/2.4.0
-            os:openbsd
+            os: openbsd
   
     environment: SET_VERSION
 
