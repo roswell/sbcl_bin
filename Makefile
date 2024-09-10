@@ -2,7 +2,6 @@
 -include .env
 export $(shell sed 's/=.*//' .env)
 
-NOP := $(shell ros build.ros nop) # avoid messages compile.
 BRANCH ?= $(shell ros build.ros branch)
 VERSION ?= $(shell ros build.ros version)
 VERSION_SUFFIX ?= .roswell
@@ -24,6 +23,7 @@ TSV_FILE ?= sbcl-bin_uri.tsv
 
 clean:
 	rm -rf zstd
+	rm -f verson branch
 	ls |grep sbcl |xargs rm -rf
 show:
 	@echo VERSION=$(VERSION) ARCH=$(ARCH) BRANCH=$(BRANCH) SUFFIX=$(SUFFIX)
@@ -86,14 +86,17 @@ docker: zstd
 		-c "cd /tmp;bash ./tools-for-build/$(IMAGE)/setup;make $(DOCKER_ACTION)"
 
 docker-default-action: compile archive
-
 latest-uris:
 	ros web.ros latests
-
-latest-version:
-	$(eval VERSION := $(shell ros web.ros version))
-	$(eval BRANCH := $(shell VERSION=$(VERSION) ros build.ros branch))
-	@echo "set version $(VERSION)"
+version:
+	ros web.ros version > $@
+branch: version
+	$(eval VERSION := $(shell cat version))
+	VERSION=$(VERSION) ros build.ros branch > $@
+latest-version: version branch
+	$(eval VERSION := $(shell cat version))
+	$(eval BRANCH := $(shell cat branch))
+	@echo "set version $(VERSION):$(BRANCH)"
 
 upload-archive:
 	VERSION=$(VERSION) TARGET=$(ARCH) SUFFIX=$(SUFFIX) ros web.ros upload-archive
