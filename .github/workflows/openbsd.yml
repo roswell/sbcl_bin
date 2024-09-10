@@ -66,6 +66,7 @@ jobs:
             sudo touch /usr/bin/ros
             sudo chmod 755 /usr/bin/ros
             sudo pkg_add gmake git sbcl curl bzip2
+            sudo bash -c 'cd zstd/lib; gmake PREFIX=/usr CFLAGS="-fPIC" install-includes install-static clean'
             LISP_IMPL=sbcl gmake latest-version compile archive;
       - name: upload
         env:
