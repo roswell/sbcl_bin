@@ -70,7 +70,7 @@ jobs:
             sudo touch /usr/bin/ros
             sudo chmod 755 /usr/bin/ros
             sudo pkg_add gmake
-            LISP_IMPL='ros run' gmake latest-version compile-1
+            LISP_IMPL='ros run' gmake latest-version compile-config
       - name: make-host-1
         run: |
           bash -c "cd sbcl;sh make-host-1.sh"
