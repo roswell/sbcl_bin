@@ -72,7 +72,8 @@ jobs:
             pwd
             sudo touch /usr/bin/ros
             sudo chmod 755 /usr/bin/ros
-            sudo pkg_add gmake git sbcl curl bzip2
+            sudo pkg_add gmake git curl bzip2
+            sudo pkg_add sbcl || sudo pkg_add sbcl--threads
             sudo bash -c 'cd zstd/lib; gmake PREFIX=/usr CFLAGS="-fPIC" install-includes install-static clean'
             LISP_IMPL=sbcl gmake latest-version compile;
       - name: upload
@@ -81,7 +82,7 @@ jobs:
           VERSION: ${{ secrets.VERSION }}
           ARCH: ${{ matrix.target }}
           IMAGE: ${{ matrix.image }}
-          SUFFIX: ${{ matrix.suffix }}
+          SUFFIX: ${{ matrix.suffix == 'yes' && format('-{0}', matrix.release) || ''}}
           LINKFLAGS: ${{ matrix.linkflags }}
           DOCKER_PLATFORM: ${{ matrix.docker-platform }}
           DOCKER_IMAGE_SUFFIX: ${{ matrix.docker-image-suffix }}
