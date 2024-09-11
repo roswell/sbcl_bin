@@ -58,7 +58,7 @@ jobs:
           curl -L https://raw.githubusercontent.com/roswell/roswell/master/scripts/install-for-ci.sh | sh
           ros install snmsts/sn.github
           make latest-version zstd
-      - name: Test on OpenBSD
+      - name: Config on OpenBSD
         uses: cross-platform-actions/action@v0.25.0
         with:
           environment_variables: VERSION ARCH IMAGE SUFFIX LINKFLAGS GH_USER GH_REPO GITHUB_OAUTH_TOKEN
@@ -67,17 +67,43 @@ jobs:
           version: ${{ matrix.release }}
           shell: bash
           run: |
-            uname -a
-            whoami
-            pwd
             sudo touch /usr/bin/ros
             sudo chmod 755 /usr/bin/ros
-            sudo pkg_add gmake git curl bzip2
-            sudo pkg_add sbcl
-            sudo pkg_add sbcl--threads
-            which sbcl > /dev/null || sudo pkg_add abcl
+            sudo pkg_add gmake
+            LISP_IMPL='ros run' gmake latest-version compile-1
+      - name: make-host-1
+        run: |
+          bash -c "cd sbcl;sh make-host-1.sh"
+      - name: build-runtime on OpenBSD
+        uses: cross-platform-actions/action@v0.25.0
+        with:
+          environment_variables: VERSION ARCH IMAGE SUFFIX LINKFLAGS GH_USER GH_REPO GITHUB_OAUTH_TOKEN
+          operating_system: ${{ matrix.os }}
+          architecture: ${{ matrix.target }}
+          version: ${{ matrix.release }}
+          shell: bash
+          run: |
+            sudo touch /usr/bin/ros
+            sudo chmod 755 /usr/bin/ros
+            sudo pkg_add gmake
             sudo bash -c 'cd zstd/lib; gmake PREFIX=/usr CFLAGS="-fPIC" install-includes install-static clean'
-            LISP_IMPL=sbcl gmake latest-version compile || LISP_IMPL=abcl gmake latest-version compile;
+            cd sbcl;sh make-target-1.sh
+      - name: make-host2
+        run: |
+          bash -c "cd sbcl;sh make-host-2.sh"
+      - name: build-contrib on OpenBSD
+        uses: cross-platform-actions/action@v0.25.0
+        with:
+          environment_variables: VERSION ARCH IMAGE SUFFIX LINKFLAGS GH_USER GH_REPO GITHUB_OAUTH_TOKEN
+          operating_system: ${{ matrix.os }}
+          architecture: ${{ matrix.target }}
+          version: ${{ matrix.release }}
+          shell: bash
+          run: |
+            sudo touch /usr/bin/ros
+            sudo chmod 755 /usr/bin/ros
+            sudo pkg_add gmake
+            cd sbcl;sh make-target-contrib.sh
       - name: upload
         env:
           GITHUB_OAUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
