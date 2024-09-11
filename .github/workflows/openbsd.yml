@@ -91,7 +91,7 @@ jobs:
       - name: make-host2
         run: |
           bash -c "cd sbcl;sh make-host-2.sh"
-      - name: build-contrib on OpenBSD
+      - name: build-target2 and contrib on ${{ matrix.os }}
         uses: cross-platform-actions/action@v0.25.0
         with:
           environment_variables: VERSION ARCH IMAGE SUFFIX LINKFLAGS GH_USER GH_REPO GITHUB_OAUTH_TOKEN
@@ -103,7 +103,7 @@ jobs:
             sudo touch /usr/bin/ros
             sudo chmod 755 /usr/bin/ros
             sudo pkg_add gmake
-            cd sbcl;sh make-target-contrib.sh
+            cd sbcl;sh make-target-2.sh && sh make-target-contrib.sh
       - name: upload
         env:
           GITHUB_OAUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
