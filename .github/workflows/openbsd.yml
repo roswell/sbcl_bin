@@ -73,7 +73,8 @@ jobs:
             sudo touch /usr/bin/ros
             sudo chmod 755 /usr/bin/ros
             sudo pkg_add gmake git curl bzip2
-            sudo pkg_add sbcl || sudo pkg_add sbcl--threads
+            sudo pkg_add sbcl
+            sudo pkg_add sbcl--threads
             sudo bash -c 'cd zstd/lib; gmake PREFIX=/usr CFLAGS="-fPIC" install-includes install-static clean'
             LISP_IMPL=sbcl gmake latest-version compile;
       - name: upload
