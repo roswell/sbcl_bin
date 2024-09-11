@@ -67,7 +67,7 @@ jobs:
             sudo chmod 755 /usr/bin/ros
             sudo pkg_add gmake git sbcl curl bzip2
             sudo bash -c 'cd zstd/lib; gmake PREFIX=/usr CFLAGS="-fPIC" install-includes install-static clean'
-            LISP_IMPL=sbcl gmake latest-version compile archive;
+            LISP_IMPL=sbcl gmake latest-version compile;
       - name: upload
         env:
           GITHUB_OAUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -79,4 +79,6 @@ jobs:
           DOCKER_PLATFORM: ${{ matrix.docker-platform }}
           DOCKER_IMAGE_SUFFIX: ${{ matrix.docker-image-suffix }}
         run: |
-          env FILE=`ls *.bz2` make latest-version upload-archive;
+          OS=${{ matrix.os }} make latest-version archive
+          ls
+          env FILE=`ls *.bz2` make latest-version upload-archive

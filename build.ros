@@ -63,11 +63,10 @@ exec ros -Q -- $0 "$@"
           (or (env "SUFFIX")
               "")))
 
-(defun archive-sbcl-bin (version uname-m suffix)
-  (declare (ignorable version uname-m suffix))
-  (let ((release-dir (namestring (uiop:getcwd)))
-        (uname (roswell.util:uname)))
-    (declare (ignorable release-dir uname))
+(defun archive-sbcl-bin (version uname uname-m suffix)
+  (declare (ignorable version uname uname-m suffix))
+  (let ((release-dir (namestring (uiop:getcwd))))
+    (declare (ignorable release-dir))
     (progn
       (sh (format nil
                   #-win32 "ln -s sbcl ~Asbcl-~A-~A-~A~A"
@@ -128,9 +127,10 @@ exec ros -Q -- $0 "$@"
    (declare(ignore argv))
    (multiple-value-bind (ver target suffix) (version-target :target :archive)
      (loop for m in (uiop:split-string target :separator '(#\, #\Space))
+           with os = (or (env "OS") (roswell.util:uname))
            do (format t "~S ~S ~S~%" ver m suffix)
               (force-output)
-              (archive-sbcl-bin ver m suffix)))
+              (archive-sbcl-bin ver os m suffix)))
    (force-output)))
 
 (export
