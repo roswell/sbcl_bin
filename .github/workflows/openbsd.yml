@@ -57,7 +57,7 @@ jobs:
         run: |
           curl -L https://raw.githubusercontent.com/roswell/roswell/master/scripts/install-for-ci.sh | sh
           ros install snmsts/sn.github
-          make latest-version zstd
+          make latest-version zstd sbcl
       - name: Config on OpenBSD
         uses: cross-platform-actions/action@v0.25.0
         with:
