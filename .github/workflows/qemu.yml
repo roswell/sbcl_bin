@@ -65,7 +65,8 @@ jobs:
           base_image: ${{ matrix.image }}
           install: |
             apt-get -qq update | true
-            apt-get -qq install sbcl git build-essential curl
+            apt-get -qq install sbcl | true
+            apt-get -qq install git build-essential curl
             cd /tmp;mkdir -p /tmp/clisp;curl -L -O https://github.com/roswell/clisp_head/releases/download/24.9.7/clisp-24.9.7-${{ matrix.target }}-linux-static-binary.tar.bz2; tar xf clisp-24.9.7*
           run: |
             SBCL_OPTIONS='' \
