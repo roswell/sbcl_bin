@@ -63,7 +63,7 @@ jobs:
         with:
           arch: none
           distro: none
-          base_image: ${{ matrix.release }}
+          base_image: ${{ matrix.image }}
           install: |
             apt-get -qq update | true
             apt-get -qq install sbcl git build-essential
