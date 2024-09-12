@@ -58,8 +58,6 @@ jobs:
             apt-get -qq update | true
             apt-get -qq install sbcl libzstd-dev git build-essential
           run: |
-            sudo touch /usr/bin/ros
-            sudo chmod 755 /usr/bin/ros
             SBCL_OPTIONS='--with-sb-core-compression' \
             LISP_IMPL='sbcl --dynamic-space-size 700MB --lose-on-corruption --disable-ldb --disable-debugger' \
             make latest-version compile
