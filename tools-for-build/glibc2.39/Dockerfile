@@ -8,5 +8,5 @@ RUN apt-get update && env DEBIAN_FRONTEND=noninteractive apt-get install -y \
 run cd /tmp; git clone https://github.com/roswell/roswell; \
     cd /tmp/roswell;./bootstrap;./configure ;make; make install; \
     cd /tmp;rm -rf /tmp/roswell; \
-    ros install sbcl-bin/2.3.11
-run ros install snmsts/sn.github
+    (ros install sbcl-bin/2.3.11 || true)
+run (ros install snmsts/sn.github || true)
