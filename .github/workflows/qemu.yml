@@ -22,21 +22,16 @@ jobs:
       matrix:
         include:
           - target: ppc64le
-            suffix: ''
+            suffix: 'trixie'
             lisp: sbcl-bin/2.4.0
-            image: 'glibc2.31'
+            image: 'ppc64le/debian:trixie'
             os: linux
             docker-platform: linux/ppc64le
-            docker-image-suffix: 'ppc64le'
   
     environment: SET_VERSION
 
     steps:
       - uses: actions/checkout@v4
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@v3
-        with:
-          image: tonistiigi/binfmt:qemu-v8.1.5
       - name: setenv
         run: |
           echo "$HOME/.roswell/bin" >> $GITHUB_PATH
@@ -47,22 +42,6 @@ jobs:
           uname -m
           echo $ROSWELL_INSTALL_DIR
           echo $ROSWELL_BRANCH
-      - name: Login to GitHub Container Registry
-        uses: docker/login-action@v3
-        with:
-          registry: docker.pkg.github.com
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-      - name: pull or build docker image
-        env:
-          DOCKER_PLATFORM: ${{ matrix.docker-platform }}
-          DOCKER_BUILD_OPTIONS: ${{ matrix.docker-build-options }}
-          DOCKER_IMAGE_SUFFIX: ${{ matrix.docker-image-suffix }}
-          IMAGE: ${{ matrix.image }}
-        run: |
-          if [ -n "$IMAGE" ]; then
-             make pull-docker || make build-docker
-          fi
       - name: Install Roswell
         env:
           LISP: ${{ matrix.lisp }}
@@ -72,48 +51,19 @@ jobs:
           make latest-version zstd sbcl
           echo 2.3.11 > version
           touch branch
-      - name: config in docker
-        env:
-          ARCH: ${{ matrix.target }}
-          IMAGE: ${{ matrix.image }}
-          SUFFIX: ${{ matrix.suffix }}
-          LINKFLAGS: ${{ matrix.linkflags }}
-          DOCKER_PLATFORM: ${{ matrix.docker-platform }}
-          DOCKER_IMAGE_SUFFIX: ${{ matrix.docker-image-suffix }}
-          DOCKER_ACTION: "show"
-          DOCKER_COMMAND_BEFORE_ACTION: "bash -c 'cd zstd/lib;make PREFIX=/usr CFLAGS=-fPIC install-includes install-static';make latest-version compile-config"
-        run: |
-          make latest-version docker
-      - name: make-host-1
-        run: |
-          bash -c "cd sbcl;sh make-host-1.sh"
-      - name: build-runtime in docker
-        env:
-          ARCH: ${{ matrix.target }}
-          IMAGE: ${{ matrix.image }}
-          SUFFIX: ${{ matrix.suffix }}
-          LINKFLAGS: ${{ matrix.linkflags }}
-          DOCKER_PLATFORM: ${{ matrix.docker-platform }}
-          DOCKER_IMAGE_SUFFIX: ${{ matrix.docker-image-suffix }}
-          DOCKER_ACTION: "show"
-          DOCKER_COMMAND_BEFORE_ACTION: "bash -c 'cd zstd/lib;make PREFIX=/usr CFLAGS=-fPIC install-includes install-static';cd sbcl;sh make-target-1.sh"
-        run: |
-          make latest-version docker
-      - name: make-host2
-        run: |
-          bash -c "cd sbcl;sh make-host-2.sh"
-      - name: build-runtime in docker
-        env:
-          ARCH: ${{ matrix.target }}
-          IMAGE: ${{ matrix.image }}
-          SUFFIX: ${{ matrix.suffix }}
-          LINKFLAGS: ${{ matrix.linkflags }}
-          DOCKER_PLATFORM: ${{ matrix.docker-platform }}
-          DOCKER_IMAGE_SUFFIX: ${{ matrix.docker-image-suffix }}
-          DOCKER_ACTION: "show"
-          DOCKER_COMMAND_BEFORE_ACTION: "bash -c 'cd zstd/lib;make PREFIX=/usr CFLAGS=-fPIC install-includes install-static';cd sbcl;sh make-target-2.sh && sh make-target-contrib.sh"
-        run: |
-           make latest-version docker
+      - name: compile on qemu
+        uses: uraimo/run-on-arch-action@v2
+        with:
+          arch: none
+          distro: none
+          base_image: ${{ matrix.image }}
+          install: |
+            apt-get -qq update | true
+            apt-get -qq install sbcl git build-essential
+          run: |
+            SBCL_OPTIONS='' \
+            LISP_IMPL='sbcl --dynamic-space-size 700MB --lose-on-corruption --disable-ldb --disable-debugger' \
+            make latest-version compile
       - name: upload-image
         env:
           GITHUB_OAUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
