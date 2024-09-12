@@ -73,12 +73,12 @@ compile-1: show sbcl
 	cat sbcl/git_hash
 	rm -f sbcl/version.lisp-expr; $(MAKE) sbcl/version.lisp-expr
 	mv sbcl/.git sbcl/_git
-
 compile-config: compile-1
 	cd sbcl;bash make-config.sh $(SBCL_OPTIONS) --arch=$(ARCH) --xc-host="$(LISP_IMPL)"
-
 compile: compile-1
 	cd sbcl;bash make.sh $(SBCL_OPTIONS) --arch=$(ARCH) --xc-host="$(LISP_IMPL)" || mv _git .git
+	$(MAKE) compile-9
+compile-9:
 	cd sbcl;bash make-shared-library.sh || true
 	cd sbcl;bash run-sbcl.sh --eval "(progn (print *features*)(print (lisp-implementation-version))(terpri)(quit))"
 	ldd sbcl/src/runtime/sbcl || otool -L sbcl/src/runtime/sbcl || true
