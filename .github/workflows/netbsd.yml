@@ -1,0 +1,116 @@
+name: openbsd
+
+on:
+  schedule:
+    - cron:  '0 1 * * *'
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    env:
+      VERSION: ${{ secrets.VERSION }}
+      ARCH: ${{ matrix.target }}
+      SUFFIX: ${{ matrix.suffix == 'yes' && format('-{0}', matrix.release) || ''}}
+      LINKFLAGS: ${{ matrix.linkflags }}
+      ROSWELL_BRANCH: master
+      GITHUB_OAUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - target: x86-64
+            release: 10.0
+            suffix: no
+            lisp: sbcl-bin/2.4.0
+            os: netbsd
+          - target: arm64
+            release: 10.0
+            suffix: no
+            lisp: sbcl-bin/2.4.0
+            os: netbsd
+  
+    environment: SET_VERSION
+
+    steps:
+      - uses: actions/checkout@v4
+      - name: setenv
+        run: |
+          echo "$HOME/.roswell/bin" >> $GITHUB_PATH
+          echo "ROSWELL_BRANCH=release" >> $GITHUB_ENV
+      - name: checkenv
+        run: |
+          uname -s
+          uname -m
+          echo $ROSWELL_INSTALL_DIR
+          echo $ROSWELL_BRANCH
+      - name: Install Roswell
+        env:
+          LISP: ${{ matrix.lisp }}
+        run: |
+          curl -L https://raw.githubusercontent.com/roswell/roswell/master/scripts/install-for-ci.sh | sh
+          ros install snmsts/sn.github
+          make latest-version zstd sbcl
+      - name: Config on OpenBSD
+        uses: cross-platform-actions/action@v0.25.0
+        with:
+          environment_variables: VERSION ARCH IMAGE SUFFIX LINKFLAGS GH_USER GH_REPO GITHUB_OAUTH_TOKEN
+          operating_system: ${{ matrix.os }}
+          architecture: ${{ matrix.target }}
+          version: ${{ matrix.release }}
+          shell: bash
+          run: |
+            sudo touch /usr/bin/ros
+            sudo chmod 755 /usr/bin/ros
+            sudo pkgin -y install gmake
+            LISP_IMPL='ros run' gmake latest-version compile-config
+      - name: make-host-1
+        run: |
+          bash -c "cd sbcl;sh make-host-1.sh"
+      - name: build-runtime on OpenBSD
+        uses: cross-platform-actions/action@v0.25.0
+        with:
+          environment_variables: VERSION ARCH IMAGE SUFFIX LINKFLAGS GH_USER GH_REPO GITHUB_OAUTH_TOKEN
+          operating_system: ${{ matrix.os }}
+          architecture: ${{ matrix.target }}
+          version: ${{ matrix.release }}
+          shell: bash
+          run: |
+            sudo touch /usr/bin/ros
+            sudo chmod 755 /usr/bin/ros
+            sudo pkgin -y install gmake
+            sudo bash -c 'cd zstd/lib; gmake PREFIX=/usr CFLAGS="-fPIC" install-includes install-static clean'
+            cd sbcl;sh make-target-1.sh
+      - name: make-host2
+        run: |
+          bash -c "cd sbcl;sh make-host-2.sh"
+      - name: build-target2 and contrib on ${{ matrix.os }}
+        uses: cross-platform-actions/action@v0.25.0
+        with:
+          environment_variables: VERSION ARCH IMAGE SUFFIX LINKFLAGS GH_USER GH_REPO GITHUB_OAUTH_TOKEN
+          operating_system: ${{ matrix.os }}
+          architecture: ${{ matrix.target }}
+          version: ${{ matrix.release }}
+          shell: bash
+          run: |
+            sudo touch /usr/bin/ros
+            sudo chmod 755 /usr/bin/ros
+            sudo pkgin -y install gmake
+            cd sbcl;sh make-target-2.sh && sh make-target-contrib.sh
+            gmake compile-9
+      - name: upload
+        env:
+          GITHUB_OAUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          VERSION: ${{ secrets.VERSION }}
+          ARCH: ${{ matrix.target }}
+          IMAGE: ${{ matrix.image }}
+          SUFFIX: ${{ matrix.suffix == 'yes' && format('-{0}', matrix.release) || ''}}
+          LINKFLAGS: ${{ matrix.linkflags }}
+          DOCKER_PLATFORM: ${{ matrix.docker-platform }}
+          DOCKER_IMAGE_SUFFIX: ${{ matrix.docker-image-suffix }}
+        run: |
+          OS=${{ matrix.os }} make latest-version archive
+          ls
+          env FILE=`ls *.bz2` make latest-version upload-archive
