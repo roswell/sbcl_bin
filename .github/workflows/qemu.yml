@@ -56,8 +56,7 @@ jobs:
           base_image: ${{ matrix.release }}
           install: |
             apt-get -qq update | true
-            apt-get -qq install sbcl git build-essential
-            bash -c 'cd zstd/lib; make PREFIX=/usr CFLAGS="-fPIC" install-includes install-static clean'
+            apt-get -qq install sbcl libzstd-dev git build-essential
           run: |
             sudo touch /usr/bin/ros
             sudo chmod 755 /usr/bin/ros
