@@ -68,7 +68,6 @@ jobs:
           env: |
             ARCH: ${{ matrix.target }}
             SUFFIX: ${{ matrix.suffix }}
-            LINKFLAGS: ${{ matrix.linkflags }}
           install: |
             apt-get -qq update | true
             apt-get -qq install sbcl | true
