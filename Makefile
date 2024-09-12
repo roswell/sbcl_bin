@@ -18,6 +18,8 @@ DOCKER_REPO ?= docker.pkg.github.com/roswell/sbcl_bin
 DOCKER_PLATFORM ?= linux/amd64
 DOCKER_BUILD_OPTIONS ?=
 DOCKER_IMAGE_SUFFIX ?=
+IMAGE ?=
+DOCKER_COMMAND_BEFORE_ACTION ?= bash ./tools-for-build/$(IMAGE)/setup
 DOCKER_ACTION ?= docker-default-action
 
 ZSTD_BRANCH ?= v1.5.6
@@ -81,7 +83,10 @@ compile: compile-1
 compile-9:
 	cd sbcl;bash make-shared-library.sh || true
 	cd sbcl;bash run-sbcl.sh --eval "(progn (print *features*)(print (lisp-implementation-version))(terpri)(quit))"
-	ldd sbcl/src/runtime/sbcl || otool -L sbcl/src/runtime/sbcl || true
+	ldd sbcl/src/runtime/sbcl || \
+	otool -L sbcl/src/runtime/sbcl || \
+	readelf -d sbcl/src/runtime/sbcl || \
+	true
 
 archive:
 	VERSION=$(VERSION) ARCH=$(ARCH) SUFFIX=$(SUFFIX) ros build.ros archive
@@ -115,7 +120,7 @@ docker: zstd
 		-e TARGET=$(TARGET) \
 		$(DOCKER_REPO)/$$(cat ./tools-for-build/$(IMAGE)/Name)$(DOCKER_IMAGE_SUFFIX) \
 		bash \
-		-c "cd /tmp;bash ./tools-for-build/$(IMAGE)/setup;make $(DOCKER_ACTION)"
+		-c "cd /tmp;$(DOCKER_COMMAND_BEFORE_ACTION);make $(DOCKER_ACTION)"
 
 docker-default-action: compile archive
 
