@@ -22,9 +22,10 @@ jobs:
       matrix:
         include:
           - target: ppc64le
+            release: 'ppc64le/debian:trixie'
             suffix: '-glibc2.40'
             lisp: sbcl-bin/2.4.0
-            image: 'ppc64le/debian:trixie'
+            image: 'glibc2.19'
             os: linux
             docker-platform: linux/ppc64le
           - target: ppc64le
@@ -62,23 +63,14 @@ jobs:
         with:
           arch: none
           distro: none
-          base_image: ${{ matrix.image }}
-          dockerRunArgs: |
-            --volume "${PWD}/artifacts:/artifacts"
-          env: |
-            ARCH: ${{ matrix.target }}
-            SUFFIX: ${{ matrix.suffix }}
+          base_image: ${{ matrix.release }}
           install: |
             apt-get -qq update | true
-            apt-get -qq install sbcl | true
-            apt-get -qq install git build-essential curl
-            #cd /tmp;mkdir -p /tmp/clisp;curl -L -O https://github.com/roswell/clisp_head/releases/download/24.9.7/clisp-24.9.7-${{ matrix.target }}-linux-static-binary.tar.bz2; tar xf clisp-24.9.7*
+            apt-get -qq install sbcl git build-essential
           run: |
-            #LISP_IMPL="/tmp/clisp-24.9.7-${{ matrix.target }}-linux-static/bin/clisp" \
-            LISP_IMPL='sbcl --dynamic-space-size 700MB --lose-on-corruption --disable-ldb --disable-debugger' \
             SBCL_OPTIONS='' \
-            make latest-version compile archive
-            mv *.bz2 /artifacts
+            LISP_IMPL='sbcl --dynamic-space-size 700MB --lose-on-corruption --disable-ldb --disable-debugger' \
+            make latest-version compile
       - name: upload-image
         env:
           GITHUB_OAUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -88,6 +80,6 @@ jobs:
           SUFFIX: ${{ matrix.suffix }}
           LINKFLAGS: ${{ matrix.linkflags }}
         run: |
-          mv ${PWD}/artifacts/* .
+          OS=${{ matrix.os }} make latest-version archive
           ls
           env FILE=`ls *.bz2` make latest-version upload-archive
