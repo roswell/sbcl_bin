@@ -51,6 +51,7 @@ jobs:
           ros install snmsts/sn.github
           make latest-version zstd sbcl
           echo 2.3.11 > version
+          touch branch
       - name: compile on qemu
         uses: uraimo/run-on-arch-action@v2
         with:
