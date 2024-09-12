@@ -12,7 +12,7 @@ jobs:
     env:
       VERSION: ${{ secrets.VERSION }}
       ARCH: ${{ matrix.target }}
-      SUFFIX: ${{ matrix.suffix == 'yes' && format('-{0}', matrix.release) || ''}}
+      SUFFIX: ${{ matrix.suffix }}
       LINKFLAGS: ${{ matrix.linkflags }}
       ROSWELL_BRANCH: master
       GITHUB_OAUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -23,9 +23,11 @@ jobs:
         include:
           - target: ppc64le
             release: 'ppc64le/debian:trixie'
-            suffix: no
+            suffix: ''
             lisp: sbcl-bin/2.4.0
+            image: 'glibc2.19'
             os: linux
+            docker-platform: linux/ppc64le
   
     environment: SET_VERSION
 
@@ -48,6 +50,7 @@ jobs:
           curl -L https://raw.githubusercontent.com/roswell/roswell/master/scripts/install-for-ci.sh | sh
           ros install snmsts/sn.github
           make latest-version zstd sbcl
+          echo 2.3.11 > version
       - name: compile on qemu
         uses: uraimo/run-on-arch-action@v2
         with:
@@ -56,22 +59,45 @@ jobs:
           base_image: ${{ matrix.release }}
           install: |
             apt-get -qq update | true
-            apt-get -qq install sbcl libzstd-dev git build-essential
+            apt-get -qq install sbcl git build-essential
           run: |
-            SBCL_OPTIONS='--with-sb-core-compression' \
+            SBCL_OPTIONS='' \
             LISP_IMPL='sbcl --dynamic-space-size 700MB --lose-on-corruption --disable-ldb --disable-debugger' \
             make latest-version compile
-      - name: upload
+      - name: upload-image
         env:
           GITHUB_OAUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           VERSION: ${{ secrets.VERSION }}
           ARCH: ${{ matrix.target }}
           IMAGE: ${{ matrix.image }}
-          SUFFIX: ${{ matrix.suffix == 'yes' && format('-{0}', matrix.release) || ''}}
+          SUFFIX: ${{ matrix.suffix }}
           LINKFLAGS: ${{ matrix.linkflags }}
-          DOCKER_PLATFORM: ${{ matrix.docker-platform }}
-          DOCKER_IMAGE_SUFFIX: ${{ matrix.docker-image-suffix }}
         run: |
           OS=${{ matrix.os }} make latest-version archive
           ls
           env FILE=`ls *.bz2` make latest-version upload-archive
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: docker.pkg.github.com
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: pull or build docker image
+        env:
+          DOCKER_PLATFORM: ${{ matrix.docker-platform }}
+          DOCKER_BUILD_OPTIONS: ${{ matrix.docker-build-options }}
+          IMAGE: ${{ matrix.image }}
+        run: |
+          if [ -n "$IMAGE" ]; then
+             make pull-docker || make build-docker
+          fi
+      - name: build
+        env:
+          VERSION: ${{ secrets.VERSION }}
+          ARCH: ${{ matrix.target }}
+          IMAGE: ${{ matrix.image }}
+          SUFFIX: ${{ matrix.suffix }}
+          LINKFLAGS: ${{ matrix.linkflags }}
+          DOCKER_PLATFORM: ${{ matrix.docker-platform }}
+        run: |
+          make latest-version docker
