@@ -22,10 +22,9 @@ jobs:
       matrix:
         include:
           - target: ppc64le
-            release: 'ppc64le/debian:trixie'
             suffix: '-glibc2.40'
             lisp: sbcl-bin/2.4.0
-            image: 'glibc2.19'
+            image: 'ppc64le/debian:trixie'
             os: linux
             docker-platform: linux/ppc64le
           - target: ppc64le
