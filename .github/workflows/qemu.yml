@@ -105,7 +105,7 @@ jobs:
           LINKFLAGS: ${{ matrix.linkflags }}
           DOCKER_PLATFORM: ${{ matrix.docker-platform }}
           DOCKER_IMAGE_SUFFIX: ${{ matrix.docker-image-suffix }}
-          DOCKER_ACTION:"show"
+          DOCKER_ACTION: "show"
           DOCKER_COMMAND_BEFORE_ACTION: "bash -c 'cd zstd/lib;make PREFIX=/usr CFLAGS=-fPIC install-includes install-static';cd sbcl;sh make-target-2.sh && sh make-target-contrib.sh"
         run: |
            make latest-version docker
