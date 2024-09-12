@@ -68,7 +68,7 @@ jobs:
             apt-get -qq install git build-essential curl
             curl -L -O https://github.com/roswell/sbcl_bin/releases/download/2.3.11/sbcl-2.3.11-ppc64le-linux-glibc2.40-binary.tar.bz2
             tar xf sbcl-2.3.11-ppc64le-linux-glibc2.40-binary.tar.bz2
-            cd sbcl-*;sh install.sh
+            rm sbcl-*.bz2;cd sbcl-*;sh install.sh
           run: |
             SBCL_OPTIONS='' \
             LISP_IMPL='sbcl --dynamic-space-size 700MB --lose-on-corruption --disable-ldb --disable-debugger' \
