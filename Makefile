@@ -73,7 +73,7 @@ sbcl/version.lisp-expr: sbcl
 compile-1: show sbcl
 	cd sbcl;{ git describe  | sed -n -e 's/^.*-g//p' ; } 2>/dev/null > git_hash
 	cat sbcl/git_hash
-	rm -f sbcl/version.lisp-expr; $(MAKE) sbcl/version.lisp-expr
+	rm -f sbcl/version.lisp-expr;VERSION=$(VERSION) $(MAKE) sbcl/version.lisp-expr
 	mv sbcl/.git sbcl/_git
 compile-config: compile-1
 	cd sbcl;bash make-config.sh $(SBCL_OPTIONS) --arch=$(ARCH) --xc-host="$(LISP_IMPL)"
