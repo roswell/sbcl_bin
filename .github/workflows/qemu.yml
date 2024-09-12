@@ -27,6 +27,7 @@ jobs:
             image: 'glibc2.19'
             os: linux
             docker-platform: linux/ppc64le
+            docker-image-suffix: 'ppc64le'
   
     environment: SET_VERSION
 
