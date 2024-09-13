@@ -89,7 +89,7 @@ jobs:
             #tar xf sbcl-2.3.11-ppc64le-linux-glibc2.39-binary.tar.bz2
             #rm sbcl-*.bz2;cd sbcl-*;sh install.sh
           run: |
-            cd sbcl;sudo sh make-target-1.sh
+            cd sbcl;sh make-target-1.sh
       - name: make-host2
         run: |
           sudo bash -c "cd sbcl;sh make-host-2.sh"
