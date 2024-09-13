@@ -75,7 +75,7 @@ jobs:
             make latest-version compile-config
       - name: make-host-1
         run: |
-          bash -c "cd sbcl;sh make-host-1.sh"
+          sudo bash -c "cd sbcl;sh make-host-1.sh"
       - name: build runtime on qemu
         uses: uraimo/run-on-arch-action@v2
         with:
@@ -89,10 +89,10 @@ jobs:
             #tar xf sbcl-2.3.11-ppc64le-linux-glibc2.39-binary.tar.bz2
             #rm sbcl-*.bz2;cd sbcl-*;sh install.sh
           run: |
-            cd sbcl;sh make-target-1.sh
+            cd sbcl;sudo sh make-target-1.sh
       - name: make-host2
         run: |
-          bash -c "cd sbcl;sh make-host-2.sh"
+          sudo bash -c "cd sbcl;sh make-host-2.sh"
       - name: build runtime on qemu
         uses: uraimo/run-on-arch-action@v2
         with:
@@ -116,6 +116,6 @@ jobs:
           SUFFIX: ${{ matrix.suffix }}
           LINKFLAGS: ${{ matrix.linkflags }}
         run: |
-          OS=${{ matrix.os }} make latest-version archive
+          OS=${{ matrix.os }} sudo make latest-version archive
           ls
           env FILE=`ls *.bz2` make latest-version upload-archive
