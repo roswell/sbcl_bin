@@ -33,6 +33,18 @@ jobs:
             image: 'ppc64le/ubuntu:24.04'
             os: linux
             docker-platform: linux/ppc64le
+          - target: ppc64le
+            suffix: '-glibc2.31'
+            lisp: sbcl-bin/2.4.0
+            image: 'ppc64le/ubuntu:20.04'
+            os: linux
+            docker-platform: linux/ppc64le
+          - target: ppc64le
+            suffix: '-glibc2.19'
+            lisp: sbcl-bin/2.4.0
+            image: 'ppc64le/ubuntu:14.04'
+            os: linux
+            docker-platform: linux/ppc64le
   
     environment: SET_VERSION
 
@@ -57,7 +69,7 @@ jobs:
           make latest-version zstd sbcl
           echo 2.3.11 > version
           touch branch
-      - name: compile on qemu
+      - name: config on qemu
         uses: uraimo/run-on-arch-action@v2
         with:
           arch: none
@@ -93,7 +105,7 @@ jobs:
       - name: make-host2
         run: |
           sudo bash -c "cd sbcl;sh make-host-2.sh"
-      - name: build runtime on qemu
+      - name: build core and contrib on qemu
         uses: uraimo/run-on-arch-action@v2
         with:
           arch: none
