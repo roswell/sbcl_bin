@@ -66,8 +66,8 @@ jobs:
           install: |
             apt-get -qq update | true
             apt-get -qq install git build-essential curl
-            curl -L -O https://github.com/roswell/sbcl_bin/releases/download/2.3.11/sbcl-2.3.11-ppc64le-linux-glibc2.40-binary.tar.bz2
-            tar xf sbcl-2.3.11-ppc64le-linux-glibc2.40-binary.tar.bz2
+            curl -L -O https://github.com/roswell/sbcl_bin/releases/download/2.3.11/sbcl-2.3.11-ppc64le-linux-glibc2.39-binary.tar.bz2
+            tar xf sbcl-2.3.11-ppc64le-linux-glibc2.39-binary.tar.bz2
             rm sbcl-*.bz2;cd sbcl-*;sh install.sh
           run: |
             SBCL_OPTIONS='' \
