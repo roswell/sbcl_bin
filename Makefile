@@ -19,8 +19,7 @@ DOCKER_PLATFORM ?= linux/amd64
 DOCKER_BUILD_OPTIONS ?=
 DOCKER_IMAGE_SUFFIX ?=
 IMAGE ?=
-DOCKER_COMMAND_BEFORE_ACTION ?= bash ./tools-for-build/$(IMAGE)/setup
-DOCKER_ACTION ?= docker-default-action
+DOCKER_ACTION ?= bash ./tools-for-build/$(IMAGE)/setup;make docker-default-action
 
 ZSTD_BRANCH ?= v1.5.6
 
@@ -78,7 +77,7 @@ compile-1: show sbcl
 compile-config: compile-1
 	cd sbcl;bash make-config.sh $(SBCL_OPTIONS) --arch=$(ARCH) --xc-host="$(LISP_IMPL)"
 compile: compile-1
-	cd sbcl;bash make.sh $(SBCL_OPTIONS) --arch=$(ARCH) --xc-host="$(LISP_IMPL)" || mv _git .git
+	bash -c "cd sbcl;make.sh $(SBCL_OPTIONS) --arch=$(ARCH) --xc-host='$(LISP_IMPL)' || mv _git .git"
 	$(MAKE) compile-9
 compile-9:
 	cd sbcl;bash make-shared-library.sh || true
@@ -107,7 +106,7 @@ push-docker:
 	docker push $(DOCKER_REPO)/$$(cat ./tools-for-build/$(IMAGE)/Name)$(DOCKER_IMAGE_SUFFIX);
 pull-docker:
 	docker pull $(DOCKER_REPO)/$$(cat ./tools-for-build/$(IMAGE)/Name)$(DOCKER_IMAGE_SUFFIX);
-docker: zstd
+docker:
 	docker run \
 		--rm \
 		--platform $(DOCKER_PLATFORM) \
@@ -120,7 +119,7 @@ docker: zstd
 		-e TARGET=$(TARGET) \
 		$(DOCKER_REPO)/$$(cat ./tools-for-build/$(IMAGE)/Name)$(DOCKER_IMAGE_SUFFIX) \
 		bash \
-		-c "cd /tmp;$(DOCKER_COMMAND_BEFORE_ACTION);make $(DOCKER_ACTION)"
+		-c "cd /tmp;$(DOCKER_ACTION)"
 
 docker-default-action: compile archive
 
