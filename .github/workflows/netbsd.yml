@@ -22,12 +22,12 @@ jobs:
       matrix:
         include:
           - target: x86-64
-            release: 10.0
+            release: '10.0'
             suffix: no
             lisp: sbcl-bin/2.4.0
             os: netbsd
           - target: arm64
-            release: 10.0
+            release: '10.0'
             suffix: no
             lisp: sbcl-bin/2.4.0
             os: netbsd
