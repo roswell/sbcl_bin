@@ -77,7 +77,7 @@ compile-1: show sbcl
 compile-config: compile-1
 	cd sbcl;bash make-config.sh $(SBCL_OPTIONS) --arch=$(ARCH) --xc-host="$(LISP_IMPL)"
 compile: compile-1
-	bash -c "cd sbcl;make.sh $(SBCL_OPTIONS) --arch=$(ARCH) --xc-host='$(LISP_IMPL)' || mv _git .git"
+	bash -c "cd sbcl;bash make.sh $(SBCL_OPTIONS) --arch=$(ARCH) --xc-host='$(LISP_IMPL)' || mv _git .git"
 	$(MAKE) compile-9
 compile-9:
 	cd sbcl;bash make-shared-library.sh || true
