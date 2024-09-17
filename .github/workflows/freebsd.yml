@@ -1,4 +1,4 @@
-name: freebsd
+name: FreeBSD
 
 on:
   schedule:
@@ -61,7 +61,7 @@ jobs:
             sudo pkg install -y bash roswell autoconf texinfo perl5 gmake gcc libffi git
             ros install ${{ matrix.lisp }}
             ros install snmsts/sn.github
-            gmake zstd sbcl
+            gmake zstd
             sudo bash -c 'cd zstd/lib; gmake PREFIX=/usr CFLAGS="-fPIC" install-includes install-static clean'
             if [ "$VERSION" = "" ]; then
               sudo -E gmake latest-version sbcl precompile-freebsd compile postcompile-freebsd archive upload-archive;
@@ -81,7 +81,7 @@ jobs:
             ros install ${{ matrix.lisp }}
             ros install snmsts/sn.github
           run: |
-            gmake zstd sbcl
+            gmake zstd
             bash -c 'cd zstd/lib; gmake PREFIX=/usr LIBDIR=/usr/lib32 CFLAGS="-m32 -fPIC" install-includes install-static clean'
             if [ "$VERSION" = "" ]; then
               gmake latest-version sbcl precompile-freebsd compile postcompile-freebsd archive upload-archive;
