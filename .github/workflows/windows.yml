@@ -121,9 +121,9 @@ jobs:
       shell: msys2 {0}
       run: |
         if [ "$VERSION" = "" ]; then
-          PATH=/mingw32/bin:$PATH make latest-version compile archive;
+          OS=windows PATH=/mingw32/bin:$PATH make latest-version compile archive;
         else
-          PATH=/mingw32/bin:$PATH make compile archive;
+          OS=windows PATH=/mingw32/bin:$PATH make compile archive;
         fi
     - name: upload
       shell: msys2 {0}
