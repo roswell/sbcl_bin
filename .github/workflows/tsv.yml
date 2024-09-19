@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        lisp: [sbcl-bin/2.0.0]
+        lisp: [sbcl-bin/2.4.0]
         target: [x86-64]
     environment: SET_VERSION
 
