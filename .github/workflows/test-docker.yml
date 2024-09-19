@@ -24,7 +24,7 @@ jobs:
           - target: ppc64le
             suffix: ''
             lisp: sbcl-bin/2.4.0
-            image: 'ppc64le/glibc2.19'
+            image: 'glibc2.19'
             os: linux
             docker-platform: linux/ppc64le
             docker-image-suffix: 'ppc64le'
