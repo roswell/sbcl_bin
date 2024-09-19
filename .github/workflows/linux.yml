@@ -12,103 +12,68 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
+        target: ['x86-64', 'x86', 'arm64']
+        suffix: ['', '-glibc2.39', '-glibc2.31', '-glibc2.19', '-glibc2.10', '-musl']
+        exclude:
+          - target: arm64
+            suffix: -glibc2.10
+          - target: arm64
+            suffix: -glibc2.19
         include:
-          - target: x86-64
-            lisp: 'sbcl-bin/2.4.0'
+          # musl1.1 is only with x86
+          - target: x86
+            suffix: -musl1.1
+          # default lisp used is sbcl-bin/2.4.0
+          - lisp: 'sbcl-bin/2.4.0'
+          # suffix default image
+          - suffix: ''
             image: 'glibc2.19'
+          - suffix: -glibc2.39
+            image: 'glibc2.39'
+          - suffix: -glibc2.31
+            image: 'glibc2.31'
+          - suffix: -glibc2.19
+            image: 'glibc2.19'
+          - suffix: -glibc2.10
+            image: 'glibc2.10'
+          - suffix: -musl
+            image: 'musl1.2.2'
+          # set default docker platform and image suffix.
+          - target: x86-64
             docker-platform: 'linux/amd64'
             docker-image-suffix: ''
           - target: x86
-            lisp: 'sbcl-bin/2.4.0'
-            image: 'glibc2.19'
             docker-platform: 'linux/amd64'
             docker-image-suffix: ''
           - target: arm64
-            lisp: 'sbcl-bin/2.4.0'
-            image: 'glibc2.19'
             docker-platform: 'linux/arm64'
             docker-image-suffix: 'aarch64'
           #- target: riscv64
-          #  lisp: 'sbcl-bin/2.4.0'
+          #  suffix: ''
           #  image: 'glibc2.31'
           #  docker-platform: 'linux/riscv64'
           #  docker-image-suffix: 'riscv64'
           # with suffix x86-64
           - target: x86-64
-            suffix: -glibc2.39
-            lisp: sbcl-bin/2.4.0
-            image: 'glibc2.39'
-            docker-platform: 'linux/amd64'
-          - target: x86-64
-            suffix: -glibc2.31
-            lisp: sbcl-bin/2.4.0
-            image: 'glibc2.31'
-            docker-platform: 'linux/amd64'
-          - target: x86-64
-            suffix: -glibc2.19
-            lisp: sbcl-bin/2.4.0
-            image: 'glibc2.19'
-            docker-platform: 'linux/amd64'
-          - target: x86-64
             suffix: -glibc2.10
-            lisp: sbcl-bin/2.4.0
             image: 'glibc2.10-64'
-            docker-platform: 'linux/amd64'
             linkflags: -lrt
-          - target: x86-64
-            suffix: -musl
-            lisp: sbcl-bin/2.4.0
-            image: 'musl1.2.2'
-            docker-platform: 'linux/amd64'
           # with suffix x86
           - target: x86
-            suffix: -glibc2.39
-            lisp: sbcl-bin/2.4.0
-            image: 'glibc2.39'
-            docker-platform: 'linux/amd64'
-          - target: x86
-            suffix: -glibc2.31
-            lisp: sbcl-bin/2.4.0
-            image: 'glibc2.31'
-            docker-platform: 'linux/amd64'
-          - target: x86
-            suffix: -glibc2.19
-            lisp: sbcl-bin/2.4.0
-            image: 'glibc2.19'
-            docker-platform: 'linux/amd64'
-          - target: x86
             suffix: -glibc2.10
-            lisp: sbcl-bin/2.4.0
-            image: 'glibc2.10'
-            docker-platform: 'linux/amd64'
             linkflags: -lrt
           - target: x86
             suffix: -musl
-            lisp: sbcl-bin/2.4.0
-            image: 'musl1.2.2'
             docker-platform: 'linux/386'
             docker-build-options: '--build-arg WRAPPER=linux32'
             docker-image-suffix: 'x86'
           - target: x86
             suffix: -musl1.1
-            lisp: sbcl-bin/2.4.0
             image: 'musl1.1.24'
             docker-platform: 'linux/386'
             docker-build-options: '--build-arg WRAPPER=linux32'
             docker-image-suffix: 'x86'
           # with suffix arm64
-          - target: arm64
-            suffix: -musl
-            lisp: sbcl-bin/2.4.0
-            image: 'musl1.2.2'
-            docker-platform: 'linux/arm64'
-            docker-image-suffix: 'aarch64'
-          - target: arm64
-            suffix: -glibc2.39
-            lisp: sbcl-bin/2.4.0
-            image: 'glibc2.39'
-            docker-platform: 'linux/arm64'
-            docker-image-suffix: 'aarch64'
 
     environment: SET_VERSION
 
