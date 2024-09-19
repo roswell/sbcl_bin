@@ -24,7 +24,7 @@ jobs:
           - target: ppc64le
             suffix: ''
             lisp: sbcl-bin/2.4.0
-            image: 'glibc2.19'
+            image: 'ppc64le/glibc2.19'
             os: linux
             docker-platform: linux/ppc64le
             docker-image-suffix: 'ppc64le'
@@ -70,7 +70,7 @@ jobs:
           if [ -n "$IMAGE" ]; then
              make pull-docker || make build-docker
           fi
-      - name: build
+      - name: config
         env:
           VERSION: ${{ secrets.VERSION }}
           ARCH: ${{ matrix.target }}
@@ -80,4 +80,35 @@ jobs:
           DOCKER_PLATFORM: ${{ matrix.docker-platform }}
           DOCKER_IMAGE_SUFFIX: ${{ matrix.docker-image-suffix }}
         run: |
-          make latest-version docker
+          make latest-version sbcl zstd
+          DOCKER_ACTION="cd zstd/lib;make PREFIX=/usr CFLAGS=-fPIC install-includes install-static" make latest-version docker
+          DOCKER_ACTION="make compile-config" make latest-version docker
+      - name: make-host-1
+        run: |
+          bash -c "cd sbcl;sh make-host-1.sh"
+      - name: build-runtime
+        env:
+          VERSION: ${{ secrets.VERSION }}
+          ARCH: ${{ matrix.target }}
+          IMAGE: ${{ matrix.image }}
+          SUFFIX: ${{ matrix.suffix }}
+          LINKFLAGS: ${{ matrix.linkflags }}
+          DOCKER_PLATFORM: ${{ matrix.docker-platform }}
+          DOCKER_IMAGE_SUFFIX: ${{ matrix.docker-image-suffix }}
+        run: |
+          DOCKER_ACTION="cd sbcl;sh make-target-1.sh" make latest-version docker
+      - name: make-host2
+        run: |
+          bash -c "cd sbcl;sh make-host-2.sh"
+      - name: build-runtime
+        env:
+          VERSION: ${{ secrets.VERSION }}
+          ARCH: ${{ matrix.target }}
+          IMAGE: ${{ matrix.image }}
+          SUFFIX: ${{ matrix.suffix }}
+          LINKFLAGS: ${{ matrix.linkflags }}
+          DOCKER_PLATFORM: ${{ matrix.docker-platform }}
+          DOCKER_IMAGE_SUFFIX: ${{ matrix.docker-image-suffix }}
+        run: |
+          DOCKER_ACTION="cd sbcl;sh make-target-2.sh && sh make-target-contrib.sh" make latest-version docker
+          DOCKER_ACTION="make compile-9" make latest-version docker
