@@ -20,7 +20,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        suffix: ['', '-glibc2.39', '-glibc2.31', '-glibc2.19']
+        suffix: ['', '-glibc2.39', '-glibc2.31', '-glibc2.19', '-musl']
         target: ['ppc64le']
         include:
           - lisp: 'sbcl-bin/2.4.0'
@@ -29,6 +29,7 @@ jobs:
           - {suffix: '-glibc2.19',image: glibc2.19 }
           - {suffix: '-glibc2.31',image: glibc2.31 }
           - {suffix: '-glibc2.39',image: glibc2.39 }
+          - {suffix: '-musl',image: musl1.2.2 }
     environment: SET_VERSION
 
     steps:
@@ -78,9 +79,10 @@ jobs:
           LINKFLAGS: ${{ matrix.linkflags }}
           DOCKER_PLATFORM: ${{ matrix.docker-platform }}
           DOCKER_IMAGE_SUFFIX: ${{ matrix.docker-image-suffix }}
+          DOCKER_ACTION: bash ./tools-for-build/${{ matrix.image }}/setup;make latest-version compile-config
         run: |
           make latest-version sbcl zstd
-          ARCH="" DOCKER_ACTION="bash ./tools-for-build/$(IMAGE)/setup;make latest-version compile-config" make latest-version docker
+          ARCH=""  make latest-version docker
       - name: make-host-1
         run: |
           sudo bash -c "cd sbcl;sh make-host-1.sh"
@@ -92,8 +94,9 @@ jobs:
           LINKFLAGS: ${{ matrix.linkflags }}
           DOCKER_PLATFORM: ${{ matrix.docker-platform }}
           DOCKER_IMAGE_SUFFIX: ${{ matrix.docker-image-suffix }}
+          DOCKER_ACTION: bash ./tools-for-build/${{ matrix.image }}/setup;cd sbcl;sh make-target-1.sh
         run: |
-          DOCKER_ACTION="bash ./tools-for-build/$(IMAGE)/setup;cd sbcl;sh make-target-1.sh" make latest-version docker
+          make latest-version docker
       - name: make-host2
         run: |
           sudo bash -c "cd sbcl;sh make-host-2.sh"
@@ -105,9 +108,9 @@ jobs:
           LINKFLAGS: ${{ matrix.linkflags }}
           DOCKER_PLATFORM: ${{ matrix.docker-platform }}
           DOCKER_IMAGE_SUFFIX: ${{ matrix.docker-image-suffix }}
+          DOCKER_ACTION: bash ./tools-for-build/${{ matrix.image }}/setup;cd sbcl;sh make-target-2.sh && sh make-target-contrib.sh;cd ..;make compile-9
         run: |
-          DOCKER_ACTION="bash ./tools-for-build/$(IMAGE)/setup;cd sbcl;sh make-target-2.sh && sh make-target-contrib.sh" make latest-version docker
-          DOCKER_ACTION="make compile-9" make latest-version docker
+          make latest-version docker
       - name: upload
         env:
           GITHUB_OAUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
