@@ -4,6 +4,6 @@ ARG WRAPPER=""
 run cd /tmp; git clone https://github.com/roswell/roswell; \
     cd /tmp/roswell;./bootstrap;$WRAPPER ./configure --with-sbcl-bin-variant='-musl';make; make install; \
     cd /tmp;rm -rf /tmp/roswell; \
-    ros install sbcl-bin/2.4.7;
+    (ros install sbcl-bin/2.4.7 || true);
 
-run ros install snmsts/sn.github
+run (ros install snmsts/sn.github || true)
