@@ -1,0 +1,123 @@
+name: LinuxCrossBuild
+
+on:
+  #schedule:
+  #  - cron:  '0 1 * * *'
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    env:
+      VERSION: ${{ secrets.VERSION }}
+      ARCH: ${{ matrix.target }}
+      SUFFIX: ${{ matrix.suffix }}
+      LINKFLAGS: ${{ matrix.linkflags }}
+      ROSWELL_BRANCH: master
+      GITHUB_OAUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+    strategy:
+      fail-fast: false
+      matrix:
+        suffix: ['']
+        target: ['ppc64le', 'riscv64']
+        include:
+          - lisp: 'sbcl-bin/2.4.0'
+          - {target: ppc64le,docker-platform: linux/ppc64le,docker-image-suffix: ppc64le }
+          - {target: riscv64,docker-platform: linux/riscv64,docker-image-suffix: riscv64 }
+          - {target: ppc64le,suffix: '',image: glibc2.19 }
+          - {target: riscv64,suffix: '',image: glibc2.31 }
+    environment: SET_VERSION
+
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+        with:
+          image: tonistiigi/binfmt:qemu-v8.1.5
+      - name: setenv
+        run: |
+          echo "$HOME/.roswell/bin" >> $GITHUB_PATH
+          echo "ROSWELL_BRANCH=release" >> $GITHUB_ENV
+      - name: checkenv
+        run: |
+          uname -s
+          uname -m
+          echo $ROSWELL_INSTALL_DIR
+          echo $ROSWELL_BRANCH
+      - name: Install Roswell
+        env:
+          LISP: ${{ matrix.lisp }}
+        run: |
+          curl -L https://raw.githubusercontent.com/roswell/roswell/master/scripts/install-for-ci.sh | sh
+          ros install snmsts/sn.github
+          make latest-version zstd sbcl
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: docker.pkg.github.com
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: pull or build&push docker image
+        env:
+          DOCKER_PLATFORM: ${{ matrix.docker-platform }}
+          DOCKER_BUILD_OPTIONS: ${{ matrix.docker-build-options }}
+          DOCKER_IMAGE_SUFFIX: ${{ matrix.docker-image-suffix }}
+          IMAGE: ${{ matrix.image }}
+        run: |
+          if [ -n "$IMAGE" ]; then
+             make pull-docker || make build-docker push-docker
+          fi
+      - name: config
+        env:
+          VERSION: ${{ secrets.VERSION }}
+          IMAGE: ${{ matrix.image }}
+          SUFFIX: ${{ matrix.suffix }}
+          LINKFLAGS: ${{ matrix.linkflags }}
+          DOCKER_PLATFORM: ${{ matrix.docker-platform }}
+          DOCKER_IMAGE_SUFFIX: ${{ matrix.docker-image-suffix }}
+        run: |
+          make latest-version sbcl zstd
+          ARCH="" DOCKER_ACTION="cd zstd/lib;make PREFIX=/usr CFLAGS=-fPIC install-includes install-static;cd ../..;make latest-version compile-config" make latest-version docker
+      - name: make-host-1
+        run: |
+          sudo bash -c "cd sbcl;sh make-host-1.sh"
+      - name: build-runtime
+        env:
+          VERSION: ${{ secrets.VERSION }}
+          IMAGE: ${{ matrix.image }}
+          SUFFIX: ${{ matrix.suffix }}
+          LINKFLAGS: ${{ matrix.linkflags }}
+          DOCKER_PLATFORM: ${{ matrix.docker-platform }}
+          DOCKER_IMAGE_SUFFIX: ${{ matrix.docker-image-suffix }}
+        run: |
+          DOCKER_ACTION="cd zstd/lib;make PREFIX=/usr CFLAGS=-fPIC install-includes install-static;cd /tmp/sbcl;sh make-target-1.sh" make latest-version docker
+      - name: make-host2
+        run: |
+          sudo bash -c "cd sbcl;sh make-host-2.sh"
+      - name: build-runtime
+        env:
+          VERSION: ${{ secrets.VERSION }}
+          IMAGE: ${{ matrix.image }}
+          SUFFIX: ${{ matrix.suffix }}
+          LINKFLAGS: ${{ matrix.linkflags }}
+          DOCKER_PLATFORM: ${{ matrix.docker-platform }}
+          DOCKER_IMAGE_SUFFIX: ${{ matrix.docker-image-suffix }}
+        run: |
+          DOCKER_ACTION="cd zstd/lib;make PREFIX=/usr CFLAGS=-fPIC install-includes install-static;cd /tmp/sbcl;sh make-target-2.sh && sh make-target-contrib.sh" make latest-version docker
+          DOCKER_ACTION="make compile-9" make latest-version docker
+      - name: upload
+        env:
+          GITHUB_OAUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          VERSION: ${{ secrets.VERSION }}
+          ARCH: ${{ matrix.target }}
+          IMAGE: ${{ matrix.image }}
+          SUFFIX: ${{ matrix.suffix }}
+          LINKFLAGS: ${{ matrix.linkflags }}
+          DOCKER_PLATFORM: ${{ matrix.docker-platform }}
+          DOCKER_IMAGE_SUFFIX: ${{ matrix.docker-image-suffix }}
+        run: |
+          make latest-version archive
+          ls
+          env FILE=`ls *.bz2` make latest-version upload-archive
