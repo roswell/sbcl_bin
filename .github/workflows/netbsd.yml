@@ -20,17 +20,21 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
+        suffix: ['', '-10.0', '-9.4', '-9.3', '-9.2']
+        target: ['x86-64', 'arm64']
+        exclude:
+          - {suffix: -9.4,target: arm64}
+          - {suffix: -9.3,target: arm64}
+          - {suffix: -9.2,target: arm64}
         include:
-          - target: x86-64
-            release: '10.0'
-            suffix: no
-            lisp: sbcl-bin/2.4.0
+          # default lisp used is sbcl-bin/2.4.8
+          - lisp: 'sbcl-bin/2.4.8'
             os: netbsd
-          - target: arm64
-            release: '10.0'
-            suffix: no
-            lisp: sbcl-bin/2.4.0
-            os: netbsd
+          - { suffix: ''     ,release: '10.0'}
+          - { suffix: '-10.0',release: '10.0'}
+          - { suffix: '-9.4' ,release: '9.4'}
+          - { suffix: '-9.3' ,release: '9.3'}
+          - { suffix: '-9.2' ,release: '9.2'}
   
     environment: SET_VERSION
 
@@ -58,7 +62,7 @@ jobs:
         with:
           environment_variables: VERSION ARCH IMAGE SUFFIX LINKFLAGS GH_USER GH_REPO GITHUB_OAUTH_TOKEN
           operating_system: ${{ matrix.os }}
-          architecture: ${{ matrix.target }}
+          architecture: ${{ matrix.target == 'x86' && 'x86-64' || matrix.target }}
           version: ${{ matrix.release }}
           shell: bash
           run: |
@@ -74,14 +78,14 @@ jobs:
         with:
           environment_variables: VERSION ARCH IMAGE SUFFIX LINKFLAGS GH_USER GH_REPO GITHUB_OAUTH_TOKEN
           operating_system: ${{ matrix.os }}
-          architecture: ${{ matrix.target }}
+          architecture: ${{ matrix.target == 'x86' && 'x86-64' || matrix.target }}
           version: ${{ matrix.release }}
           shell: bash
           run: |
             sudo touch /usr/bin/ros
             sudo chmod 755 /usr/bin/ros
             sudo pkgin -y install gmake
-            sudo bash -c 'cd zstd/lib; gmake PREFIX=/usr CFLAGS="-fPIC" install-includes install-static clean'
+            sudo bash -c "cd zstd/lib; gmake PREFIX=/usr CFLAGS=${{ matrix.target == 'x86' && '-fPIC -m32' || '-fPIC' }} install-includes install-static clean"
             cd sbcl;sh make-target-1.sh
       - name: make-host2
         run: |
@@ -91,7 +95,7 @@ jobs:
         with:
           environment_variables: VERSION ARCH IMAGE SUFFIX LINKFLAGS GH_USER GH_REPO GITHUB_OAUTH_TOKEN
           operating_system: ${{ matrix.os }}
-          architecture: ${{ matrix.target }}
+          architecture: ${{ matrix.target == 'x86' && 'x86-64' || matrix.target }}
           version: ${{ matrix.release }}
           shell: bash
           run: |
