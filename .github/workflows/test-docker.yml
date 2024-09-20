@@ -93,7 +93,7 @@ jobs:
           DOCKER_PLATFORM: ${{ matrix.docker-platform }}
           DOCKER_IMAGE_SUFFIX: ${{ matrix.docker-image-suffix }}
         run: |
-          DOCKER_ACTION="cd zstd/lib;make PREFIX=/usr CFLAGS=-fPIC install-includes install-static;cd ../sbcl;sh make-target-1.sh" make latest-version docker
+          DOCKER_ACTION="cd zstd/lib;make PREFIX=/usr CFLAGS=-fPIC install-includes install-static;cd /tmp/sbcl;sh make-target-1.sh" make latest-version docker
       - name: make-host2
         run: |
           sudo bash -c "cd sbcl;sh make-host-2.sh"
@@ -106,5 +106,5 @@ jobs:
           DOCKER_PLATFORM: ${{ matrix.docker-platform }}
           DOCKER_IMAGE_SUFFIX: ${{ matrix.docker-image-suffix }}
         run: |
-          DOCKER_ACTION="cd zstd/lib;make PREFIX=/usr CFLAGS=-fPIC install-includes install-static;cd ../sbcl;sh make-target-2.sh && sh make-target-contrib.sh" make latest-version docker
+          DOCKER_ACTION="cd zstd/lib;make PREFIX=/usr CFLAGS=-fPIC install-includes install-static;cd /tmp/sbcl;sh make-target-2.sh && sh make-target-contrib.sh" make latest-version docker
           DOCKER_ACTION="make compile-9" make latest-version docker
