@@ -12,7 +12,7 @@ jobs:
     env:
       VERSION: ${{ secrets.VERSION }}
       ARCH: ${{ matrix.target }}
-      SUFFIX: ${{ matrix.suffix == 'yes' && format('-{0}', matrix.release) || ''}}
+      SUFFIX: ${{ matrix.suffix }}
       LINKFLAGS: ${{ matrix.linkflags }}
       ROSWELL_BRANCH: master
       GITHUB_OAUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -111,7 +111,7 @@ jobs:
           VERSION: ${{ secrets.VERSION }}
           ARCH: ${{ matrix.target }}
           IMAGE: ${{ matrix.image }}
-          SUFFIX: ${{ matrix.suffix == 'yes' && format('-{0}', matrix.release) || ''}}
+          SUFFIX: ${{ matrix.suffix }}
           LINKFLAGS: ${{ matrix.linkflags }}
           DOCKER_PLATFORM: ${{ matrix.docker-platform }}
           DOCKER_IMAGE_SUFFIX: ${{ matrix.docker-image-suffix }}
