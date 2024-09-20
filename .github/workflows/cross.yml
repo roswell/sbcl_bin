@@ -20,14 +20,15 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        suffix: ['']
-        target: ['ppc64le', 'riscv64']
+        suffix: ['', '-glibc2.39', '-glibc2.31', '-glibc2.19']
+        target: ['ppc64le']
         include:
           - lisp: 'sbcl-bin/2.4.0'
           - {target: ppc64le,docker-platform: linux/ppc64le,docker-image-suffix: ppc64le }
-          - {target: riscv64,docker-platform: linux/riscv64,docker-image-suffix: riscv64 }
           - {target: ppc64le,suffix: '',image: glibc2.19 }
-          - {target: riscv64,suffix: '',image: glibc2.31 }
+          - {suffix: '-glibc2.19',image: glibc2.19 }
+          - {suffix: '-glibc2.31',image: glibc2.31 }
+          - {suffix: '-glibc2.39',image: glibc2.39 }
     environment: SET_VERSION
 
     steps:
@@ -79,7 +80,7 @@ jobs:
           DOCKER_IMAGE_SUFFIX: ${{ matrix.docker-image-suffix }}
         run: |
           make latest-version sbcl zstd
-          ARCH="" DOCKER_ACTION="cd zstd/lib;make PREFIX=/usr CFLAGS=-fPIC install-includes install-static;cd ../..;make latest-version compile-config" make latest-version docker
+          ARCH="" DOCKER_ACTION="bash ./tools-for-build/$(IMAGE)/setup;make latest-version compile-config" make latest-version docker
       - name: make-host-1
         run: |
           sudo bash -c "cd sbcl;sh make-host-1.sh"
@@ -92,7 +93,7 @@ jobs:
           DOCKER_PLATFORM: ${{ matrix.docker-platform }}
           DOCKER_IMAGE_SUFFIX: ${{ matrix.docker-image-suffix }}
         run: |
-          DOCKER_ACTION="cd zstd/lib;make PREFIX=/usr CFLAGS=-fPIC install-includes install-static;cd /tmp/sbcl;sh make-target-1.sh" make latest-version docker
+          DOCKER_ACTION="bash ./tools-for-build/$(IMAGE)/setup;cd sbcl;sh make-target-1.sh" make latest-version docker
       - name: make-host2
         run: |
           sudo bash -c "cd sbcl;sh make-host-2.sh"
@@ -105,7 +106,7 @@ jobs:
           DOCKER_PLATFORM: ${{ matrix.docker-platform }}
           DOCKER_IMAGE_SUFFIX: ${{ matrix.docker-image-suffix }}
         run: |
-          DOCKER_ACTION="cd zstd/lib;make PREFIX=/usr CFLAGS=-fPIC install-includes install-static;cd /tmp/sbcl;sh make-target-2.sh && sh make-target-contrib.sh" make latest-version docker
+          DOCKER_ACTION="bash ./tools-for-build/$(IMAGE)/setup;cd sbcl;sh make-target-2.sh && sh make-target-contrib.sh" make latest-version docker
           DOCKER_ACTION="make compile-9" make latest-version docker
       - name: upload
         env:
