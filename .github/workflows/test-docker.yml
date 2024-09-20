@@ -11,7 +11,6 @@ jobs:
     runs-on: ubuntu-latest
     env:
       VERSION: ${{ secrets.VERSION }}
-      ARCH: ${{ matrix.target }}
       SUFFIX: ${{ matrix.suffix }}
       LINKFLAGS: ${{ matrix.linkflags }}
       ROSWELL_BRANCH: master
@@ -73,7 +72,6 @@ jobs:
       - name: config
         env:
           VERSION: ${{ secrets.VERSION }}
-          ARCH: ${{ matrix.target }}
           IMAGE: ${{ matrix.image }}
           SUFFIX: ${{ matrix.suffix }}
           LINKFLAGS: ${{ matrix.linkflags }}
@@ -81,14 +79,13 @@ jobs:
           DOCKER_IMAGE_SUFFIX: ${{ matrix.docker-image-suffix }}
         run: |
           make latest-version sbcl zstd
-          DOCKER_ACTION="cd zstd/lib;make PREFIX=/usr CFLAGS=-fPIC install-includes install-static;cd ../..;make compile-config" make latest-version docker
+          DOCKER_ACTION="cd zstd/lib;make PREFIX=/usr CFLAGS=-fPIC install-includes install-static;cd ../..;make latest-version compile-config" make latest-version docker
       - name: make-host-1
         run: |
           sudo bash -c "cd sbcl;sh make-host-1.sh"
       - name: build-runtime
         env:
           VERSION: ${{ secrets.VERSION }}
-          ARCH: ${{ matrix.target }}
           IMAGE: ${{ matrix.image }}
           SUFFIX: ${{ matrix.suffix }}
           LINKFLAGS: ${{ matrix.linkflags }}
@@ -102,7 +99,6 @@ jobs:
       - name: build-runtime
         env:
           VERSION: ${{ secrets.VERSION }}
-          ARCH: ${{ matrix.target }}
           IMAGE: ${{ matrix.image }}
           SUFFIX: ${{ matrix.suffix }}
           LINKFLAGS: ${{ matrix.linkflags }}
