@@ -57,8 +57,8 @@ jobs:
       shell: msys2 {0}
       run: |
         make zstd
-        mv /mingw64/bin/libzstd.dll /mingw64/bin/-libzstd.dll
-        bash -c 'cd zstd/lib;make CFLAGS="-fPIC" libzstd.a-release;mkdir -p /msys64/mingw64/lib/gcc;cp libzstd.a /msys64/mingw64/lib/gcc/'
+        find /mingw64 | grep zstd
+        bash -c 'cd zstd/lib;make CFLAGS="-fPIC" libzstd.a-release;'
         if [ "$VERSION" = "" ]; then
           OS=windows make latest-version compile archive;
         else
