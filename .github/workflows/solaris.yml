@@ -59,7 +59,7 @@ jobs:
           run: |
             sudo touch /usr/bin/ros
             sudo chmod 755 /usr/bin/ros
-            LISP_IMPL='ros run' make latest-version compile-config
+            LISP_IMPL='ros run' gmake latest-version compile-config
       - name: make-host-1
         run: |
           bash -c "cd sbcl;sh make-host-1.sh"
@@ -73,5 +73,5 @@ jobs:
           run: |
             sudo touch /usr/bin/ros
             sudo chmod 755 /usr/bin/ros
-            sudo bash -c 'cd zstd/lib; make PREFIX=/usr CFLAGS="-fPIC" install-includes install-static clean'
+            sudo bash -c 'cd zstd/lib; gmake PREFIX=/usr CFLAGS="-fPIC" install-includes install-static clean'
             cd sbcl;sh make-target-1.sh
