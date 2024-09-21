@@ -23,7 +23,7 @@ jobs:
       RESULT_NAME: windows-${{ matrix.arch2 }}
       RESULT_PATH: windows-${{ matrix.arch2 }}
       RESULT_PATH_SUB: roswell
-      SBCL_OPTIONS:
+      SBCL_OPTIONS: --fancy
       ARCH: ${{ matrix.target }}
       VERSION: ${{ secrets.VERSION }}
       GITHUB_OAUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -56,6 +56,8 @@ jobs:
     - name: build sbcl
       shell: msys2 {0}
       run: |
+        make zstd
+        bash -c 'cd zstd/lib;make CFLAGS="-fPIC" install-includes install-static'
         if [ "$VERSION" = "" ]; then
           OS=windows make latest-version compile archive;
         else
