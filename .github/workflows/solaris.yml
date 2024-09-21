@@ -54,7 +54,7 @@ jobs:
             sudo touch /usr/bin/ros
             sudo chmod 755 /usr/bin/ros
             curl -L -O https://github.com/roswell/sbcl_bin/releases/download/2.3.0/sbcl-2.3.0-x86-64-solaris-binary.tar.bz2
-            gtar xvf sbcl-2.3.0-x86-64-solaris-binary.tar.bz2
+            tar xvf sbcl-2.3.0-x86-64-solaris-binary.tar.bz2
             bash -c "cd sbcl-2.3.0-x86-64-solaris;sh install.sh"
             LISP_IMPL=sbcl OS=${{ matrix.os }} gmake latest-version compile archive
       - name: upload
