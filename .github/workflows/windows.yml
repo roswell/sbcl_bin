@@ -58,7 +58,9 @@ jobs:
       run: |
         make zstd
         find /mingw64 | grep zstd
-        bash -c 'cd zstd/lib;make CFLAGS="-fPIC" libzstd.a-release;'
+        rm /mingw64/lib/libzstd.dll.a
+        mv /mingw64/bin/libzstd.dll /mingw64/bin/libzstd.dll_
+        bash -c 'cd zstd/lib;make CFLAGS="-fPIC" libzstd.a-release;cp libzstd.a /mingw64/lib;cp *.h /mingw64/include'
         if [ "$VERSION" = "" ]; then
           OS=windows make latest-version compile archive;
         else
