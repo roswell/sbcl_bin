@@ -1,4 +1,4 @@
-name: windows
+name: Windows
 
 on:
   schedule:
@@ -64,6 +64,7 @@ jobs:
     - name: upload
       shell: msys2 {0}
       run: |
+        ls
         if [ "$VERSION" = "" ]; then
           make latest-version upload-archive;
         else
