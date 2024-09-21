@@ -50,6 +50,12 @@ jobs:
           usesh: true
           prepare: |
             env
+            echo ----------
+            ls /usr/bin
+            echo ----------
+            ls /opt/csw/bin
+            echo ----------
+            ls /usr/sbin
           run: |
             sudo touch /usr/bin/ros
             sudo chmod 755 /usr/bin/ros
