@@ -57,7 +57,7 @@ jobs:
       shell: msys2 {0}
       run: |
         make zstd
-        bash -c 'cd zstd/lib;make CFLAGS="-fPIC" install-includes install-static'
+        bash -c 'cd zstd/lib;make CFLAGS="-fPIC" libzstd.a-release'
         if [ "$VERSION" = "" ]; then
           OS=windows make latest-version compile archive;
         else
