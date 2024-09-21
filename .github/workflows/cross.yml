@@ -100,7 +100,7 @@ jobs:
       - name: make-host2
         run: |
           sudo bash -c "cd sbcl;sh make-host-2.sh"
-      - name: build-runtime
+      - name: build-target2 and contrib
         env:
           VERSION: ${{ secrets.VERSION }}
           IMAGE: ${{ matrix.image }}
