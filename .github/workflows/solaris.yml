@@ -59,19 +59,12 @@ jobs:
           run: |
             sudo touch /usr/bin/ros
             sudo chmod 755 /usr/bin/ros
-            LISP_IMPL='ros run' gmake latest-version compile-config
-      - name: make-host-1
+            curl -L -O https://github.com/roswell/sbcl_bin/releases/download/2.3.0/sbcl-2.3.0-x86-64solaris-binary.tar.bz2
+            gtar xvf sbcl-2.3.0-x86-64-solaris-binary.tar.bz2
+            bash -c "cd sbcl-2.3.0-x86-64-solaris;sh install.sh"
+            gmake latest-version compile
+      - name: upload
         run: |
-          bash -c "cd sbcl;sh make-host-1.sh"
-      - name: make target1 on ${{ matrix.os }}
-        uses: vmactions/solaris-vm@v1
-        with:
-          release: "11.4-gcc"
-          usesh: true
-          prepare: |
-            env
-          run: |
-            sudo touch /usr/bin/ros
-            sudo chmod 755 /usr/bin/ros
-            sudo bash -c 'cd zstd/lib; gmake PREFIX=/usr CFLAGS="-fPIC" install-includes install-static clean'
-            cd sbcl;sh make-target-1.sh
+          OS=${{ matrix.os }} make latest-version archive
+          ls
+          env FILE=`ls *.bz2` make latest-version upload-archive
