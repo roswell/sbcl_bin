@@ -92,7 +92,11 @@ exec ros -Q -- $0 "$@"
     (progn
       (uiop:chdir (format nil "~A/sbcl/" release-dir))
       (sh "bash make-windows-installer.sh")
-      (sh "cp output/*.msi .."))))
+      (sh (format nil "cp output/*.msi ../sbcl-~A-~A-~A~A-binary.msi"
+                  version
+                  uname-m
+                  uname
+                  suffix)))))
 
 (export
  (defun default (&rest argv)
