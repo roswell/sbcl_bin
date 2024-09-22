@@ -49,14 +49,12 @@ jobs:
           usesh: true
           prepare: |
             env
-            pkg install build-essential
+            pkg install build-essential git
           run: |
-            sudo touch /usr/bin/ros
-            sudo chmod 755 /usr/bin/ros
-            curl -L -O https://github.com/roswell/sbcl_bin/releases/download/2.3.0/sbcl-2.3.0-x86-64-solaris-binary.tar.bz2
-            tar xvf sbcl-2.3.0-x86-64-solaris-binary.tar.bz2
-            sudo bash -c "cd sbcl-2.3.0-x86-64-solaris;sh install.sh --prefix=/usr"
-            LISP_IMPL=sbcl OS=${{ matrix.os }} gmake latest-version compile archive
+            git clone https://github.com/roswell/roswell && bash -c "cd roswell;./bootstrap;./configure;make;sudo make install --prefix=/usr"
+            ros install sbcl-bin/2.3.0
+            ros run -- --version
+            gmake latest-version compile archive
       - name: upload
         run: |
           env FILE=`ls *.bz2` make latest-version upload-archive
