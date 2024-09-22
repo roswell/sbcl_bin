@@ -17,6 +17,7 @@ jobs:
       ROSWELL_BRANCH: master
       GH_USER: ${{ github.repository_owner }}
       GH_REPO: sbcl_bin
+      SBCL_OPTIONS: --without-sb-thread --with-sb-core-compression --xref-for-internals --with-sb-after-xc-core
       GITHUB_OAUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
     strategy:
@@ -46,6 +47,7 @@ jobs:
       - name: Config on ${{ matrix.os }}
         uses: vmactions/omnios-vm@v1
         with:
+          envs: 'SBCL_OPTIONS'
           usesh: true
           prepare: |
             env
