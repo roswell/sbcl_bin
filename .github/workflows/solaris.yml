@@ -25,13 +25,14 @@ jobs:
       fail-fast: false
       matrix:
         sbclpatch: ["20240923_omnios",""]
-        suffix: ['']
+        suffix: ['', '-no-thread']
         target: ['x86-64', 'x86']
-        sbcloptions: ['--without-sb-thread --with-sb-core-compression --with-sb-xref-for-internals --with-sb-after-xc-core', '--fancy']
         include:
           # default lisp used is sbcl-bin/2.4.8
           - lisp: 'sbcl-bin/2.4.8'
             os: solaris
+          - {suffix: '',sbcloptions: '--fancy'}
+          - {suffix: '-no-thread',sbcloptions: '--without-sb-thread --with-sb-core-compression --with-sb-xref-for-internals --with-sb-after-xc-core'}
     environment: SET_VERSION
 
     steps:
@@ -55,7 +56,10 @@ jobs:
           prepare: |
             env
             pkg install build-essential git
-            rm -rf /usr/lib/libzstd.so* /usr/lib/amd64/libzstd.so*
+            mkdir /tmp/x86;
+            mv /usr/lib/libzstd.so* /tmp/x86
+            mkdir /tmp/amd64
+            mv /usr/lib/amd64/libzstd.so* /tmp/amd64
           run: |
             sudo bash -c 'cd zstd/lib;make PREFIX=/usr CFLAGS="-fPIC -m32" install-includes install-static clean'
             sudo bash -c 'cd zstd/lib;make PREFIX=/usr LIBDIR=/usr/lib/amd64 CFLAGS="-fPIC" install-static'
@@ -63,6 +67,8 @@ jobs:
             ros install sbcl-bin/2.3.0
             ros run -- --version
             gmake latest-version compile archive
+            sudo mv /tmp/x86/* /usr/lib
+            sudo mv /tmp/amd64/* /usr/lib/amd64
       - name: upload
         run: |
           #WIP FILE=`ls *.bz2` make latest-version upload-archive
