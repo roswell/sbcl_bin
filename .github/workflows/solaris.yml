@@ -24,7 +24,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        sbclpatch: ["20240923_omnios_static",""]
+        sbclpatch: ["20240923_omnios",""]
         suffix: ['', '-no-thread']
         target: ['x86-64', 'x86']
         include:
@@ -48,6 +48,7 @@ jobs:
           curl -L https://raw.githubusercontent.com/roswell/roswell/master/scripts/install-for-ci.sh | sh
           ros install snmsts/sn.github
           make latest-version zstd sbcl
+          sed -i "s/-lzstd/-Wl,-Bstatic -lzstd -Wl,-Bdynamic/g" sbcl/src/runtime/Config.x86*-sunos
       - name: Build on ${{ matrix.os }}
         uses: vmactions/omnios-vm@v1
         with:
@@ -64,5 +65,6 @@ jobs:
             ros run -- --version
             gmake latest-version compile archive
       - name: upload
+        if: ${{ matrix.suffix == '' }}
         run: |
-          #WIP FILE=`ls *.bz2` make latest-version upload-archive
+          FILE=`ls *.bz2` make latest-version upload-archive
