@@ -139,5 +139,4 @@ postcompile-freebsd:
 	mv /tmp/libzstd.so* /usr/local/lib
 
 patch-sbcl:
-	@# space spearated designation SBCL_PATCH="20240923_omnios 20240918_netbsdarm64-core-compression"
-	ARR=($(SBCL_PATCH)); for S in "$${ARR[@]}"; do bash -c "cd sbcl;git apply ../tools-for-build/patch/$$S"; done
+	cd sbcl;git apply ../tools-for-build/patch/$(SBCL_PATCH)
