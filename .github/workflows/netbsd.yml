@@ -118,7 +118,7 @@ jobs:
           envs: 'ARCH SUFFIX'
           usesh: true
           prepare: |
-            pkgin -y install gmake sbcl
+            /usr/sbin/pkg_add gmake sbcl
           run: |
             LISP_IMPL=sbcl gmake latest-version compile
       - name: upload
