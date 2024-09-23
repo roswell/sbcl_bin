@@ -57,8 +57,8 @@ jobs:
             env
             pkg install build-essential git
           run: |
-            sudo bash -c 'cd zstd/lib;gmake PREFIX=/usr CFLAGS="-fPIC -m32" install-includes install-static clean'
-            sudo bash -c 'cd zstd/lib;gmake PREFIX=/usr LIBDIR=/usr/lib/amd64 CFLAGS="-fPIC" install-static'
+            sudo bash -c 'cd zstd/lib;gmake PREFIX=/usr CFLAGS="-fPIC -m32" libzstd.a-release;cp libzstd.a /usr/lib;cp *.h /usr/include'
+            sudo bash -c 'cd zstd/lib;gmake PREFIX=/usr LIBDIR=/usr/lib/amd64 CFLAGS="-fPIC" clean libzstd.a-release;cp libzstd.a /usr/lib/amd64'
             git clone https://github.com/roswell/roswell && bash -c "cd roswell;./bootstrap;./configure --prefix=/usr;gmake;sudo gmake install"
             ros install sbcl-bin/2.3.0
             ros run -- --version
@@ -66,7 +66,7 @@ jobs:
             sudo mv /usr/lib/libzstd.so* /tmp/x86
             mkdir /tmp/amd64
             sudo mv /usr/lib/amd64/libzstd.so* /tmp/amd64
-            gmake latest-version compile archive
+            LISP_IMPL='$$HOME/.roswell/impls/x86-64/solaris/sbcl-bin/2.3.0/bin/sbcl' gmake latest-version compile archive
             sudo mv /tmp/x86/* /usr/lib
             sudo mv /tmp/amd64/* /usr/lib/amd64
       - name: upload
