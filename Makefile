@@ -139,4 +139,4 @@ postcompile-freebsd:
 	mv /tmp/libzstd.so* /usr/local/lib
 
 patch-sbcl:
-	cd sbcl;git apply ../tools-for-build/patch/$(SBCL_PATCH)
+	cd sbcl;git apply ../tools-for-build/patch/$(SBCL_PATCH);git diff
