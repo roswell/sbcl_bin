@@ -21,7 +21,7 @@ jobs:
       fail-fast: false
       matrix:
         suffix: ['', '-10.0', '-9.4', '-9.3', '-9.2']
-        target: ['x86-64', 'arm64']
+        target: ['x86-64', 'arm64', 'x86']
         exclude:
           - {suffix: -9.4,target: arm64}
           - {suffix: -9.3,target: arm64}
@@ -58,6 +58,7 @@ jobs:
           ros install snmsts/sn.github
           make latest-version zstd sbcl
       - name: Config on ${{ matrix.os }}
+        if: ${{ matrix.target != 'x86' }}
         uses: cross-platform-actions/action@v0.25.0
         with:
           environment_variables: VERSION ARCH IMAGE SUFFIX LINKFLAGS GH_USER GH_REPO GITHUB_OAUTH_TOKEN
@@ -71,6 +72,7 @@ jobs:
             sudo pkgin -y install gmake
             LISP_IMPL='ros run' gmake latest-version compile-config
       - name: make-host-1
+        if: ${{ matrix.target != 'x86' }}
         run: |
           bash -c "cd sbcl;sh make-host-1.sh"
       - name: build-runtime on ${{ matrix.os }}
@@ -91,6 +93,7 @@ jobs:
         run: |
           bash -c "cd sbcl;sh make-host-2.sh"
       - name: build-target2 and contrib on ${{ matrix.os }}
+        if: ${{ matrix.target != 'x86' }}
         uses: cross-platform-actions/action@v0.25.0
         with:
           environment_variables: VERSION ARCH IMAGE SUFFIX LINKFLAGS GH_USER GH_REPO GITHUB_OAUTH_TOKEN
@@ -105,6 +108,17 @@ jobs:
             /usr/sbin/paxctl +m sbcl/src/runtime/sbcl || true
             bash -c "cd sbcl;sh make-target-2.sh && sh make-target-contrib.sh"
             gmake compile-9
+      - name: Build on ${{ matrix.os }}
+        if: ${{ matrix.target == 'x86' }}
+        uses: vmactions/netbsd-vm@v1
+        with:
+          release: ${{ matrix.release }}
+          envs: 'ARCH SUFFIX'
+          usesh: true
+          prepare: |
+            pkgin -y install gmake sbcl
+          run: |
+            LISP_IMPL=sbcl gmake latest-version compile
       - name: upload
         env:
           GITHUB_OAUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
