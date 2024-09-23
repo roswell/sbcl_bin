@@ -1,0 +1,56 @@
+diff --git a/src/runtime/Config.arm64-netbsd b/src/runtime/Config.arm64-netbsd
+index 93470e3..a8cf3f8 100644
+--- a/src/runtime/Config.arm64-netbsd
++++ b/src/runtime/Config.arm64-netbsd
+@@ -11,7 +11,7 @@
+ 
+ include Config.arm64-bsd
+ 
+-OS_LIBS = -lutil
++OS_LIBS += -lutil
+ 
+ ifdef LISP_FEATURE_SB_THREAD
+   OS_LIBS += -lpthread -lrt
+diff --git a/src/runtime/Config.x86-64-sunos b/src/runtime/Config.x86-64-sunos
+index 9a8b621..dd1e439 100644
+--- a/src/runtime/Config.x86-64-sunos
++++ b/src/runtime/Config.x86-64-sunos
+@@ -1,5 +1,5 @@
+ CC=gcc
+-CFLAGS += -m64 -g -Wall -std=gnu89 -D__EXTENSIONS__ -DSVR4 -D_REENTRANT -fno-omit-frame-pointer
++CFLAGS += -m64 -g -Wall -std=gnu89 -D__EXTENSIONS__ -DSVR4 -D_REENTRANT -fno-omit-frame-pointer -D_POSIX_PTHREAD_SEMANTICS
+ LINKFLAGS = -m64 -g
+ ASFLAGS = -m64 -Wall
+ GREP = ggrep
+@@ -14,7 +14,7 @@ ARCH_SRC = x86-64-arch.c
+ OS_SRC = sunos-os.c x86-64-sunos-os.c
+ OS_LIBS= -ldl -lsocket -lnsl -lrt
+ ifdef LISP_FEATURE_SB_CORE_COMPRESSION
+-  OS_LIBS += -lzstd
++  OS_LIBS += -Wl,-Bstatic -lzstd -Wl,-Bdynamic
+ endif
+ 
+ ifdef LISP_FEATURE_IMMOBILE_SPACE
+diff --git a/src/runtime/Config.x86-sunos b/src/runtime/Config.x86-sunos
+index b83c948..9ad2dfe 100644
+--- a/src/runtime/Config.x86-sunos
++++ b/src/runtime/Config.x86-sunos
+@@ -10,7 +10,8 @@
+ # files for more information.
+ 
+ CC=gcc
+-CFLAGS += -g -O2 -Wall -D__EXTENSIONS__ -DSVR4 -D_REENTRANT -fno-omit-frame-pointer
++CFLAGS += -g -O2 -Wall -D__EXTENSIONS__ -DSVR4 -D_REENTRANT -fno-omit-frame-pointer -D_POSIX_PTHREAD_SEMANTICS -m32
++LINKFLAGS += -m32
+ GREP = ggrep
+ 
+ ASSEM_SRC = x86-assem.S
+@@ -20,7 +21,7 @@ OS_SRC = sunos-os.c x86-sunos-os.c
+ OS_LIBS= -ldl -lsocket -lnsl -lrt
+ 
+ ifdef LISP_FEATURE_SB_CORE_COMPRESSION
+-  OS_LIBS += -lzstd
++  OS_LIBS += -Wl,-Bstatic -lzstd -Wl,-Bdynamic
+ endif
+ 
+ GC_SRC= fullcgc.c gencgc.c traceroot.c
