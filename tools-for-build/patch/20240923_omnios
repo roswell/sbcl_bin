@@ -1,0 +1,25 @@
+diff --git a/src/runtime/Config.x86-64-sunos b/src/runtime/Config.x86-64-sunos
+index 9a8b621..091a2f3 100644
+--- a/src/runtime/Config.x86-64-sunos
++++ b/src/runtime/Config.x86-64-sunos
+@@ -1,5 +1,5 @@
+ CC=gcc
+-CFLAGS += -m64 -g -Wall -std=gnu89 -D__EXTENSIONS__ -DSVR4 -D_REENTRANT -fno-omit-frame-pointer
++CFLAGS += -m64 -g -Wall -std=gnu89 -D__EXTENSIONS__ -DSVR4 -D_REENTRANT -fno-omit-frame-pointer -D_POSIX_PTHREAD_SEMANTICS
+ LINKFLAGS = -m64 -g
+ ASFLAGS = -m64 -Wall
+ GREP = ggrep
+diff --git a/src/runtime/Config.x86-sunos b/src/runtime/Config.x86-sunos
+index b83c948..10635d1 100644
+--- a/src/runtime/Config.x86-sunos
++++ b/src/runtime/Config.x86-sunos
+@@ -10,7 +10,8 @@
+ # files for more information.
+ 
+ CC=gcc
+-CFLAGS += -g -O2 -Wall -D__EXTENSIONS__ -DSVR4 -D_REENTRANT -fno-omit-frame-pointer
++CFLAGS += -g -O2 -Wall -D__EXTENSIONS__ -DSVR4 -D_REENTRANT -fno-omit-frame-pointer -D_POSIX_PTHREAD_SEMANTICS -m32
++LINKFLAGS += -m32
+ GREP = ggrep
+ 
+ ASSEM_SRC = x86-assem.S

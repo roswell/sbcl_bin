@@ -12,6 +12,7 @@ ARCH ?= $(shell ros build.ros uname)
 SUFFIX ?=
 TARGETS ?=$(ARCH)
 SBCL_OPTIONS ?=--fancy
+SBCL_PATCH ?= 
 LISP_IMPL ?= ros -L sbcl-bin without-roswell=t --no-rc run
 
 DOCKER_REPO ?= docker.pkg.github.com/roswell/sbcl_bin
@@ -63,6 +64,9 @@ show:
 	cc -print-search-dirs || true
 sbcl:
 	git clone --depth 5 https://github.com/sbcl/sbcl --branch=$(BRANCH)
+	@if [ -n "$(SBCL_PATCH)" ]; then\
+		SBCL_PATCH="$(SBCL_PATCH)" $(MAKE) patch-sbcl; \
+	fi
 zstd:
 	git clone --depth 5 https://github.com/facebook/zstd --branch=$(ZSTD_BRANCH)
 
@@ -133,3 +137,7 @@ precompile-freebsd:
 
 postcompile-freebsd:
 	mv /tmp/libzstd.so* /usr/local/lib
+
+patch-sbcl:
+	@# space spearated designation SBCL_PATCH="20240923_omnios 20240918_netbsdarm64-core-compression"
+	ARR=($(SBCL_PATCH)); for S in "$${ARR[@]}"; do bash -c "cd sbcl;git apply ../tools-for-build/patch/$$S"; done
