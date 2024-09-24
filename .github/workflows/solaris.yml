@@ -49,7 +49,7 @@ jobs:
           ros install snmsts/sn.github
           make latest-version zstd sbcl
           sed -i "s/-lzstd/-Wl,-Bstatic -lzstd -Wl,-Bdynamic/g" sbcl/src/runtime/Config.x86*-sunos
-      - name: Build on ${{ matrix.os }}
+      - name: Build on omnios
         if: ${{ matrix.os == 'omnios' }}
         uses: vmactions/omnios-vm@v1
         with:
@@ -65,7 +65,7 @@ jobs:
             ros install sbcl-bin/2.3.0
             ros run -- --version
             gmake latest-version compile archive
-      - name: Build on ${{ matrix.os }}
+      - name: Build on solaris
         if: ${{ matrix.os == 'solaris' }}
         uses: vmactions/solaris-vm@v1
         with:
@@ -73,7 +73,14 @@ jobs:
           envs: 'SBCL_OPTIONS ARCH'
           usesh: true
           prepare: |
-            env
+            pkg publisher solaris
+            beadm list
+            pkg info entire
+            pkg list -af entire
+            pkg list -af gcc-7
+            pkg list -af gcc-11
+            pkg install -v --accept developer/gcc-7@7.3.0-11.4.0.0.1.14.0
+            pkgutil -y -i automake autoconf autoconf_archive libtool pkgconfig libcppunit1_12_1 libcppunit_dev gsed ggrep
           run: |
             sudo bash -c 'cd zstd/lib;gmake PREFIX=/usr CFLAGS="-fPIC -m32" libzstd.a-release;cp libzstd.a /usr/lib;cp *.h /usr/include'
             sudo bash -c 'cd zstd/lib;gmake PREFIX=/usr LIBDIR=/usr/lib/amd64 CFLAGS="-fPIC" clean libzstd.a-release;cp libzstd.a /usr/lib/amd64'
