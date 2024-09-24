@@ -25,12 +25,12 @@ jobs:
       fail-fast: false
       matrix:
         sbclpatch: ["20240923_omnios",""]
+        os:['solaris','omnios']
         suffix: ['', '-no-thread']
         target: ['x86-64', 'x86']
         include:
           # default lisp used is sbcl-bin/2.4.8
           - lisp: 'sbcl-bin/2.4.8'
-            os: solaris
           - {suffix: '',sbcloptions: '--fancy'}
           - {suffix: '-no-thread',sbcloptions: '--without-sb-thread --with-sb-core-compression --with-sb-xref-for-internals --with-sb-after-xc-core'}
     environment: SET_VERSION
@@ -50,6 +50,7 @@ jobs:
           make latest-version zstd sbcl
           sed -i "s/-lzstd/-Wl,-Bstatic -lzstd -Wl,-Bdynamic/g" sbcl/src/runtime/Config.x86*-sunos
       - name: Build on ${{ matrix.os }}
+        if: ${{ matrix.os == 'omnios' }}
         uses: vmactions/omnios-vm@v1
         with:
           envs: 'SBCL_OPTIONS ARCH'
@@ -64,7 +65,23 @@ jobs:
             ros install sbcl-bin/2.3.0
             ros run -- --version
             gmake latest-version compile archive
+      - name: Build on ${{ matrix.os }}
+        if: ${{ matrix.os == 'solaris' }}
+        uses: vmactions/solaris-vm@v1
+        with:
+          release: "11.4-gcc"
+          envs: 'SBCL_OPTIONS ARCH'
+          usesh: true
+          prepare: |
+            env
+          run: |
+            sudo bash -c 'cd zstd/lib;gmake PREFIX=/usr CFLAGS="-fPIC -m32" libzstd.a-release;cp libzstd.a /usr/lib;cp *.h /usr/include'
+            sudo bash -c 'cd zstd/lib;gmake PREFIX=/usr LIBDIR=/usr/lib/amd64 CFLAGS="-fPIC" clean libzstd.a-release;cp libzstd.a /usr/lib/amd64'
+            git clone https://github.com/roswell/roswell && bash -c "cd roswell;./bootstrap;./configure --prefix=/usr;gmake;sudo gmake install"
+            ros install sbcl-bin/2.3.0
+            ros run -- --version
+            gmake latest-version compile archive
       - name: upload
-        if: ${{ matrix.suffix == '' }}
+        if: ${{ matrix.suffix == '' && matrix.os == 'omnios' }}
         run: |
           FILE=`ls *.bz2` make latest-version upload-archive
