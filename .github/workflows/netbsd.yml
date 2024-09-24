@@ -85,7 +85,7 @@ jobs:
             sudo touch /usr/bin/ros
             sudo chmod 755 /usr/bin/ros
             sudo pkgin -y install gmake
-            sudo bash -c "cd zstd/lib; gmake PREFIX=/usr CFLAGS=${{ matrix.target == 'x86' && '-fPIC -m32' || '-fPIC' }} install-includes install-static clean"
+            sudo bash -c "cd zstd/lib; gmake PREFIX=/usr CFLAGS='${{ matrix.target == 'x86' && '-fPIC -m32' || '-fPIC' }}' install-includes install-static clean"
             cd sbcl;sh make-target-1.sh
       - name: make-host2
         run: |
