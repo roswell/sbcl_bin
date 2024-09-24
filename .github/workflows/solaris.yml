@@ -82,8 +82,8 @@ jobs:
             pkg install -v --accept developer/gcc-7@7.3.0-11.4.0.0.1.14.0
             pkgutil -y -i automake autoconf autoconf_archive libtool pkgconfig libcppunit1_12_1 libcppunit_dev gsed ggrep
           run: |
-            sudo bash -c 'cd zstd/lib;gmake PREFIX=/usr CFLAGS="-fPIC -m32" libzstd.a-release;cp libzstd.a /usr/lib;cp *.h /usr/include'
-            sudo bash -c 'cd zstd/lib;gmake PREFIX=/usr LIBDIR=/usr/lib/amd64 CFLAGS="-fPIC" clean libzstd.a-release;cp libzstd.a /usr/lib/amd64'
+            sudo bash -c 'cd zstd/lib;gmake CC=gcc PREFIX=/usr CFLAGS="-fPIC -m32" libzstd.a-release;cp libzstd.a /usr/lib;cp *.h /usr/include'
+            sudo bash -c 'cd zstd/lib;gmake CC=gcc PREFIX=/usr LIBDIR=/usr/lib/amd64 CFLAGS="-fPIC" clean libzstd.a-release;cp libzstd.a /usr/lib/amd64'
             git clone https://github.com/roswell/roswell && bash -c "cd roswell;./bootstrap;./configure --prefix=/usr;gmake;sudo gmake install"
             ros install sbcl-bin/2.3.0
             ros run -- --version
