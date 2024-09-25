@@ -20,13 +20,14 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        suffix: ['', '-glibc2.39', '-glibc2.31', '-glibc2.19', '-musl']
+        suffix: ['', '-glibc2.39', '-glibc2.31', '-glibc2.23', '-glibc2.19', '-musl']
         target: ['ppc64le']
         include:
           - lisp: 'sbcl-bin/2.4.0'
           - {target: ppc64le,docker-platform: linux/ppc64le,docker-image-suffix: ppc64le }
           - {target: ppc64le,suffix: '',image: glibc2.19 }
           - {suffix: '-glibc2.19',image: glibc2.19 }
+          - {suffix: '-glibc2.23',image: glibc2.23 }
           - {suffix: '-glibc2.31',image: glibc2.31 }
           - {suffix: '-glibc2.39',image: glibc2.39 }
           - {suffix: '-musl',image: musl1.2.2 }
