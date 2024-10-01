@@ -16,10 +16,12 @@ jobs:
       LINKFLAGS: ${{ matrix.linkflags }}
       ROSWELL_BRANCH: master
       GITHUB_OAUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      SBCL_PATCH: ${{ matrix.sbclpatch }}
 
     strategy:
       fail-fast: false
       matrix:
+        sbclpatch: ["", "20241001_ppc64linuxmusl"]
         suffix: ['', '-glibc2.39', '-glibc2.31', '-glibc2.23', '-glibc2.19', '-musl']
         target: ['ppc64le']
         include:
@@ -55,7 +57,6 @@ jobs:
         run: |
           curl -L https://raw.githubusercontent.com/roswell/roswell/master/scripts/install-for-ci.sh | sh
           ros install snmsts/sn.github
-          make latest-version zstd sbcl
       - name: Login to GitHub Container Registry
         uses: docker/login-action@v3
         with:
