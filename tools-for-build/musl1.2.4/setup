@@ -1,0 +1,2 @@
+#!/bin/sh
+bash -c "cd zstd/lib;make PREFIX=/usr CFLAGS=-fPIC install-includes install-static"
