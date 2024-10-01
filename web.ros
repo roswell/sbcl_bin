@@ -336,13 +336,13 @@ exec ros -Q -- $0 "$@"
                                         (remove-version (fourth y)))
                               (string< (remove-version (fourth x))
                                        (remove-version (fourth y))))
-                             ;; sort by variant version
+                             ;; sort by variant version but no variant should come first.
                              ((string/= (keep-version (fourth x))
                                         (keep-version (fourth y)))
-                              (or (equal (keep-version (fourth x)) "") ;; only version case no variant should come first
-                                  (uiop:version<
-                                   (keep-version (fourth y))
-                                   (keep-version (fourth x)))))))))))))
+                              (and (not (equal (fourth y) ""))
+                                   (uiop:version<
+                                    (keep-version (fourth y))
+                                    (keep-version (fourth x)))))))))))))
 
 (defun table-md (stream)
   (let ((o stream))
