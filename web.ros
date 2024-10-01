@@ -268,37 +268,44 @@ exec ros -Q -- $0 "$@"
               (cdr (loop for line in
                             (uiop:read-file-lines file)
                          collect (uiop:split-string line :separator '(#\tab))))))))
-
-(defun table-sort-order ()
-  (let ((osh (make-hash-table  :test 'equal))
-        (cpuh (make-hash-table :test 'equal)))
-    (loop with newversion
-          for l in (table-uri-tsv)
-          for variant = (unless (zerop (length (fourth l)))
-                          (fourth l))
-          for version = (mapcar #'parse-integer (uiop:split-string  (third l) :separator '(#\.)))
-          for cpu = (second l)
-          for os = (first l)
-          unless newversion
-          do (setf newversion version)
-          unless variant
-          do (let ((diff (cond ((equalp version newversion) 100) ;;exact the newest
-                               ((and (= (first version) (first newversion));; old release in this year.
-                                     (= (second version) (second newversion)))
-                                30)
-                               ((and (= (first version) (first newversion)) ;; not ancient.
-                                     )
-                                10)
-                               (t 1)))) ;;ancient
-               (incf (gethash os osh 0) diff)
-               (incf (gethash cpu cpuh 0) diff)))
-    (values
-     (let (l)
-       (maphash (lambda (x y) (push (list x y) l)) osh)
-       (mapcar #'first (sort l #'> :key 'second)))
-     (let (l)
-       (maphash (lambda (x y) (push (list x y) l)) cpuh)
-       (mapcar #'first (sort l #'> :key 'second))))))
+(let (cache)
+  (defun table-sort-order ()
+    (or cache
+        (let ((osh (make-hash-table  :test 'equal))
+              (cpuh (make-hash-table :test 'equal)))
+          (loop with newversion
+                for l in (table-uri-tsv)
+                for variant = (unless (zerop (length (fourth l)))
+                                (fourth l))
+                for version = (mapcar #'parse-integer (uiop:split-string  (third l) :separator '(#\.)))
+                for cpu = (second l)
+                for os = (first l)
+                unless newversion
+                do (setf newversion version)
+                unless variant
+                do (let ((diff (cond ((equalp version newversion) 100) ;;exact the newest
+                                     ((and (= (first version) (first newversion));; release in this year.
+                                           (= (second version) (second newversion)))
+                                      30)
+                                     ((and (= (first version) (first newversion)) ;; release in last year
+                                           (= (second version) (1- (second newversion))))
+                                      25)
+                                     (t 1)))) ;;ancient
+                     (incf (gethash os osh 0) diff)
+                     (incf (gethash cpu cpuh 0) diff)))
+          (setf cache
+                (list
+                 (let (l)
+                   (maphash (lambda (x y) (push (list x y) l)) osh)
+                   (setf l (sort l #'> :key 'second))
+                   (print l)
+                   (mapcar #'first l))
+                 (let (l)
+                   (maphash (lambda (x y) (push (list x y) l)) cpuh)
+                   (setf l (sort l #'> :key 'second))
+                   (print l)
+                   (mapcar #'first l))))))
+    (apply 'values cache)))
 
 (defun table-tree ()
   (multiple-value-bind (os- arch-)
@@ -332,9 +339,10 @@ exec ros -Q -- $0 "$@"
                              ;; sort by variant version
                              ((string/= (keep-version (fourth x))
                                         (keep-version (fourth y)))
-                              (uiop:version<
-                               (keep-version (fourth y))
-                               (keep-version (fourth x))))))))))))
+                              (or (equal (keep-version (fourth x)) "") ;; only version case no variant should come first
+                                  (uiop:version<
+                                   (keep-version (fourth y))
+                                   (keep-version (fourth x)))))))))))))
 
 (defun table-md (stream)
   (let ((o stream))
@@ -350,7 +358,9 @@ exec ros -Q -- $0 "$@"
                         (loop for table3 in table2
                               for version = (uiop:split-string (third table3) :separator  '(#\.))
                               for version1 = (first version)
-                              for obsolate = (equal version1 "1")
+                              for obsolate = (or (equal version1 "1")  ;; 1.x 2.0.x are obsolate version
+                                                 (and (equal version1 "2")
+                                                      (equal (second version) "0")))
                               do (format o "~A[~A~A](~A)~A<br />"
                                          (if obsolate "~~" "")
                                          (third table3)
