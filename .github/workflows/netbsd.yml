@@ -17,7 +17,6 @@ jobs:
       ROSWELL_BRANCH: master
       SBCL_PATCH: ${{ matrix.sbclpatch }}
       GITHUB_OAUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      SBCL_PATCH: ${{ matrix.sbclpatch }}
 
     strategy:
       fail-fast: false
