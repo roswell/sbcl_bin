@@ -76,7 +76,7 @@ jobs:
             sudo touch /usr/bin/ros
             sudo chmod 755 /usr/bin/ros
             sudo pkgin -y install gmake
-            LISP_IMPL='ros run' gmake latest-version compile-config
+            SBCL_OPTIONS=$SBCL_OPTIONS LISP_IMPL='ros run' gmake latest-version compile-config
       - name: make-host-1
         run: |
           bash -c "cd sbcl;sh make-host-1.sh"
