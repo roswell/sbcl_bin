@@ -39,7 +39,7 @@ jobs:
           - {suffix: '-glibc2.19',target: armel,docker-platform: linux/arm/v6,docker-image-suffix: armel,image: glibc2.19-debian, lisp: 'sbcl-bin/2.4.0'}
           - {suffix: ''          ,target: armv7,docker-platform: linux/arm/v7,docker-image-suffix: armv7,image: glibc2.19-debian, lisp: 'sbcl-bin/2.4.0'}
           - {suffix: '-glibc2.19',target: armv7,docker-platform: linux/arm/v7,docker-image-suffix: armv7,image: glibc2.19-debian, lisp: 'sbcl-bin/2.4.0'}
-          - {suffix: '-glibc2.13',target: armhf,docker-platform: linux/arm/v6,docker-image-suffix: armhf,image: glibc2.13-raspbian, lisp: 'sbcl-bin/2.4.0'}
+          - {suffix: '-glibc2.13',target: armhf,docker-platform: linux/arm/v6,docker-image-suffix: armhf,image: glibc2.13-raspbian, lisp: 'sbcl-bin/2.4.0', linkflags: '-lrt'}
     environment: SET_VERSION
 
     steps:
