@@ -1,4 +1,4 @@
 curl -L -O https://downloads.raspberrypi.com/raspbian/archive/2015-05-12-12:58/root.tar.xz
-docker image import ./root.tar.xz raspbian_armhf:2015-05-12
+docker image import ./root.tar.xz raspbian_armhf:2015-05-12 --platform $DOCKER_PLATFORM
 #docker run -it --rm raspbian_armhf:2015-05-12 /bin/bash
 docker images
