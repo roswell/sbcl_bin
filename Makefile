@@ -50,7 +50,7 @@ upload-archive: web.ros
 #tag
 mirror-uris:
 	curl -L http://sbcl.org/platform-table.html | grep http|awk -F '"' '{print $$2}'|grep binary > $@
-tag:
+mirror:
 	METHOD=mirror ros run -l Lakefile
 
 clean:
