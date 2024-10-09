@@ -8,10 +8,6 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        lisp: [sbcl-bin/2.4.0]
-    environment: SET_VERSION
     steps:
       - uses: actions/checkout@v4
       - name: setenv
@@ -22,10 +18,10 @@ jobs:
 
       - name: Install Roswell
         env:
-          LISP: ${{ matrix.lisp }}
+          LISP: sbcl-bin/2.4.0
         run: |
           curl -L https://raw.githubusercontent.com/roswell/roswell/master/scripts/install-for-ci.sh | sh
-          ros install snmsts/sn.github
+          ros install snmsts/sn.github roswell/sbcl_bin
       - name: tag
         env:
           GITHUB_OAUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
