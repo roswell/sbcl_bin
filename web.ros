@@ -51,7 +51,11 @@ exec ros -Q -- $0 "$@"
 (defun account ()
   (values
    (or (env "GH_USER") (symbol-value (uiop:safe-read-from-string "roswell.github.utils:*user*")))
-   (or (env "GH_REPO") (symbol-value(uiop:safe-read-from-string "roswell.github.utils:*repo*")))))
+   (or (env "GH_REPO")
+       (let ((repo (symbol-value (uiop:safe-read-from-string "roswell.github.utils:*repo*"))))
+         (if (cl-ppcre:scan-to-strings "(.*)\.git$" repo)
+             (subseq repo 0 (- (length repo) 4))
+             repo)))))
 
 (defun tsv-filename ()
   (or (env "TSV_FILE")

@@ -26,7 +26,7 @@ ZSTD_BRANCH ?= v1.5.6
 
 #version
 version: web.ros
-	@echo $(shell ros web.ros version) > $@
+	@echo $(shell GH_USER=$(GH_USER) GH_REPO=$(GH_REPO) ros web.ros version) > $@
 branch: version
 	$(eval VERSION := $(shell cat version))
 	VERSION=$(VERSION) ros build.ros branch > $@
@@ -122,6 +122,7 @@ docker:
 		-e CFLAGS=$(CFLAGS) \
 		-e LINKFLAGS=$(LINKFLAGS) \
 		-e TARGET=$(TARGET) \
+		-e LISP_IMPL=$(LISP_IMPL) \
 		$(DOCKER_REPO)/$$(cat ./tools-for-build/$(IMAGE)/Name)$(DOCKER_IMAGE_SUFFIX) \
 		bash \
 		-c "cd /tmp;$(DOCKER_ACTION)"
