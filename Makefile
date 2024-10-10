@@ -122,7 +122,7 @@ docker:
 		-e CFLAGS=$(CFLAGS) \
 		-e LINKFLAGS=$(LINKFLAGS) \
 		-e TARGET=$(TARGET) \
-		-e LISP_IMPL=$(LISP_IMPL) \
+		-e LISP_IMPL="$(LISP_IMPL)" \
 		$(DOCKER_REPO)/$$(cat ./tools-for-build/$(IMAGE)/Name)$(DOCKER_IMAGE_SUFFIX) \
 		bash \
 		-c "cd /tmp;$(DOCKER_ACTION)"
