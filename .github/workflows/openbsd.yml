@@ -20,18 +20,19 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        suffix: ['', '-7.5', '-7.4', '-7.3', '-7.2', '-7.1', '-6.9']
+        suffix: ['', '-7.6', '-7.5', '-7.4', '-7.3', '-7.2', '-7.1', '-6.9']
         target: [x86-64, arm64]
         include:
           - lisp: 'sbcl-bin/2.4.0'
             os: openbsd
-          - { suffix: ''     ,release: '7.5'}
+          - { suffix: ''     ,release: '7.6'}
           - { suffix: '-6.9' ,release: '6.9'}
           - { suffix: '-7.1' ,release: '7.1'}
           - { suffix: '-7.2' ,release: '7.2'}
           - { suffix: '-7.3' ,release: '7.3'}
           - { suffix: '-7.4' ,release: '7.4'}
           - { suffix: '-7.5' ,release: '7.5'}
+          - { suffix: '-7.6' ,release: '7.6'}
   
     environment: SET_VERSION
 
