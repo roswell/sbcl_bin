@@ -77,13 +77,14 @@ compile-1: show sbcl
 	cd sbcl;{ git describe  | sed -n -e 's/^.*-g//p' ; } 2>/dev/null > git_hash
 	cat sbcl/git_hash
 	rm -f sbcl/version.lisp-expr;VERSION=$(VERSION) $(MAKE) sbcl/version.lisp-expr
-	mv sbcl/.git sbcl/_git
+	mv sbcl/.git sbcl/_git || true
 compile-config: compile-1
 	cd sbcl;bash make-config.sh $(SBCL_OPTIONS) --arch=$(ARCH) --xc-host="$(LISP_IMPL)"
 compile: compile-1
-	bash -c "cd sbcl;bash make.sh $(SBCL_OPTIONS) --arch=$(ARCH) --xc-host='$(LISP_IMPL)' || mv _git .git" \
+	bash -c "cd sbcl;bash make.sh $(SBCL_OPTIONS) --arch=$(ARCH) --xc-host='$(LISP_IMPL)'" \
 	&& $(MAKE) compile-9
 compile-9:
+	cd sbcl;mv _git .git || true
 	cd sbcl;bash make-shared-library.sh || true
 	cd sbcl;bash run-sbcl.sh --eval "(progn (print *features*)(print (lisp-implementation-version))(terpri)(quit))"
 	ldd sbcl/src/runtime/sbcl || \
@@ -126,6 +127,52 @@ docker:
 		$(DOCKER_REPO)/$$(cat ./tools-for-build/$(IMAGE)/Name)$(DOCKER_IMAGE_SUFFIX) \
 		bash \
 		-c "cd /tmp;$(DOCKER_ACTION)"
+#OK
+#TARGET=riscv64 DOCKER_PLATFORM=linux/riscv64 DOCKER_IMAGE_SUFFIX=riscv64 IMAGE=glibc2.31          SUFFIX= make cross-docker
+#NG
+#TARGET=armhf   DOCKER_PLATFORM=linux/arm/v6  DOCKER_IMAGE_SUFFIX=armhf   IMAGE=glibc2.13-raspbian SUFFIX=-glibc2.13 LINKFLAGS=-lrt  make cross-docker
+
+cross-docker: cross-docker-1 cross-docker-2 cross-docker-3 cross-docker-4 cross-docker-5
+	OS=linux ARCH=$(TARGET) SUFFIX=$(SUFFIX) make latest-version archive
+
+cross-docker-1:
+	IMAGE=$(IMAGE) \
+	TARGET=$(TARGET) \
+	SUFFIX=$(SUFFIX) \
+	CFLAGS=$(CFLAGS) \
+	LINKFLAGS=$(LINKFLAGS) \
+	DOCKER_PLATFORM=$(DOCKER_PLATFORM) \
+	DOCKER_IMAGE_SUFFIX=$(DOCKER_IMAGE_SUFFIX) \
+	DOCKER_ACTION="bash ./tools-for-build/$(IMAGE)/setup;make latest-version compile-config" \
+	ARCH="" \
+	$(MAKE) latest-version docker
+
+cross-docker-2:
+	cd sbcl;sh make-host-1.sh
+
+cross-docker-3:
+	IMAGE=$(IMAGE) \
+	TARGET=$(TARGET) \
+	SUFFIX=$(SUFFIX) \
+	CFLAGS=$(CFLAGS) \
+	LINKFLAGS=$(LINKFLAGS) \
+	DOCKER_PLATFORM=$(DOCKER_PLATFORM) \
+	DOCKER_IMAGE_SUFFIX=$(DOCKER_IMAGE_SUFFIX) \
+	DOCKER_ACTION="bash ./tools-for-build/$(IMAGE)/setup;cd sbcl;sh make-target-1.sh" \
+	$(MAKE) latest-version docker
+
+cross-docker-4:
+	cd sbcl;sh make-host-2.sh
+
+cross-docker-5:
+	IMAGE=$(IMAGE) \
+	SUFFIX=$(SUFFIX) \
+	CFLAGS=$(CFLAGS) \
+	LINKFLAGS=$(LINKFLAGS) \
+	DOCKER_PLATFORM=$(DOCKER_PLATFORM) \
+	DOCKER_IMAGE_SUFFIX=$(DOCKER_IMAGE_SUFFIX) \
+	DOCKER_ACTION="bash ./tools-for-build/$(IMAGE)/setup;cd sbcl;sh make-target-2.sh && sh make-target-contrib.sh;cd ..;make latest-version compile-9" \
+	$(MAKE) latest-version docker
 
 docker-default-action: compile archive
 
