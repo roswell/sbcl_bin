@@ -19,10 +19,7 @@
 
 (defun release-exist-p (tagname &key owner repo)
   (ignore-errors
-    (find tagname
-          (releases-list owner repo)
-          :key (lambda (x) (getf x :|tag_name|))
-          :test 'equal)))
+    (releases-by-tag owner repo tagname)))
 
 (defun ensure-release-exists (tagname &key owner repo)
   (format t "ensure-release-exists ~A ~A ~A:" tagname owner repo)
@@ -33,8 +30,9 @@
         (releases-create owner repo tagname))))
 
 (defun asset-upload (path tagname &key owner repo force)
-  (let ((release-id (getf (release-exist-p tagname :owner owner :repo repo) :|id|))
-        (name (file-namestring path)))
+  (let* ((release (release-exist-p tagname :owner owner :repo repo))
+         (release-id (getf release :|id|))
+         (name (file-namestring path)))
     (format t "release-id: ~A :name ~A force ~A" release-id name force)
     (force-output)
     (when force
