@@ -77,7 +77,7 @@ exec ros -Q -- $0 "$@"
          (account)
        (format t "version:~A target:~A suffix:~A uname:~A user:~A repo:~A ~%" version target suffix uname
                user repo)
-       (upload% file version user repo t)))))
+       (upload% (first file) version user repo t)))))
 
 (export
  (defun upload-if-absent (file)
@@ -88,7 +88,7 @@ exec ros -Q -- $0 "$@"
          (account)
        (format t "version:~A target:~A suffix:~A uname:~A user:~A repo:~A ~%" version target suffix uname
                user repo)
-       (upload% file version user repo nil)))))
+       (upload% (first file) version user repo nil)))))
 
 (defun upload-files (files &key (interactive t))
   (multiple-value-bind (version target suffix uname)
