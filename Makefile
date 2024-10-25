@@ -6,6 +6,10 @@ VERSION ?= $(shell ros build.ros version)
 TSV_FILE ?= sbcl-bin_uri.tsv
 WEB_ROS_URI=https://raw.githubusercontent.com/roswell/sbcl_bin/master/web.ros
 
+ORIGIN_URI=https://github.com/sbcl/sbcl
+ORIGIN_REF=master
+GITHUB=https://github.com/roswell/sbcl_head
+
 BRANCH ?= $(shell ros build.ros branch)
 VERSION_SUFFIX ?= .roswell
 ARCH ?= $(shell ros build.ros uname)
@@ -53,10 +57,30 @@ mirror-uris:
 mirror:
 	METHOD=mirror ros run -l Lakefile
 
+hash:
+	git ls-remote --heads $(ORIGIN_URI) $(ORIGIN_REF) |sed -r "s/^([0-9a-fA-F]*).*/\1/" > hash
+
+lasthash: web.ros
+	curl -sSL -o lasthash $(GITHUB)/releases/download/files/hash || touch lasthash
+
+tag: hash lasthash web.ros
+	@echo hash     = $(shell cat hash)
+	@echo lasthash = $(shell cat lasthash)
+	cp hash $(shell cat hash)
+	diff -u hash lasthash || \
+	( VERSION=$(VERSION) ros web.ros upload hash; \
+	  VERSION=$(VERSION) ros web.ros upload $(shell cat hash); \
+	  VERSION=files ros web.ros upload hash)
+
+#zstd
+zstd:
+	git clone --depth 5 https://github.com/facebook/zstd --branch=$(ZSTD_BRANCH)
+
 clean:
 	rm -rf zstd
 	rm -f verson branch
 	ls |grep sbcl |xargs rm -rf
+	rm -f hash lasthash
 
 show:
 	@echo VERSION=$(VERSION) ARCH=$(ARCH) BRANCH=$(BRANCH) SUFFIX=$(SUFFIX)
@@ -67,8 +91,6 @@ sbcl:
 	@if [ -n "$(SBCL_PATCH)" ]; then\
 		SBCL_PATCH="$(SBCL_PATCH)" $(MAKE) patch-sbcl; \
 	fi
-zstd:
-	git clone --depth 5 https://github.com/facebook/zstd --branch=$(ZSTD_BRANCH)
 
 sbcl/version.lisp-expr: sbcl
 	cd sbcl;echo '"$(VERSION)$(VERSION_SUFFIX)$(SUFFIX)"' > version.lisp-expr
