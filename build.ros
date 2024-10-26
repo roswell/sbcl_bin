@@ -82,7 +82,7 @@ exec ros -Q -- $0 "$@"
       (let ((path (format nil "~A-binary.tar" base)))
         (when (probe-file (format nil "~A/src/runtime/libsbcl.so" base))
           ;; adding shared
-          (sh format nil "tar -rf ~A ~A/src/runtime/libsbcl.so" path base))
+          (sh (format nil "tar -rf ~A ~A/src/runtime/libsbcl.so" path base)))
         (sh (format nil "rm -f ~A.bz2" path))
         (sh (format nil "bzip2 ~A" path))))
     #+win32
