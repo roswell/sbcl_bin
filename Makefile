@@ -2,13 +2,13 @@
 -include .env
 export $(shell sed 's/=.*//' .env)
 
-VERSION ?= $(shell ros build.ros version)
+VERSION ?= $(shell date +%y.%-m.%-d)
 TSV_FILE ?= sbcl-bin_uri.tsv
 WEB_ROS_URI=https://raw.githubusercontent.com/roswell/sbcl_bin/master/web.ros
 
 ORIGIN_URI=https://github.com/sbcl/sbcl
 ORIGIN_REF=master
-GITHUB=https://github.com/roswell/sbcl_head
+GITHUB=https://github.com/$(GITHUB_REPOSITORY)
 
 BRANCH ?= $(shell ros build.ros branch)
 VERSION_SUFFIX ?= .roswell
@@ -51,6 +51,8 @@ table: web.ros
 #archive
 upload-archive: web.ros
 	VERSION=$(VERSION) TARGET=$(ARCH) SUFFIX=$(SUFFIX) ros web.ros upload-archive
+archive:
+	VERSION=$(VERSION) ARCH=$(ARCH) SUFFIX=$(SUFFIX) ros build.ros archive
 #tag
 mirror-uris:
 	curl -L http://sbcl.org/platform-table.html | grep http|awk -F '"' '{print $$2}'|grep binary > $@
@@ -60,8 +62,8 @@ mirror:
 hash:
 	git ls-remote --heads $(ORIGIN_URI) $(ORIGIN_REF) |sed -r "s/^([0-9a-fA-F]*).*/\1/" > hash
 
-lasthash: web.ros
-	curl -sSL -o lasthash $(GITHUB)/releases/download/files/hash || touch lasthash
+lasthash:
+	curl -sSL -o lasthash $(GITHUB)/releases/download/files/hash || true
 
 tag: hash lasthash web.ros
 	@echo hash     = $(shell cat hash)
@@ -83,9 +85,11 @@ clean:
 	rm -f hash lasthash
 
 show:
-	@echo VERSION=$(VERSION) ARCH=$(ARCH) BRANCH=$(BRANCH) SUFFIX=$(SUFFIX)
+	@echo VERSION=$(VERSION) ARCH=$(ARCH) BRANCH=$(BRANCH) SUFFIX=$(SUFFIX) HASH=$(HASH)
 	cc -x c -v -E /dev/null || true
 	cc -print-search-dirs || true
+
+#sbcl
 sbcl:
 	git clone --depth 5 https://github.com/sbcl/sbcl --branch=$(BRANCH)
 	@if [ -n "$(SBCL_PATCH)" ]; then\
@@ -113,10 +117,6 @@ compile-9:
 	otool -L sbcl/src/runtime/sbcl || \
 	readelf -d sbcl/src/runtime/sbcl || \
 	true
-
-archive:
-	VERSION=$(VERSION) ARCH=$(ARCH) SUFFIX=$(SUFFIX) ros build.ros archive
-
 #docker
 debug-docker:
 	docker run \
