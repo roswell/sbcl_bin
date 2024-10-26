@@ -25,7 +25,7 @@ jobs:
       fail-fast: false
       matrix:
         sbclpatch: [""]
-        os: ['solaris']
+        os: ['omnios', 'solaris']
         suffix: ['']
         target: ['x86-64', 'x86']
         include:
