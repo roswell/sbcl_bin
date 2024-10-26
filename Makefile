@@ -4,7 +4,7 @@ export $(shell sed 's/=.*//' .env)
 
 VERSION ?= $(shell date +%y.%-m.%-d)
 TSV_FILE ?= sbcl-bin_uri.tsv
-WEB_ROS_URI=https://raw.githubusercontent.com/roswell/sbcl_bin/master/web.ros
+ROS_URI=https://raw.githubusercontent.com/roswell/sbcl_bin/master/
 
 ORIGIN_URI=https://github.com/sbcl/sbcl
 ORIGIN_REF=master
@@ -37,7 +37,9 @@ branch: version
 latest-uris: web.ros
 	ros web.ros latests
 web.ros:
-	curl -L -O $(WEB_ROS_URI)
+	curl -L -O $(ROS_URI)/web.ros
+build.ros:
+	curl -L -O $(ROS_URI)/build.ros
 #tsv
 tsv: web.ros
 	TSV_FILE=$(TSV_FILE) ros web.ros tsv
@@ -51,7 +53,7 @@ table: web.ros
 #archive
 upload-archive: web.ros
 	VERSION=$(VERSION) TARGET=$(ARCH) SUFFIX=$(SUFFIX) ros web.ros upload-archive
-archive:
+archive: build.ros
 	VERSION=$(VERSION) ARCH=$(ARCH) SUFFIX=$(SUFFIX) ros build.ros archive
 #tag
 mirror-uris:

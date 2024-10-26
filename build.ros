@@ -65,38 +65,31 @@ exec ros -Q -- $0 "$@"
 
 (defun archive-sbcl-bin (version uname uname-m suffix)
   (declare (ignorable version uname uname-m suffix))
-  (let ((release-dir (namestring (uiop:getcwd))))
+  (let ((release-dir (namestring (uiop:getcwd)))
+        (base (format nil "sbcl-~A-~A-~A~A"
+                      version
+                      uname-m
+                      uname
+                      suffix)))
     (declare (ignorable release-dir))
-    (progn
+    (progn ;; bzip2
       (sh (format nil
-                  #-win32 "ln -s sbcl ~Asbcl-~A-~A-~A~A"
-                  #+win32 "cp -r sbcl ~Asbcl-~A-~A-~A~A"
+                  #-win32 "ln -s sbcl ~A~A"
+                  #+win32 "cp -r sbcl ~A~A"
                   release-dir
-                  version
-                  uname-m
-                  uname
-                  suffix))
-      (sh (format nil "bash sbcl/binary-distribution.sh sbcl-~A-~A-~A~A"
-                  version
-                  uname-m
-                  uname
-                  suffix))
-      (let ((path (format nil "sbcl-~A-~A-~A~A-binary.tar"
-                          version
-                          uname-m
-                          uname
-                          suffix)))
+                  base))
+      (sh (format nil "bash sbcl/binary-distribution.sh ~A" base))
+      (let ((path (format nil "~A-binary.tar" base)))
+        (when (probe-file (format nil "~A/src/runtime/libsbcl.so" base))
+          ;; adding shared
+          (sh format nil "tar -rf ~A ~A/src/runtime/libsbcl.so" path base))
         (sh (format nil "rm -f ~A.bz2" path))
         (sh (format nil "bzip2 ~A" path))))
     #+win32
-    (progn
+    (progn ;; msi
       (uiop:chdir (format nil "~A/sbcl/" release-dir))
       (sh "bash make-windows-installer.sh")
-      (sh (format nil "cp output/*.msi ../sbcl-~A-~A-~A~A-binary.msi"
-                  version
-                  uname-m
-                  uname
-                  suffix)))))
+      (sh (format nil "cp output/*.msi ../~A-binary.msi" base)))))
 
 (export
  (defun default (&rest argv)
