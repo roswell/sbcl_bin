@@ -38,7 +38,7 @@ jobs:
           curl -L https://raw.githubusercontent.com/roswell/roswell/master/scripts/install-for-ci.sh | sh
           ros install snmsts/sn.github roswell/sbcl_bin
           make zstd
-          bash -c "cd zstd/lib; sudo make PREFIX=/usr/local install-includes install-static clean"
+          bash -c "cd zstd/lib; sudo make PREFIX=/usr/local CFLAGS=-mmacosx-version-min=10.9 CXXFLAGS=-mmacosx-version-min=10.9 LDFLAGS=-mmacosx-version-min=10.9 install-includes install-static clean"
           rm -f /usr/local/lib/libzstd*.dylib /opt/homebrew/lib/libzstd*.dylib
       - name: build & upload
         env:
