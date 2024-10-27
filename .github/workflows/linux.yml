@@ -24,7 +24,7 @@ jobs:
           # default lisp used is sbcl-bin/2.4.0
           - lisp: 'sbcl-bin/2.4.0'
           # suffix default image
-          - {suffix: ''          ,image: glibc2.19 }
+          - {suffix: ''          ,image: glibc2.23 }
           # riscv64 target don't have trusty release.
           #-{suffix: '',target: riscv64,image: 'glibc2.31'}
           - {suffix: '-glibc2.10',image: glibc2.10 }
@@ -75,7 +75,7 @@ jobs:
           LISP: ${{ matrix.lisp }}
         run: |
           curl -L https://raw.githubusercontent.com/roswell/roswell/master/scripts/install-for-ci.sh | sh
-          ros install snmsts/sn.github
+          ros install snmsts/sn.github roswell/sbcl_bin
       - name: Login to GitHub Container Registry
         uses: docker/login-action@v3
         with:
