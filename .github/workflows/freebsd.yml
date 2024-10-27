@@ -43,6 +43,7 @@ jobs:
       - name: Install Roswell
         env:
           LISP: ${{ matrix.lisp }}
+          GITHUB_OAUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           curl -L https://raw.githubusercontent.com/roswell/roswell/master/scripts/install-for-ci.sh | sh
           ros install snmsts/sn.github roswell/sbcl_bin

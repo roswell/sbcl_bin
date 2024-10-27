@@ -2,7 +2,7 @@
 -include .env
 export $(shell sed 's/=.*//' .env)
 
-VERSION ?= $(shell date +%y.%-m.%-d)
+VERSION ?=
 TSV_FILE ?= sbcl-bin_uri.tsv
 ROS_URI=https://raw.githubusercontent.com/roswell/sbcl_bin/master/
 
