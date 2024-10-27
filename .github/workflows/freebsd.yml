@@ -36,6 +36,17 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+      - name: setenv
+        run: |
+          echo "$HOME/.roswell/bin" >> $GITHUB_PATH
+          echo "ROSWELL_BRANCH=release" >> $GITHUB_ENV
+      - name: Install Roswell
+        env:
+          LISP: ${{ matrix.lisp }}
+        run: |
+          curl -L https://raw.githubusercontent.com/roswell/roswell/master/scripts/install-for-ci.sh | sh
+          ros install snmsts/sn.github roswell/sbcl_bin
+          make latest-version zstd sbcl
       - if: ${{ matrix.target != 'x86' }}
         name: Test on FreeBSD
         uses: cross-platform-actions/action@v0.25.0
@@ -51,16 +62,11 @@ jobs:
             whoami
             pwd
             sudo env IGNORE_OSVERSION=yes pkg update -f
-            sudo pkg install -y bash roswell autoconf texinfo perl5 gmake gcc libffi git
+            sudo pkg install -y bash roswell autoconf texinfo perl5 gmake gcc libffi git findutils
             ros install ${{ matrix.lisp }}
             ros install snmsts/sn.github
-            gmake zstd
             sudo bash -c 'cd zstd/lib; gmake PREFIX=/usr CFLAGS="-fPIC" install-includes install-static clean'
-            if [ "$VERSION" = "" ]; then
-              sudo -E gmake latest-version sbcl precompile-freebsd compile postcompile-freebsd archive upload-archive;
-            else
-              sudo -E gmake sbcl precompile-freebsd compile postcompile-freebsd archive upload-archive;
-            fi
+            sudo -E gmake latest-version precompile-freebsd compile postcompile-freebsd archive upload-archive;
       - if: ${{ matrix.target == 'x86' }}
         name: Test on FreeBSD
         id: test
@@ -74,10 +80,5 @@ jobs:
             ros install ${{ matrix.lisp }}
             ros install snmsts/sn.github
           run: |
-            gmake zstd
             bash -c 'cd zstd/lib; gmake PREFIX=/usr LIBDIR=/usr/lib32 CFLAGS="-m32 -fPIC" install-includes install-static clean'
-            if [ "$VERSION" = "" ]; then
-              gmake latest-version sbcl precompile-freebsd compile postcompile-freebsd archive upload-archive;
-            else
-              gmake sbcl precompile-freebsd compile postcompile-freebsd archive upload-archive;
-            fi
+            gmake latest-version precompile-freebsd compile postcompile-freebsd archive upload-archive;
