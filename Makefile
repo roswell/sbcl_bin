@@ -19,7 +19,7 @@ SBCL_OPTIONS ?=--fancy
 SBCL_PATCH ?=
 LISP_IMPL ?= ros -L sbcl-bin without-roswell=t --no-rc run
 
-DOCKER_REPO ?= docker.pkg.github.com/roswell/sbcl_bin
+DOCKER_REPO ?= docker.pkg.github.com/$(GITHUB_REPOSITORY)
 DOCKER_PLATFORM ?= linux/amd64
 DOCKER_BUILD_OPTIONS ?=
 DOCKER_IMAGE_SUFFIX ?=
@@ -31,7 +31,7 @@ ZSTD_BRANCH ?= v1.5.6
 #version
 version: web.ros
 	@echo $(shell GH_USER=$(GH_USER) GH_REPO=$(GH_REPO) ros web.ros version) > $@
-branch: version
+branch: version build.ros
 	$(eval VERSION := $(shell cat version))
 	VERSION=$(VERSION) ros build.ros branch > $@
 latest-uris: web.ros
@@ -65,7 +65,7 @@ hash:
 	git ls-remote --heads $(ORIGIN_URI) $(ORIGIN_REF) |sed -r "s/^([0-9a-fA-F]*).*/\1/" > hash
 
 lasthash:
-	curl -sSL -o lasthash $(GITHUB)/releases/download/files/hash || true
+	curl -sSL -f -o lasthash $(GITHUB)/releases/download/files/hash || rm -f lasthash
 
 tag: hash lasthash web.ros
 	@echo hash     = $(shell cat hash)
@@ -93,7 +93,12 @@ show:
 
 #sbcl
 sbcl:
-	git clone --depth 5 https://github.com/sbcl/sbcl --branch=$(BRANCH)
+	@if [ -n "$(HASH)" ]; then\
+		git clone --depth 100 https://github.com/sbcl/sbcl --branch=master \
+		cd sbcl;git checkout $(HASH) \
+	else \
+		git clone --depth 5 https://github.com/sbcl/sbcl --branch=$(BRANCH) \
+	fi
 	@if [ -n "$(SBCL_PATCH)" ]; then\
 		SBCL_PATCH="$(SBCL_PATCH)" $(MAKE) patch-sbcl; \
 	fi
@@ -200,10 +205,11 @@ cross-docker-5:
 
 docker-default-action: compile archive
 
-latest-version: version branch
+latest-version: version branch lasthash
 	$(eval VERSION := $(shell cat version))
 	$(eval BRANCH := $(shell cat branch))
-	@echo "set version $(VERSION):$(BRANCH)"
+	$(eval HASH := $(shell cat lasthash))
+	@echo "set version $(VERSION):$(HASH):$(BRANCH)"
 
 precompile-freebsd:
 	mv /usr/local/lib/libzstd.so* /tmp
