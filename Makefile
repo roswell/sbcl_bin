@@ -93,11 +93,11 @@ show:
 
 #sbcl
 sbcl:
-	@if [ -n "$(HASH)" ]; then\
-		git clone --depth 100 https://github.com/sbcl/sbcl --branch=master \
-		cd sbcl;git checkout $(HASH) \
+	if [ -n "$(HASH)" ]; then \
+		git clone --depth 100 https://github.com/sbcl/sbcl --branch=master; \
+		cd sbcl;git checkout $(HASH); \
 	else \
-		git clone --depth 5 https://github.com/sbcl/sbcl --branch=$(BRANCH) \
+		git clone --depth 5 https://github.com/sbcl/sbcl --branch=$(BRANCH); \
 	fi
 	@if [ -n "$(SBCL_PATCH)" ]; then\
 		SBCL_PATCH="$(SBCL_PATCH)" $(MAKE) patch-sbcl; \
