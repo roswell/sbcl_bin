@@ -62,7 +62,7 @@ jobs:
           LISP: ${{ matrix.lisp }}
         run: |
           curl -L https://raw.githubusercontent.com/roswell/roswell/master/scripts/install-for-ci.sh | sh
-          ros install snmsts/sn.github
+          ros install snmsts/sn.github roswell/sbcl_bin
           make latest-version zstd sbcl
       - name: Config on ${{ matrix.os }}
         uses: cross-platform-actions/action@v0.25.0
