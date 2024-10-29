@@ -53,6 +53,8 @@ table: web.ros
 #archive
 upload-archive: web.ros
 	VERSION=$(VERSION) TARGET=$(ARCH) SUFFIX=$(SUFFIX) ros web.ros upload-archive
+upload-archive-p: web.ros
+	VERSION=$(VERSION) TARGET=$(ARCH) SUFFIX=$(SUFFIX) ros web.ros upload-archive-p
 archive: build.ros
 	VERSION=$(VERSION) ARCH=$(ARCH) SUFFIX=$(SUFFIX) ros build.ros archive
 #tag

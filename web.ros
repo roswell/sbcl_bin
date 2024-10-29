@@ -135,6 +135,23 @@ exec ros -Q -- $0 "$@"
                          (setf file-not-found t)))
                finally (when file-not-found
                          (uiop:quit 1))))))))
+(export
+ (defun upload-archive-p (args)
+   (declare (ignore args))
+   (multiple-value-bind (version target suffix uname)
+       (version-target :target :archive)
+     (let ((release (and version (< (length version) 20)))
+           (file (format nil "sbcl-~A-~A-~A~A-binary.tar.bz2"
+                         version
+                         target
+                         uname
+                         suffix)))
+       (when release
+         (multiple-value-bind (user repo)
+             (account)
+           (let ((uri (format nil "https://github.com/~A/~A/releases/download/~A/~A" user repo version file)))
+             (format t "Is ~A exist?~%" uri)
+             (nth-value 1 (dex:head uri)))))))))
 
 (defun releases ()
   (multiple-value-bind (user repo)
