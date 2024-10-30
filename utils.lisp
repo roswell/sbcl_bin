@@ -9,7 +9,7 @@
   (last (uiop:split-string
          (string-trim
           (string #\lf)
-          (uiop:run-program "git remote -v | head -n 1|awk -F ' ' '{print $2}'" :output :string))
+          (second (uiop:split-string (uiop:run-program "git remote -v | head -n 1" :output :string))))
          :separator '(#\/ #\:))
         2))
 
