@@ -4,7 +4,7 @@ run apt-get update && env DEBIAN_FRONTEND=noninteractive apt-get install -y \
  && apt-get clean \
  && rm -rf /var/lib/apt/lists/*
 run cd /tmp; curl -L -O https://github.com/roswell/roswell/releases/download/v24.10.115/roswell-24.10.115-linux-`uname -m`.tar.bz2 \
-    cd /tmp/roswell; make install;
+    cd /tmp/roswell; make install; \
     cd /tmp;rm -rf /tmp/roswell roswell*.bz2; \
     (ros install sbcl-bin/2.4.0 || true)
 run (ros install snmsts/sn.github || true)
