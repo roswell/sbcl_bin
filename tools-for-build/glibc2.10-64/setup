@@ -1,6 +1,11 @@
 #!/bin/sh
+echo '#!/bin/bash' > /usr/local/bin/cc
 if [ "$ARCH" == "x86" ]; then
-  bash -c 'cd zstd/lib;make PREFIX=/usr LIBDIR=/usr/lib CFLAGS="-fPIC -m32" install-includes install-static'
+ echo '/root/zig/zig cc -target x86-linux-gnu.2.12 -L /usr/local/lib/ -I /usr/local/include/ $*' >> /usr/local/bin/cc
 else
-  bash -c 'cd zstd/lib;make PREFIX=/usr LIBDIR=/usr/lib64 CFLAGS=-fPIC install-includes install-static'
+ echo '/root/zig/zig cc -target x86_64-linux-gnu.2.12 -L /usr/local/lib/ -I /usr/local/include/ $*' >> /usr/local/bin/cc
 fi
+echo '#!/bin/bash' > /usr/local/bin/ar
+echo '/root/zig/zig ar $*' >> /usr/local/bin/ar
+chmod 755 /usr/local/bin/cc /usr/local/bin/ar
+bash -c 'cd zstd/lib;make PREFIX=/usr/local CFLAGS=-fPIC install-includes install-static'
