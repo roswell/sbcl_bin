@@ -52,7 +52,7 @@ jobs:
       run: |
         gcc -v
         curl -L https://raw.githubusercontent.com/roswell/roswell/master/scripts/install-for-ci.sh | sh
-        ros install snmsts/sn.github
+        ros install snmsts/sn.github roswell/sbcl_bin
     - name: build sbcl
       shell: msys2 {0}
       run: |

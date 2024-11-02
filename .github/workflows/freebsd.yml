@@ -15,8 +15,6 @@ jobs:
       SUFFIX: ${{ matrix.suffix }}
       LINKFLAGS: ${{ matrix.linkflags }}
       ROSWELL_BRANCH: master
-      GH_USER: ${{ github.repository_owner }}
-      GH_REPO: sbcl_bin
       GITHUB_OAUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
     strategy:
@@ -27,6 +25,7 @@ jobs:
         include:
           # default lisp used is sbcl-bin/2.4.8
           - lisp: 'sbcl-bin/2.4.8'
+            os: freebsd
           - { suffix: ''     ,release: '13.3'}
           - { suffix: '-13.2',release: '13.2'}
           - { suffix: '-13.3',release: '13.3'}
@@ -67,7 +66,7 @@ jobs:
             ros install ${{ matrix.lisp }}
             ros install snmsts/sn.github roswell/sbcl_bin
             sudo bash -c 'cd zstd/lib; gmake PREFIX=/usr CFLAGS="-fPIC" install-includes install-static clean'
-            sudo -E gmake latest-version precompile-freebsd compile postcompile-freebsd archive upload-archive;
+            sudo -E gmake latest-version precompile-freebsd compile postcompile-freebsd archive;
       - if: ${{ matrix.target == 'x86' }}
         name: Test on FreeBSD
         id: test
@@ -79,7 +78,21 @@ jobs:
           prepare: |
             pkg install -y bash roswell autoconf texinfo perl5 gmake gcc libffi git
             ros install ${{ matrix.lisp }}
-            ros install snmsts/sn.github
+            ros install snmsts/sn.github roswell/sbcl_bin
           run: |
             bash -c 'cd zstd/lib; gmake PREFIX=/usr LIBDIR=/usr/lib32 CFLAGS="-m32 -fPIC" install-includes install-static clean'
-            gmake latest-version precompile-freebsd compile postcompile-freebsd archive upload-archive;
+            gmake latest-version precompile-freebsd compile postcompile-freebsd archive;
+      - name: upload
+        env:
+          GITHUB_OAUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          VERSION: ${{ secrets.VERSION }}
+          ARCH: ${{ matrix.target }}
+          IMAGE: ${{ matrix.image }}
+          SUFFIX: ${{ matrix.suffix }}
+          LINKFLAGS: ${{ matrix.linkflags }}
+          DOCKER_PLATFORM: ${{ matrix.docker-platform }}
+          DOCKER_IMAGE_SUFFIX: ${{ matrix.docker-image-suffix }}
+        run: |
+          OS=${{ matrix.os }} make latest-version archive
+          ls
+          env FILE=`ls *.bz2` make latest-version upload-archive
