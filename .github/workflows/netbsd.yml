@@ -64,7 +64,16 @@ jobs:
           curl -L https://raw.githubusercontent.com/roswell/roswell/master/scripts/install-for-ci.sh | sh
           ros install snmsts/sn.github roswell/sbcl_bin
           make latest-version zstd sbcl
+      - name: check uploaded
+        id: check_uploaded
+        env:
+          VERSION: ${{ secrets.VERSION }}
+          ARCH: ${{ matrix.target }}
+          SUFFIX: ${{ matrix.suffix }}
+        run: make latest-version upload-archive-p
+        continue-on-error: true
       - name: Config on ${{ matrix.os }}
+        if: ${{ steps.check_uploaded.outcome == 'failure' || github.event_name != 'schedule' }}
         uses: cross-platform-actions/action@v0.25.0
         with:
           environment_variables: VERSION ARCH IMAGE SUFFIX LINKFLAGS GH_USER GH_REPO GITHUB_OAUTH_TOKEN
@@ -78,9 +87,11 @@ jobs:
             sudo pkgin -y install gmake
             SBCL_OPTIONS=$SBCL_OPTIONS LISP_IMPL='ros run' gmake latest-version compile-config
       - name: make-host-1
+        if: ${{ steps.check_uploaded.outcome == 'failure' || github.event_name != 'schedule' }}
         run: |
           bash -c "cd sbcl;sh make-host-1.sh"
       - name: build-runtime on ${{ matrix.os }}
+        if: ${{ steps.check_uploaded.outcome == 'failure' || github.event_name != 'schedule' }}
         uses: cross-platform-actions/action@v0.25.0
         with:
           environment_variables: VERSION ARCH IMAGE SUFFIX LINKFLAGS GH_USER GH_REPO GITHUB_OAUTH_TOKEN
@@ -95,9 +106,11 @@ jobs:
             sudo bash -c "cd zstd/lib; gmake PREFIX=/usr ${{ matrix.target == 'x86' && 'LIBDIR=/usr/lib/i386' || ''}} CFLAGS='${{ matrix.target == 'x86' && '-fPIC -m32' || '-fPIC' }}' install-includes install-static clean"
             cd sbcl;sh make-target-1.sh
       - name: make-host2
+        if: ${{ steps.check_uploaded.outcome == 'failure' || github.event_name != 'schedule' }}
         run: |
           bash -c "cd sbcl;sh make-host-2.sh"
       - name: build-target2 and contrib on ${{ matrix.os }}
+        if: ${{ steps.check_uploaded.outcome == 'failure' || github.event_name != 'schedule' }}
         uses: cross-platform-actions/action@v0.25.0
         with:
           environment_variables: VERSION ARCH IMAGE SUFFIX LINKFLAGS GH_USER GH_REPO GITHUB_OAUTH_TOKEN
@@ -113,6 +126,7 @@ jobs:
             bash -c "cd sbcl;sh make-target-2.sh && sh make-target-contrib.sh"
             gmake compile-9
       - name: upload
+        if: ${{ steps.check_uploaded.outcome == 'failure' || github.event_name != 'schedule' }}
         env:
           GITHUB_OAUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           VERSION: ${{ secrets.VERSION }}
