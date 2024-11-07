@@ -10,7 +10,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     env:
-      UNAME: "openbsd"
+      UNAME: ${{ matrix.os }}
       VERSION: ${{ secrets.VERSION }}
       ARCH: ${{ matrix.target }}
       SUFFIX: ${{ matrix.suffix }}
