@@ -10,6 +10,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     env:
+      UNAME: ${{ matrix.os }}
       VERSION: ${{ secrets.VERSION }}
       ARCH: ${{ matrix.target }}
       SUFFIX: ${{ matrix.suffix }}
@@ -47,7 +48,15 @@ jobs:
           curl -L https://raw.githubusercontent.com/roswell/roswell/master/scripts/install-for-ci.sh | sh
           ros install snmsts/sn.github roswell/sbcl_bin
           make latest-version zstd sbcl
-      - if: ${{ matrix.target != 'x86' }}
+      - name: check uploaded
+        id: check_uploaded
+        env:
+          VERSION: ${{ secrets.VERSION }}
+          ARCH: ${{ matrix.target }}
+          SUFFIX: ${{ matrix.suffix }}
+        run: make latest-version upload-archive-p
+        continue-on-error: true
+      - if: ${{ matrix.target != 'x86' && ( steps.check_uploaded.outcome == 'failure' || github.event_name != 'schedule' ) }}
         name: Test on FreeBSD
         uses: cross-platform-actions/action@v0.25.0
         with:
@@ -67,7 +76,7 @@ jobs:
             ros install snmsts/sn.github roswell/sbcl_bin
             sudo bash -c 'cd zstd/lib; gmake PREFIX=/usr CFLAGS="-fPIC" install-includes install-static clean'
             sudo -E gmake latest-version precompile-freebsd compile postcompile-freebsd archive;
-      - if: ${{ matrix.target == 'x86' }}
+      - if: ${{ matrix.target == 'x86'  && ( steps.check_uploaded.outcome == 'failure' || github.event_name != 'schedule' ) }}
         name: Test on FreeBSD
         id: test
         uses: vmactions/freebsd-vm@v1
