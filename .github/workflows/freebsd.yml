@@ -91,7 +91,8 @@ jobs:
           run: |
             bash -c 'cd zstd/lib; gmake PREFIX=/usr LIBDIR=/usr/lib32 CFLAGS="-m32 -fPIC" install-includes install-static clean'
             gmake latest-version precompile-freebsd compile postcompile-freebsd archive;
-      - name: upload
+      - if: ${{ steps.check_uploaded.outcome == 'failure' || github.event_name != 'schedule' }}
+        name: upload
         env:
           GITHUB_OAUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           VERSION: ${{ secrets.VERSION }}
