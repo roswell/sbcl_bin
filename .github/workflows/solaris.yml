@@ -10,13 +10,12 @@ jobs:
   build:
     runs-on: ubuntu-latest
     env:
+      UNAME: ${{ matrix.os }}
       VERSION: ${{ secrets.VERSION }}
       ARCH: ${{ matrix.target }}
       SUFFIX: ${{ matrix.suffix }}
       LINKFLAGS: ${{ matrix.linkflags }}
       ROSWELL_BRANCH: master
-      GH_USER: ${{ github.repository_owner }}
-      GH_REPO: sbcl_bin
       SBCL_OPTIONS: ${{ matrix.sbcloptions }}
       GITHUB_OAUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       SBCL_PATCH: ${{ matrix.sbclpatch }}
@@ -48,8 +47,16 @@ jobs:
           ros install snmsts/sn.github
           make latest-version zstd sbcl
           sed -i "s/-lzstd/-Wl,-Bstatic -lzstd -Wl,-Bdynamic/g" sbcl/src/runtime/Config.x86*-sunos
+      - name: check uploaded
+        id: check_uploaded
+        env:
+          VERSION: ${{ secrets.VERSION }}
+          ARCH: ${{ matrix.target }}
+          SUFFIX: ${{ matrix.suffix }}
+        run: make latest-version upload-archive-p
+        continue-on-error: true
       - name: Build on omnios
-        if: ${{ matrix.os == 'omnios' }}
+        if: ${{ matrix.os == 'omnios' && ( steps.check_uploaded.outcome == 'failure' || github.event_name != 'schedule' ) }}
         uses: vmactions/omnios-vm@v1
         with:
           envs: 'SBCL_OPTIONS ARCH'
@@ -65,7 +72,7 @@ jobs:
             ros run -- --version
             gmake latest-version compile archive
       - name: Build on solaris
-        if: ${{ matrix.os == 'solaris' }}
+        if: ${{ matrix.os == 'solaris' && ( steps.check_uploaded.outcome == 'failure' || github.event_name != 'schedule' ) }}
         uses: vmactions/solaris-vm@v1
         with:
           release: "11.4-gcc"
