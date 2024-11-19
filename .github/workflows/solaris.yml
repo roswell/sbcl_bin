@@ -95,6 +95,6 @@ jobs:
             ros run -- --version
             gmake latest-version compile archive
       - name: upload
-        if: ${{ matrix.suffix == '' && matrix.os == 'omnios' }}
+        if: ${{ steps.check_uploaded.outcome == 'failure' || github.event_name != 'schedule' }}
         run: |
           FILE=`ls *.bz2` make latest-version upload-archive
