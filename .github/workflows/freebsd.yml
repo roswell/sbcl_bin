@@ -16,6 +16,8 @@ jobs:
       SUFFIX: ${{ matrix.suffix }}
       LINKFLAGS: ${{ matrix.linkflags }}
       ROSWELL_BRANCH: master
+      SBCL_PATCH: ${{ matrix.sbclpatch }}
+      SBCL_OPTIONS: ${{ matrix.sbcloptions }}
       GITHUB_OAUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
     strategy:
@@ -57,12 +59,12 @@ jobs:
           SUFFIX: ${{ matrix.suffix }}
         run: make latest-version upload-archive-p
         continue-on-error: true
-      - if: ${{ matrix.target != 'x86' && ( steps.check_uploaded.outcome == 'failure' || github.event_name != 'schedule' ) }}
-        name: Test on FreeBSD
+      - name: Config on ${{ matrix.os }}
+        if: ${{ matrix.target != 'x86' && ( steps.check_uploaded.outcome == 'failure' || github.event_name != 'schedule' ) }}
         uses: cross-platform-actions/action@v0.25.0
         with:
           environment_variables: VERSION ARCH IMAGE SUFFIX LINKFLAGS GH_USER GH_REPO GITHUB_OAUTH_TOKEN
-          operating_system: freebsd
+          operating_system: ${{ matrix.os }}
           architecture: ${{ matrix.target == 'x86' && 'x86-64' || matrix.target }}
           version: ${{ matrix.release }}
           shell: bash
@@ -73,12 +75,41 @@ jobs:
             pwd
             sudo env IGNORE_OSVERSION=yes pkg update -f
             sudo pkg install -y bash roswell autoconf texinfo perl5 gmake gcc libffi git findutils
-            ros install ${{ matrix.lisp }}
-            ros install snmsts/sn.github roswell/sbcl_bin
+            SBCL_OPTIONS=$SBCL_OPTIONS LISP_IMPL='ros run' gmake latest-version compile-config
+      - name: make-host-1
+        if: ${{ matrix.target != 'x86' && ( steps.check_uploaded.outcome == 'failure' || github.event_name != 'schedule' ) }}
+        run: |
+          bash -c "cd sbcl;sh make-host-1.sh"
+      - name: build-runtime on ${{ matrix.os }}
+        if: ${{ matrix.target != 'x86' && ( steps.check_uploaded.outcome == 'failure' || github.event_name != 'schedule' ) }}
+        uses: cross-platform-actions/action@v0.25.0
+        with:
+          environment_variables: VERSION ARCH IMAGE SUFFIX LINKFLAGS GH_USER GH_REPO GITHUB_OAUTH_TOKEN
+          operating_system: ${{ matrix.os }}
+          architecture: ${{ matrix.target == 'x86' && 'x86-64' || matrix.target }}
+          version: ${{ matrix.release }}
+          shell: bash
+          run: |
             sudo bash -c 'cd zstd/lib; gmake PREFIX=/usr CFLAGS="-fPIC" install-includes install-static clean'
-            sudo -E gmake latest-version compile archive;
-      - if: ${{ matrix.target == 'x86'  && ( steps.check_uploaded.outcome == 'failure' || github.event_name != 'schedule' ) }}
-        name: Test on FreeBSD
+            cd sbcl;sh make-target-1.sh
+      - name: make-host2
+        if: ${{ matrix.target != 'x86' && ( steps.check_uploaded.outcome == 'failure' || github.event_name != 'schedule' ) }}
+        run: |
+          bash -c "cd sbcl;sh make-host-2.sh"
+      - name: build-target2 and contrib on ${{ matrix.os }}
+        if: ${{ matrix.target != 'x86' && ( steps.check_uploaded.outcome == 'failure' || github.event_name != 'schedule' ) }}
+        uses: cross-platform-actions/action@v0.25.0
+        with:
+          environment_variables: VERSION ARCH IMAGE SUFFIX LINKFLAGS GH_USER GH_REPO GITHUB_OAUTH_TOKEN
+          operating_system: ${{ matrix.os }}
+          architecture: ${{ matrix.target }}
+          version: ${{ matrix.release }}
+          shell: bash
+          run: |
+            bash -c "cd sbcl;sh make-target-2.sh && sh make-target-contrib.sh"
+            gmake compile-9
+      - name: FreeBSD on x86
+        if: ${{ matrix.target == 'x86'  && ( steps.check_uploaded.outcome == 'failure' || github.event_name != 'schedule' ) }}
         id: test
         uses: vmactions/freebsd-vm@v1
         with:
