@@ -2,7 +2,7 @@ name: FreeBSD
 
 on:
   schedule:
-    - cron:  '0 1 * * *'
+    - cron:  '5 0 * * *'
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
 
@@ -48,6 +48,7 @@ jobs:
           curl -L https://raw.githubusercontent.com/roswell/roswell/master/scripts/install-for-ci.sh | sh
           ros install snmsts/sn.github roswell/sbcl_bin
           make latest-version zstd sbcl
+          sed -i "s/-lzstd/-Wl,-Bstatic -lzstd -Wl,-Bdynamic/g" sbcl/src/runtime/Config.*-bsd
       - name: check uploaded
         id: check_uploaded
         env:
@@ -75,7 +76,7 @@ jobs:
             ros install ${{ matrix.lisp }}
             ros install snmsts/sn.github roswell/sbcl_bin
             sudo bash -c 'cd zstd/lib; gmake PREFIX=/usr CFLAGS="-fPIC" install-includes install-static clean'
-            sudo -E gmake latest-version precompile-freebsd compile postcompile-freebsd archive;
+            sudo -E gmake latest-version compile archive;
       - if: ${{ matrix.target == 'x86'  && ( steps.check_uploaded.outcome == 'failure' || github.event_name != 'schedule' ) }}
         name: Test on FreeBSD
         id: test
@@ -90,7 +91,7 @@ jobs:
             ros install snmsts/sn.github roswell/sbcl_bin
           run: |
             bash -c 'cd zstd/lib; gmake PREFIX=/usr LIBDIR=/usr/lib32 CFLAGS="-m32 -fPIC" install-includes install-static clean'
-            gmake latest-version precompile-freebsd compile postcompile-freebsd archive;
+            gmake latest-version compile archive;
       - if: ${{ steps.check_uploaded.outcome == 'failure' || github.event_name != 'schedule' }}
         name: upload
         env:
