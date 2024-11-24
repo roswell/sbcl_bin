@@ -1,0 +1,13 @@
+diff --git a/src/runtime/Config.x86-sunos b/src/runtime/Config.x86-sunos
+index 10635d1..160363e 100644
+--- a/src/runtime/Config.x86-sunos
++++ b/src/runtime/Config.x86-sunos
+@@ -10,7 +10,7 @@
+ # files for more information.
+ 
+ CC=gcc
+-CFLAGS += -g -O2 -Wall -D__EXTENSIONS__ -DSVR4 -D_REENTRANT -fno-omit-frame-pointer -D_POSIX_PTHREAD_SEMANTICS -m32
++CFLAGS += -g -O2 -Wall -std=gnu89 -D__EXTENSIONS__ -DSVR4 -D_REENTRANT -fno-omit-frame-pointer -D_POSIX_PTHREAD_SEMANTICS -m32
+ LINKFLAGS += -m32
+ GREP = ggrep
+ 
