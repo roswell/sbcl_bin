@@ -1,5 +1,17 @@
+diff --git a/contrib/sb-grovel/def-to-lisp.lisp b/contrib/sb-grovel/def-to-lisp.lisp
+index 878a4bd0e..e4308ca0b 100644
+--- a/contrib/sb-grovel/def-to-lisp.lisp
++++ b/contrib/sb-grovel/def-to-lisp.lisp
+@@ -211,6 +211,7 @@ code:
+                   (or (sb-ext:posix-getenv "SBCL_MACOSX_VERSION_MIN")
+                       "10.4")))
+        #+(and x86-64 sunos) '("-m64")
++       #+(and x86 sunos) '("-m32")
+        (list "-o" (namestring exefile) (namestring sourcefile)))
+       :search t
+       :input nil
 diff --git a/src/runtime/Config.x86-sunos b/src/runtime/Config.x86-sunos
-index 10635d1..160363e 100644
+index 10635d163..160363ed4 100644
 --- a/src/runtime/Config.x86-sunos
 +++ b/src/runtime/Config.x86-sunos
 @@ -10,7 +10,7 @@
