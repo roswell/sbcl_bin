@@ -35,7 +35,6 @@ jobs:
             os: netbsd
             sbcloptions: --fancy
           - target: x86
-            sbclpatch: 20240924_netbsd-m32
             sbcloptions: '--without-sb-thread --with-sb-core-compression --with-sb-xref-for-internals --with-sb-after-xc-core'
           - { suffix: ''     ,release: '10.0'}
           - { suffix: '-10.0',release: '10.0'}
