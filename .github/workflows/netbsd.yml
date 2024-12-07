@@ -23,7 +23,6 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        sbclpatch: ["20240924_netbsd-m32"]
         suffix: ['', '-10.0', '-9.4', '-9.3', '-9.2']
         target: ['x86-64', 'arm64', 'x86']
         exclude:

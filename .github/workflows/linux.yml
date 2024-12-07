@@ -49,9 +49,6 @@ jobs:
           - {suffix: '-musl1.2.4',target: x86,docker-platform: linux/386,docker-build-options: '--build-arg WRAPPER=linux32',docker-image-suffix: 'x86' }
           - {suffix: '-musl1.2.2',target: x86,docker-platform: linux/386,docker-build-options: '--build-arg WRAPPER=linux32',docker-image-suffix: 'x86' }
           - {suffix: '-musl1.1'  ,target: x86,docker-platform: linux/386,docker-build-options: '--build-arg WRAPPER=linux32',docker-image-suffix: 'x86' }
-          - {target: ppc64le,suffix: '-musl'     ,sbclpatch: "20241001_ppc64linuxmusl" }
-          - {target: ppc64le,suffix: '-musl1.2.4',sbclpatch: "20241001_ppc64linuxmusl" }
-          - {target: ppc64le,suffix: '-musl1.2.2',sbclpatch: "20241001_ppc64linuxmusl" }
     environment: SET_VERSION
 
     steps:
