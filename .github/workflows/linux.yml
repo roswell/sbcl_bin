@@ -12,11 +12,9 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        suffix: ['', '-glibc2.39', '-glibc2.31', '-glibc2.23', '-glibc2.19', '-glibc2.10', '-musl', '-musl1.2.4', '-musl1.2.2', '-musl1.1']
+        suffix: ['', '-glibc2.39', '-glibc2.31', '-glibc2.23', '-glibc2.19', '-musl', '-musl1.2.4', '-musl1.2.2', '-musl1.1']
         target: ['x86-64', 'x86', 'arm64', 'ppc64le']
         exclude:
-          - {suffix: -glibc2.10,target: arm64}
-          - {suffix: -glibc2.10,target: ppc64le}
           - {suffix: -musl1.1,target: x86-64}
           - {suffix: -musl1.1,target: arm64}
           - {suffix: -musl1.1,target: ppc64le}
@@ -27,7 +25,6 @@ jobs:
           - {suffix: ''          ,image: glibc2.23 }
           # riscv64 target don't have trusty release.
           #-{suffix: '',target: riscv64,image: 'glibc2.31'}
-          - {suffix: '-glibc2.10',image: glibc2.10 }
           - {suffix: '-glibc2.19',image: glibc2.19 }
           - {suffix: '-glibc2.23',image: glibc2.23 }
           - {suffix: '-glibc2.31',image: glibc2.31 }
@@ -41,9 +38,6 @@ jobs:
           - {target: arm64  ,docker-platform: linux/arm64  ,docker-image-suffix: 'aarch64',cross: yes}
           - {target: ppc64le,docker-platform: linux/ppc64le,docker-image-suffix: 'ppc64le',cross: yes}
           #-{target: riscv64,docker-platform: linux/riscv64,docker-image-suffix: 'riscv64'}
-          # with suffix glibc2.10 require some treat.
-          - {suffix: '-glibc2.10',linkflags: '-lrt' }
-          - {suffix: '-glibc2.10',target: x86-64,image: glibc2.10-64 }
           # musl suffix
           - {suffix: '-musl'     ,target: x86,docker-platform: linux/386,docker-build-options: '--build-arg WRAPPER=linux32',docker-image-suffix: 'x86' }
           - {suffix: '-musl1.2.4',target: x86,docker-platform: linux/386,docker-build-options: '--build-arg WRAPPER=linux32',docker-image-suffix: 'x86' }
