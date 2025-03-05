@@ -23,7 +23,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        suffix: ['', '-10.0', '-9.4', '-9.3', '-9.2']
+        suffix: ['', '-10.1', '-10.0', '-9.4', '-9.3', '-9.2']
         target: ['x86-64', 'arm64', 'x86']
         exclude:
           - {suffix: -9.4,target: arm64}
@@ -36,7 +36,8 @@ jobs:
             sbcloptions: --fancy
           - target: x86
             sbcloptions: '--without-sb-thread --with-sb-core-compression --with-sb-xref-for-internals --with-sb-after-xc-core'
-          - { suffix: ''     ,release: '10.0'}
+          - { suffix: ''     ,release: '10.1'}
+          - { suffix: '-10.1',release: '10.1'}
           - { suffix: '-10.0',release: '10.0'}
           - { suffix: '-9.4' ,release: '9.4'}
           - { suffix: '-9.3' ,release: '9.3'}
@@ -73,7 +74,7 @@ jobs:
         continue-on-error: true
       - name: Config on ${{ matrix.os }}
         if: ${{ steps.check_uploaded.outcome == 'failure' || github.event_name != 'schedule' }}
-        uses: cross-platform-actions/action@v0.25.0
+        uses: cross-platform-actions/action@v0.27.0
         with:
           environment_variables: VERSION ARCH IMAGE SUFFIX LINKFLAGS GH_USER GH_REPO GITHUB_OAUTH_TOKEN
           operating_system: ${{ matrix.os }}
