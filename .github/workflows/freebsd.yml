@@ -23,17 +23,20 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        suffix: ['', '-13.2', '-13.3', '-14.0', '-14.1']
+        suffix: ['', '-14.2', '-13.4', '-14.1', '-13.3', '-14.0', '-13.2']
         target: ['x86-64', 'x86', 'arm64']
         include:
           # default lisp used is sbcl-bin/2.4.8
           - lisp: 'sbcl-bin/2.4.8'
+            cpa: 'cross-platform-actions/action@v0.27.0'
             os: freebsd
-          - { suffix: ''     ,release: '13.3'}
+          - { suffix: ''     ,release: '13.4'}
           - { suffix: '-13.2',release: '13.2'}
           - { suffix: '-13.3',release: '13.3'}
+          - { suffix: '-13.4',release: '13.4'}
           - { suffix: '-14.0',release: '14.0'}
           - { suffix: '-14.1',release: '14.1'}
+          - { suffix: '-14.2',release: '14.2'}
     environment: SET_VERSION
 
     steps:
@@ -61,7 +64,7 @@ jobs:
         continue-on-error: true
       - name: Config on ${{ matrix.os }}
         if: ${{ matrix.target != 'x86' && ( steps.check_uploaded.outcome == 'failure' || github.event_name != 'schedule' ) }}
-        uses: cross-platform-actions/action@v0.25.0
+        uses: ${{ matrix.cpa }}
         with:
           environment_variables: VERSION ARCH IMAGE SUFFIX LINKFLAGS GH_USER GH_REPO GITHUB_OAUTH_TOKEN
           operating_system: ${{ matrix.os }}
@@ -82,7 +85,7 @@ jobs:
           bash -c "cd sbcl;sh make-host-1.sh"
       - name: build-runtime on ${{ matrix.os }}
         if: ${{ matrix.target != 'x86' && ( steps.check_uploaded.outcome == 'failure' || github.event_name != 'schedule' ) }}
-        uses: cross-platform-actions/action@v0.25.0
+        uses: ${{ matrix.cpa }}
         with:
           environment_variables: VERSION ARCH IMAGE SUFFIX LINKFLAGS GH_USER GH_REPO GITHUB_OAUTH_TOKEN
           operating_system: ${{ matrix.os }}
@@ -98,7 +101,7 @@ jobs:
           bash -c "cd sbcl;sh make-host-2.sh"
       - name: build-target2 and contrib on ${{ matrix.os }}
         if: ${{ matrix.target != 'x86' && ( steps.check_uploaded.outcome == 'failure' || github.event_name != 'schedule' ) }}
-        uses: cross-platform-actions/action@v0.25.0
+        uses: ${{ matrix.cpa }}
         with:
           environment_variables: VERSION ARCH IMAGE SUFFIX LINKFLAGS GH_USER GH_REPO GITHUB_OAUTH_TOKEN
           operating_system: ${{ matrix.os }}
