@@ -23,7 +23,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        suffix: ['', '-14.2', '-13.4', '-14.1', '-13.3', '-14.0', '-13.2']
+        suffix: ['', '-14.3', '-13.5', '-14.2', '-13.4', '-14.1', '-13.3', '-14.0', '-13.2']
         target: ['x86-64', 'x86', 'arm64']
         include:
           # default lisp used is sbcl-bin/2.4.8
@@ -33,9 +33,11 @@ jobs:
           - { suffix: '-13.2',release: '13.2'}
           - { suffix: '-13.3',release: '13.3'}
           - { suffix: '-13.4',release: '13.4'}
+          - { suffix: '-13.5',release: '13.5'}
           - { suffix: '-14.0',release: '14.0'}
           - { suffix: '-14.1',release: '14.1'}
           - { suffix: '-14.2',release: '14.2'}
+          - { suffix: '-14.3',release: '14.3'}
     environment: SET_VERSION
 
     steps:
