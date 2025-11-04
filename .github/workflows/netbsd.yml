@@ -74,7 +74,7 @@ jobs:
         continue-on-error: true
       - name: Config on ${{ matrix.os }}
         if: ${{ steps.check_uploaded.outcome == 'failure' || github.event_name != 'schedule' }}
-        uses: cross-platform-actions/action@v0.27.0
+        uses: cross-platform-actions/action@v0.29.0
         with:
           environment_variables: VERSION ARCH IMAGE SUFFIX LINKFLAGS GH_USER GH_REPO GITHUB_OAUTH_TOKEN
           operating_system: ${{ matrix.os }}
@@ -92,7 +92,7 @@ jobs:
           bash -c "cd sbcl;sh make-host-1.sh"
       - name: build-runtime on ${{ matrix.os }}
         if: ${{ steps.check_uploaded.outcome == 'failure' || github.event_name != 'schedule' }}
-        uses: cross-platform-actions/action@v0.25.0
+        uses: cross-platform-actions/action@v0.29.0
         with:
           environment_variables: VERSION ARCH IMAGE SUFFIX LINKFLAGS GH_USER GH_REPO GITHUB_OAUTH_TOKEN
           operating_system: ${{ matrix.os }}
@@ -111,7 +111,7 @@ jobs:
           bash -c "cd sbcl;sh make-host-2.sh"
       - name: build-target2 and contrib on ${{ matrix.os }}
         if: ${{ steps.check_uploaded.outcome == 'failure' || github.event_name != 'schedule' }}
-        uses: cross-platform-actions/action@v0.25.0
+        uses: cross-platform-actions/action@v0.29.0
         with:
           environment_variables: VERSION ARCH IMAGE SUFFIX LINKFLAGS GH_USER GH_REPO GITHUB_OAUTH_TOKEN
           operating_system: ${{ matrix.os }}
