@@ -8,7 +8,7 @@ on:
 
 jobs:
   build:
-    runs-on: ${{ matrix.target == 'arm64' && 'macos-14' || 'macOS-13' }}
+    runs-on: 'macos-14'
     strategy:
       fail-fast: false
       matrix:
