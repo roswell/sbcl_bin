@@ -123,7 +123,7 @@ jobs:
           usesh: true
           prepare: |
             pkg install -y bash roswell autoconf texinfo perl5 gmake gcc libffi git
-            pkg install -y compat14x || true
+            pkg install -y compat14x-amd64 || true
             ros install ${{ matrix.lisp }}
             ros install snmsts/sn.github roswell/sbcl_bin
           run: |
