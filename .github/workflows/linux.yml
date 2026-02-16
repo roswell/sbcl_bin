@@ -83,7 +83,7 @@ jobs:
         if: ${{ steps.check_uploaded.outcome == 'failure' || github.event_name != 'schedule' }}
         uses: docker/login-action@v3
         with:
-          registry: docker.pkg.github.com
+          registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
       - name: pull or build&push docker image

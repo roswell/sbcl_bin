@@ -19,7 +19,7 @@ SBCL_OPTIONS ?=--fancy
 SBCL_PATCH ?=
 LISP_IMPL ?= ros -L sbcl-bin without-roswell=t --no-rc run
 
-DOCKER_REPO ?= docker.pkg.github.com/$(GITHUB_REPOSITORY)
+DOCKER_REPO ?= ghcr.io/$(GITHUB_REPOSITORY)
 DOCKER_PLATFORM ?= linux/amd64
 DOCKER_BUILD_OPTIONS ?=
 DOCKER_IMAGE_SUFFIX ?=
