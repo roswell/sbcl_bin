@@ -15,6 +15,7 @@ jobs:
       ARCH: ${{ matrix.target }}
       SUFFIX: ${{ matrix.suffix }}
       LINKFLAGS: ${{ matrix.linkflags }}
+      SBCL_PATCH: 20260301_openbsd-machine-reloc
       ROSWELL_BRANCH: master
       GITHUB_OAUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
