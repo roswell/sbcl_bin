@@ -1,0 +1,93 @@
+name: Haiku
+
+on:
+  schedule:
+    - cron:  '0 1 * * *'
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    env:
+      UNAME: haiku
+      VERSION: ${{ secrets.VERSION }}
+      ARCH: x86-64
+      GITHUB_OAUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+    environment: SET_VERSION
+
+    steps:
+      - uses: actions/checkout@v4
+      - name: setenv
+        run: |
+          echo "$HOME/.roswell/bin" >> $GITHUB_PATH
+          echo "ROSWELL_BRANCH=release" >> $GITHUB_ENV
+      - name: Install Roswell
+        env:
+          LISP: sbcl-bin/2.6.1
+        run: |
+          curl -L https://raw.githubusercontent.com/roswell/roswell/master/scripts/install-for-ci.sh | sh
+          ros install snmsts/sn.github roswell/sbcl_bin
+          make latest-version zstd sbcl
+      - name: check uploaded
+        id: check_uploaded
+        run: make latest-version upload-archive-p
+        continue-on-error: true
+      - name: compile-config on haiku
+        if: ${{ steps.check_uploaded.outcome == 'failure' || github.event_name != 'schedule' }}
+        uses: cross-platform-actions/action@v0.32.0
+        with:
+          environment_variables: VERSION ARCH GITHUB_OAUTH_TOKEN
+          operating_system: haiku
+          version: r1beta5
+          architecture: x86_64
+          image_url: https://github.com/roswell/sbcl_bin/releases/download/files/haiku-r1beta5-x86-64-20260303.qcow2
+          shell: bash
+          run: |
+            touch /boot/home/config/non-packaged/bin/ros
+            chmod 755 /boot/home/config/non-packaged/bin/ros
+            pkgman install -y curl_devel
+            LISP_IMPL='ros run' make latest-version compile-config
+      - name: make-host-1
+        if: ${{ steps.check_uploaded.outcome == 'failure' || github.event_name != 'schedule' }}
+        run: bash -c "cd sbcl;sh make-host-1.sh"
+      - name: build-runtime on haiku
+        if: ${{ steps.check_uploaded.outcome == 'failure' || github.event_name != 'schedule' }}
+        uses: cross-platform-actions/action@v0.32.0
+        with:
+          environment_variables: VERSION ARCH GITHUB_OAUTH_TOKEN
+          operating_system: haiku
+          version: r1beta5
+          architecture: x86_64
+          image_url: https://github.com/roswell/sbcl_bin/releases/download/files/haiku-r1beta5-x86-64-20260303.qcow2
+          shell: bash
+          run: |
+            # build static zstd
+            cd zstd/lib
+            make PREFIX=/boot/home/config/non-packaged CFLAGS="-fPIC" install-includes install-static clean
+            cd ../..
+            # patch Config for static zstd
+            sed -i 's|OS_LIBS += -lbe -lnetwork -lbsd|OS_LIBS += -L/boot/home/config/non-packaged/lib -lbe -lnetwork -lbsd|' sbcl/src/runtime/Config.x86-64-haiku
+            sed -i 's|OS_LIBS += -lzstd|OS_LIBS += -Wl,-Bstatic -lzstd -Wl,-Bdynamic|' sbcl/src/runtime/Config.x86-64-haiku
+            cd sbcl; sh make-target-1.sh
+      - name: make-host-2
+        if: ${{ steps.check_uploaded.outcome == 'failure' || github.event_name != 'schedule' }}
+        run: bash -c "cd sbcl;sh make-host-2.sh"
+      - name: build-target2 on haiku
+        if: ${{ steps.check_uploaded.outcome == 'failure' || github.event_name != 'schedule' }}
+        uses: cross-platform-actions/action@v0.32.0
+        with:
+          environment_variables: VERSION ARCH GITHUB_OAUTH_TOKEN
+          operating_system: haiku
+          version: r1beta5
+          architecture: x86_64
+          image_url: https://github.com/roswell/sbcl_bin/releases/download/files/haiku-r1beta5-x86-64-20260303.qcow2
+          shell: bash
+          run: |
+            cd sbcl; sh make-target-2.sh && sh make-target-contrib.sh
+            cd ..; make latest-version compile-9
+      - name: upload
+        if: ${{ steps.check_uploaded.outcome == 'failure' || github.event_name != 'schedule' }}
+        run: |
+          OS=haiku make latest-version archive
+          env FILE=`ls *.bz2` make latest-version upload-archive
