@@ -17,7 +17,8 @@
     "x86-linux-binary.tar.bz2"
     "x86-64-darwin-binary.tar.bz2"
     "x86-darwin-binary.tar.bz2"
-    "arm64-linux-binary.tar.bz2"))
+    "arm64-linux-binary.tar.bz2"
+    "arm64-windows-binary.msi"))
 
 #-lparallel ;; missing functions from lake
 (progn
