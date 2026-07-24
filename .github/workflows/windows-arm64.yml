@@ -52,6 +52,10 @@ jobs:
       shell: msys2 {0}
       run: |
         make zstd
+        # -lzstd resolves libzstd.dll.a before libzstd.a, so drop the import
+        # library to force a static link. Unlike MINGW64 we must NOT move
+        # /clangarm64/bin/libzstd.dll aside: ld.lld.exe itself links against it.
+        rm -f /clangarm64/lib/libzstd.dll.a
         bash -c 'cd zstd/lib;make CFLAGS="-fPIC" libzstd.a-release;cp libzstd.a /clangarm64/lib;cp *.h /clangarm64/include'
         if [ "$VERSION" = "" ]; then
           OS=windows make latest-version compile;
