@@ -75,7 +75,8 @@ exec ros -Q -- $0 "$@"
     (progn ;; bzip2
       (sh (format nil
                   #-win32 "ln -s sbcl ~A~A"
-                  #+win32 "cp -r sbcl ~A~A"
+                  ;; -L dereferences symlinks; windows can't recreate them.
+                  #+win32 "cp -rL sbcl ~A~A"
                   release-dir
                   base))
       (sh (format nil "bash sbcl/binary-distribution.sh ~A" base))
