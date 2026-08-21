@@ -13,6 +13,7 @@ jobs:
       ARCH: ${{ matrix.target }}
       SUFFIX: ${{ matrix.suffix }}
       LINKFLAGS: ${{ matrix.linkflags }}
+      CFLAGS: ${{ matrix.cflags }}
       ROSWELL_BRANCH: master
       GITHUB_OAUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       SBCL_PATCH: ${{ matrix.sbclpatch }}
@@ -21,10 +22,10 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - {suffix: '',          target: armel,docker-platform: linux/arm/v6,docker-image-suffix: armel,image: glibc2.19-debian,  lisp: 'sbcl-bin/2.4.0'}
-          - {suffix: '-glibc2.19',target: armel,docker-platform: linux/arm/v6,docker-image-suffix: armel,image: glibc2.19-debian,  lisp: 'sbcl-bin/2.4.0'}
-          - {suffix: ''          ,target: armv7,docker-platform: linux/arm/v7,docker-image-suffix: armv7,image: glibc2.19-debian,  lisp: 'sbcl-bin/2.4.0'}
-          - {suffix: '-glibc2.19',target: armv7,docker-platform: linux/arm/v7,docker-image-suffix: armv7,image: glibc2.19-debian,  lisp: 'sbcl-bin/2.4.0'}
+          - {suffix: '',          target: armel,docker-platform: linux/arm/v6,docker-image-suffix: armel,image: glibc2.19-debian,  lisp: 'sbcl-bin/2.4.0', cflags: '-std=gnu99'}
+          - {suffix: '-glibc2.19',target: armel,docker-platform: linux/arm/v6,docker-image-suffix: armel,image: glibc2.19-debian,  lisp: 'sbcl-bin/2.4.0', cflags: '-std=gnu99'}
+          - {suffix: ''          ,target: armv7,docker-platform: linux/arm/v7,docker-image-suffix: armv7,image: glibc2.19-debian,  lisp: 'sbcl-bin/2.4.0', cflags: '-std=gnu99'}
+          - {suffix: '-glibc2.19',target: armv7,docker-platform: linux/arm/v7,docker-image-suffix: armv7,image: glibc2.19-debian,  lisp: 'sbcl-bin/2.4.0', cflags: '-std=gnu99'}
           #- {suffix: '-glibc2.13',target: armhf,docker-platform: linux/arm/v6,docker-image-suffix: armhf,image: glibc2.13-raspbian,lisp: 'sbcl-bin/2.4.0', linkflags: '-lrt'}
     environment: SET_VERSION
 
@@ -83,6 +84,7 @@ jobs:
           IMAGE: ${{ matrix.image }}
           SUFFIX: ${{ matrix.suffix }}
           LINKFLAGS: ${{ matrix.linkflags }}
+          CFLAGS: ${{ matrix.cflags }}
           DOCKER_PLATFORM: ${{ matrix.docker-platform }}
           DOCKER_IMAGE_SUFFIX: ${{ matrix.docker-image-suffix }}
           DOCKER_ACTION: bash ./tools-for-build/${{ matrix.image }}/setup;make latest-version compile-config
@@ -100,6 +102,7 @@ jobs:
           IMAGE: ${{ matrix.image }}
           SUFFIX: ${{ matrix.suffix }}
           LINKFLAGS: ${{ matrix.linkflags }}
+          CFLAGS: ${{ matrix.cflags }}
           DOCKER_PLATFORM: ${{ matrix.docker-platform }}
           DOCKER_IMAGE_SUFFIX: ${{ matrix.docker-image-suffix }}
           DOCKER_ACTION: bash ./tools-for-build/${{ matrix.image }}/setup;cd sbcl;sh make-target-1.sh
@@ -116,6 +119,7 @@ jobs:
           IMAGE: ${{ matrix.image }}
           SUFFIX: ${{ matrix.suffix }}
           LINKFLAGS: ${{ matrix.linkflags }}
+          CFLAGS: ${{ matrix.cflags }}
           DOCKER_PLATFORM: ${{ matrix.docker-platform }}
           DOCKER_IMAGE_SUFFIX: ${{ matrix.docker-image-suffix }}
           DOCKER_ACTION: bash ./tools-for-build/${{ matrix.image }}/setup;cd sbcl;sh make-target-2.sh && sh make-target-contrib.sh;cd ..;make compile-9
@@ -130,6 +134,7 @@ jobs:
           IMAGE: ${{ matrix.image }}
           SUFFIX: ${{ matrix.suffix }}
           LINKFLAGS: ${{ matrix.linkflags }}
+          CFLAGS: ${{ matrix.cflags }}
           DOCKER_PLATFORM: ${{ matrix.docker-platform }}
           DOCKER_IMAGE_SUFFIX: ${{ matrix.docker-image-suffix }}
         run: |
