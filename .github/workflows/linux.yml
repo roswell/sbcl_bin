@@ -25,7 +25,7 @@ jobs:
           - {suffix: ''          ,image: glibc2.23 }
           # riscv64 target don't have trusty release.
           #-{suffix: '',target: riscv64,image: 'glibc2.31'}
-          - {suffix: '-glibc2.19',image: glibc2.19 }
+          - {suffix: '-glibc2.19',image: glibc2.19 , cflags: '-std=gnu99'}
           - {suffix: '-glibc2.23',image: glibc2.23 }
           - {suffix: '-glibc2.31',image: glibc2.31 }
           - {suffix: '-glibc2.39',image: glibc2.39 }
@@ -106,6 +106,7 @@ jobs:
           IMAGE: ${{ matrix.image }}
           SUFFIX: ${{ matrix.suffix }}
           LINKFLAGS: ${{ matrix.linkflags }}
+          CFLAGS: ${{ matrix.cflags }}
           DOCKER_PLATFORM: ${{ matrix.docker-platform }}
           DOCKER_IMAGE_SUFFIX: ${{ matrix.docker-image-suffix }}
           SBCL_PATCH: ${{ matrix.sbclpatch }}
@@ -122,6 +123,7 @@ jobs:
           IMAGE: ${{ matrix.image }}
           SUFFIX: ${{ matrix.suffix }}
           LINKFLAGS: ${{ matrix.linkflags }}
+          CFLAGS: ${{ matrix.cflags }}
           DOCKER_PLATFORM: ${{ matrix.docker-platform }}
           DOCKER_IMAGE_SUFFIX: ${{ matrix.docker-image-suffix }}
           DOCKER_ACTION: bash ./tools-for-build/${{ matrix.image }}/setup;make latest-version compile-config
@@ -140,6 +142,7 @@ jobs:
           IMAGE: ${{ matrix.image }}
           SUFFIX: ${{ matrix.suffix }}
           LINKFLAGS: ${{ matrix.linkflags }}
+          CFLAGS: ${{ matrix.cflags }}
           DOCKER_PLATFORM: ${{ matrix.docker-platform }}
           DOCKER_IMAGE_SUFFIX: ${{ matrix.docker-image-suffix }}
           DOCKER_ACTION: bash ./tools-for-build/${{ matrix.image }}/setup;cd sbcl;sh make-target-1.sh
@@ -156,6 +159,7 @@ jobs:
           IMAGE: ${{ matrix.image }}
           SUFFIX: ${{ matrix.suffix }}
           LINKFLAGS: ${{ matrix.linkflags }}
+          CFLAGS: ${{ matrix.cflags }}
           DOCKER_PLATFORM: ${{ matrix.docker-platform }}
           DOCKER_IMAGE_SUFFIX: ${{ matrix.docker-image-suffix }}
           DOCKER_ACTION: bash ./tools-for-build/${{ matrix.image }}/setup;cd sbcl;sh make-target-2.sh && sh make-target-contrib.sh;cd ..;make compile-9
@@ -170,6 +174,7 @@ jobs:
           IMAGE: ${{ matrix.image }}
           SUFFIX: ${{ matrix.suffix }}
           LINKFLAGS: ${{ matrix.linkflags }}
+          CFLAGS: ${{ matrix.cflags }}
           DOCKER_PLATFORM: ${{ matrix.docker-platform }}
           DOCKER_IMAGE_SUFFIX: ${{ matrix.docker-image-suffix }}
         run: |
