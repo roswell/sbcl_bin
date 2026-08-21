@@ -89,7 +89,7 @@ jobs:
         if: ${{ matrix.target != 'x86' && ( steps.check_uploaded.outcome == 'failure' || github.event_name != 'schedule' ) }}
         uses: cross-platform-actions/action@v0.32.0
         with:
-          environment_variables: VERSION ARCH IMAGE SUFFIX LINKFLAGS GH_USER GH_REPO GITHUB_OAUTH_TOKEN
+          environment_variables: VERSION ARCH IMAGE SUFFIX LINKFLAGS SBCL_OPTIONS GH_USER GH_REPO GITHUB_OAUTH_TOKEN
           operating_system: ${{ matrix.os }}
           architecture: ${{ matrix.target == 'x86' && 'x86-64' || matrix.target }}
           version: ${{ matrix.release }}
@@ -105,7 +105,7 @@ jobs:
         if: ${{ matrix.target != 'x86' && ( steps.check_uploaded.outcome == 'failure' || github.event_name != 'schedule' ) }}
         uses: cross-platform-actions/action@v0.32.0
         with:
-          environment_variables: VERSION ARCH IMAGE SUFFIX LINKFLAGS GH_USER GH_REPO GITHUB_OAUTH_TOKEN
+          environment_variables: VERSION ARCH IMAGE SUFFIX LINKFLAGS SBCL_OPTIONS GH_USER GH_REPO GITHUB_OAUTH_TOKEN
           operating_system: ${{ matrix.os }}
           architecture: ${{ matrix.target }}
           version: ${{ matrix.release }}
