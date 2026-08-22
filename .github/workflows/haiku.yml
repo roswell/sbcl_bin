@@ -35,7 +35,7 @@ jobs:
         continue-on-error: true
       - name: compile-config on haiku
         if: ${{ steps.check_uploaded.outcome == 'failure' || github.event_name != 'schedule' }}
-        uses: cross-platform-actions/action@v0.32.0
+        uses: cross-platform-actions/action@v1.4.0
         with:
           environment_variables: VERSION ARCH GITHUB_OAUTH_TOKEN
           operating_system: haiku
@@ -53,7 +53,7 @@ jobs:
         run: bash -c "cd sbcl;sh make-host-1.sh"
       - name: build-runtime on haiku
         if: ${{ steps.check_uploaded.outcome == 'failure' || github.event_name != 'schedule' }}
-        uses: cross-platform-actions/action@v0.32.0
+        uses: cross-platform-actions/action@v1.4.0
         with:
           environment_variables: VERSION ARCH GITHUB_OAUTH_TOKEN
           operating_system: haiku
@@ -75,7 +75,7 @@ jobs:
         run: bash -c "cd sbcl;sh make-host-2.sh"
       - name: build-target2 on haiku
         if: ${{ steps.check_uploaded.outcome == 'failure' || github.event_name != 'schedule' }}
-        uses: cross-platform-actions/action@v0.32.0
+        uses: cross-platform-actions/action@v1.4.0
         with:
           environment_variables: VERSION ARCH GITHUB_OAUTH_TOKEN
           operating_system: haiku
