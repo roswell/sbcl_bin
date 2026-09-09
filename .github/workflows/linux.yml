@@ -12,7 +12,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        suffix: ['', '-glibc2.39', '-glibc2.31', '-glibc2.23', '-glibc2.19', '-musl', '-musl1.2.4', '-musl1.2.2', '-musl1.1']
+        suffix: ['', '-glibc2.39', '-glibc2.31', '-glibc2.23', '-glibc2.19', '-musl', '-musl1.2.5', '-musl1.2.4', '-musl1.2.2', '-musl1.1']
         target: ['x86-64', 'x86', 'arm64', 'ppc64le', 'riscv64']
         exclude:
           - {suffix: -musl1.1,target: x86-64}
@@ -21,7 +21,6 @@ jobs:
           - {suffix: -musl1.1,target: riscv64}
           - {target: riscv64,suffix: -glibc2.23}
           - {target: riscv64,suffix: -glibc2.19}
-          - {target: riscv64,suffix: -musl}
           - {target: riscv64,suffix: -musl1.2.4}
           - {target: riscv64,suffix: -musl1.2.2}
         include:
@@ -35,6 +34,8 @@ jobs:
           - {suffix: '-glibc2.31',image: glibc2.31 }
           - {suffix: '-glibc2.39',image: glibc2.39 }
           - {suffix: '-musl',image: musl1.2.2 }
+          - {suffix: '-musl',image: musl1.2.5 ,target: riscv64}
+          - {suffix: '-musl1.2.5',image: musl1.2.5 }
           - {suffix: '-musl1.2.4',image: musl1.2.4 }
           - {suffix: '-musl1.2.2',image: musl1.2.2 }
           - {suffix: '-musl1.1',image: musl1.1.24 }
@@ -45,6 +46,7 @@ jobs:
           - {target: riscv64,docker-platform: linux/riscv64,docker-image-suffix: 'riscv64',cross: yes,sbclpatch: '20260909_riscv-detect-qemu-user'}
           # musl suffix
           - {suffix: '-musl'     ,target: x86,docker-platform: linux/386,docker-build-options: '--build-arg WRAPPER=linux32',docker-image-suffix: 'x86' }
+          - {suffix: '-musl1.2.5',target: x86,docker-platform: linux/386,docker-build-options: '--build-arg WRAPPER=linux32',docker-image-suffix: 'x86' }
           - {suffix: '-musl1.2.4',target: x86,docker-platform: linux/386,docker-build-options: '--build-arg WRAPPER=linux32',docker-image-suffix: 'x86' }
           - {suffix: '-musl1.2.2',target: x86,docker-platform: linux/386,docker-build-options: '--build-arg WRAPPER=linux32',docker-image-suffix: 'x86' }
           - {suffix: '-musl1.1'  ,target: x86,docker-platform: linux/386,docker-build-options: '--build-arg WRAPPER=linux32',docker-image-suffix: 'x86' }

@@ -1,0 +1,5 @@
+#!/bin/sh
+# zstd-dev ships /usr/lib/libzstd.so, which ld picks over the static library we
+# install below. drop the link only; libzstd.so.1 stays for apk.
+rm -f /usr/lib/libzstd.so
+bash -c "cd zstd/lib;make PREFIX=/usr CFLAGS=-fPIC install-includes install-static"
