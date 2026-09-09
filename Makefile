@@ -212,7 +212,7 @@ latest-version: version branch lasthash
 	@echo "set version $(VERSION):$(HASH):$(BRANCH)"
 
 patch-sbcl:
-	cd sbcl;git apply ../tools-for-build/patch/$(SBCL_PATCH);git diff
+	cd sbcl;git apply ../tools-for-build/patch/$(SBCL_PATCH) && echo "applied $(SBCL_PATCH)" || echo "$(SBCL_PATCH) did not apply";git diff
 
 diff:
 	cd ..;diff -ur --exclude=.git --exclude=.env --exclude=table.md --exclude=web.ros --exclude=sbcl --exclude=version sbcl_bin sbcl_head
