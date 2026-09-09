@@ -158,8 +158,6 @@ docker:
 		$(DOCKER_REPO)/$$(cat ./tools-for-build/$(IMAGE)/Name)$(DOCKER_IMAGE_SUFFIX) \
 		bash \
 		-c "cd /tmp;$(DOCKER_ACTION)"
-#OK
-#TARGET=riscv64 DOCKER_PLATFORM=linux/riscv64 DOCKER_IMAGE_SUFFIX=riscv64 IMAGE=glibc2.31          SUFFIX= make cross-docker
 #NG
 #TARGET=armhf   DOCKER_PLATFORM=linux/arm/v6  DOCKER_IMAGE_SUFFIX=armhf   IMAGE=glibc2.13-raspbian SUFFIX=-glibc2.13 LINKFLAGS=-lrt  make cross-docker
 

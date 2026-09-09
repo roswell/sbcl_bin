@@ -1,0 +1,22 @@
+diff --git a/src/runtime/linux-os.c b/src/runtime/linux-os.c
+index 851bbb4..783633e 100644
+--- a/src/runtime/linux-os.c
++++ b/src/runtime/linux-os.c
+@@ -190,10 +190,16 @@ int os_preinit(char *argv[], char *envp[])
+      * There's no way to know what it _will_ do, so we have to guess based on
+      * whether the emulation looks bad. */
+     char buf[100];
++    int emulated = 0;
+     FILE *f = fopen("/proc/cpuinfo", "r");
+     ignore_value(fgets(buf, sizeof buf, f));
+     ignore_value(fgets(buf, sizeof buf, f));
+-    if (!strstr(buf, "hart")) { // look for "hardware thread" string
++    if (!strstr(buf, "hart")) // look for "hardware thread" string
++        emulated = 1;
++    if (!emulated) // qemu-linux-user fakes a "hart" line, but names itself in "uarch"
++        while (fgets(buf, sizeof buf, f))
++            if (strstr(buf, "uarch") && strstr(buf, "qemu")) { emulated = 1; break; }
++    if (emulated) {
+         fprintf(stderr, "WARNING: enabling mmap() workaround. GC time may be affected\n");
+         rewind(f);
+         fprintf(stderr, "Contents of /proc/cpuinfo:\n");
