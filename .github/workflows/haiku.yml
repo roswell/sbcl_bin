@@ -41,7 +41,6 @@ jobs:
           operating_system: haiku
           version: r1beta5
           architecture: x86_64
-          image_url: https://github.com/roswell/sbcl_bin/releases/download/files/haiku-r1beta5-x86-64-20260303.qcow2
           shell: bash
           run: |
             touch /boot/home/config/non-packaged/bin/ros
@@ -59,7 +58,6 @@ jobs:
           operating_system: haiku
           version: r1beta5
           architecture: x86_64
-          image_url: https://github.com/roswell/sbcl_bin/releases/download/files/haiku-r1beta5-x86-64-20260303.qcow2
           shell: bash
           run: |
             # build static zstd
@@ -81,7 +79,6 @@ jobs:
           operating_system: haiku
           version: r1beta5
           architecture: x86_64
-          image_url: https://github.com/roswell/sbcl_bin/releases/download/files/haiku-r1beta5-x86-64-20260303.qcow2
           shell: bash
           run: |
             cd sbcl; sh make-target-2.sh && sh make-target-contrib.sh
