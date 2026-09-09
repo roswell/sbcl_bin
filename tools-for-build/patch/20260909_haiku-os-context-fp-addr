@@ -1,0 +1,15 @@
+diff --git a/src/runtime/x86-64-haiku-os.c b/src/runtime/x86-64-haiku-os.c
+index 4b2966e..d012938 100644
+--- a/src/runtime/x86-64-haiku-os.c
++++ b/src/runtime/x86-64-haiku-os.c
+@@ -27,6 +27,10 @@ os_context_register_t *os_context_sp_addr(os_context_t *context) {
+     return (os_context_register_t *)&context->uc_mcontext.rsp;
+ }
+ 
++os_context_register_t *os_context_fp_addr(os_context_t *context) {
++    return (os_context_register_t *)&context->uc_mcontext.rbp;
++}
++
+ os_context_register_t*
+ os_context_register_addr(os_context_t *context, int reg_encoding)
+ {

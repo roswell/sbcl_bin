@@ -12,6 +12,7 @@ jobs:
       UNAME: haiku
       VERSION: ${{ secrets.VERSION }}
       ARCH: x86-64
+      SBCL_PATCH: 20260909_haiku-os-context-fp-addr
       GITHUB_OAUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
     environment: SET_VERSION
