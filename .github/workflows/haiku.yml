@@ -46,7 +46,6 @@ jobs:
           run: |
             touch /boot/home/config/non-packaged/bin/ros
             chmod 755 /boot/home/config/non-packaged/bin/ros
-            pkgman install -y curl_devel
             LISP_IMPL='ros run' make latest-version compile-config
       - name: make-host-1
         if: ${{ steps.check_uploaded.outcome == 'failure' || github.event_name != 'schedule' }}
