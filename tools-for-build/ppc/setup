@@ -1,0 +1,6 @@
+#!/bin/sh
+# the image has no roswell; make-config only records --xc-host, so a stub is enough
+mkdir -p /usr/local/bin
+touch /usr/local/bin/ros
+chmod 755 /usr/local/bin/ros
+sh -c 'cd zstd/lib;make PREFIX=/usr CFLAGS=-fPIC install-includes install-static'
