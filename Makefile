@@ -151,8 +151,8 @@ docker:
 		-e ARCH=$(ARCH) \
 		-e VERSION=$(VERSION) \
 		-e SUFFIX=$(SUFFIX) \
-		-e CFLAGS=$(CFLAGS) \
-		-e LINKFLAGS=$(LINKFLAGS) \
+		-e CFLAGS="$(CFLAGS)" \
+		-e LINKFLAGS="$(LINKFLAGS)" \
 		-e TARGET=$(TARGET) \
 		-e LISP_IMPL="$(LISP_IMPL)" \
 		$(DOCKER_REPO)/$$(cat ./tools-for-build/$(IMAGE)/Name)$(DOCKER_IMAGE_SUFFIX) \
