@@ -158,6 +158,45 @@ docker:
 		$(DOCKER_REPO)/$$(cat ./tools-for-build/$(IMAGE)/Name)$(DOCKER_IMAGE_SUFFIX) \
 		bash \
 		-c "cd /tmp;$(DOCKER_ACTION)"
+#qemu (full system emulation; docker has no image for the target)
+QEMU_IMAGE   ?= ubuntu-14.04-ppc-20260910.qcow2
+QEMU_SYSTEM  ?= qemu-system-ppc
+QEMU_MEM     ?= 2048
+QEMU_OPTIONS ?= -L pc-bios -boot c -M mac99,via=pmu \
+  -prom-env 'boot-device=hd:,\yaboot' -prom-env 'boot-args=conf=hd:,\yaboot.conf'
+QEMU_TIMEOUT      ?= 3600
+QEMU_BOOT_TIMEOUT ?= 600
+
+$(QEMU_IMAGE):
+	curl -L -O $(GITHUB)/releases/download/files/$(QEMU_IMAGE)
+
+boot-qemu: $(QEMU_IMAGE)
+	rm -f cmd cmd.rc cmd.log qemu-serial.log
+	$(QEMU_SYSTEM) $(QEMU_OPTIONS) -m $(QEMU_MEM) -hda $(QEMU_IMAGE) \
+	  -fsdev local,id=h0,path=`pwd`,security_model=mapped-xattr \
+	  -device virtio-9p-pci,fsdev=h0,mount_tag=hostshare \
+	  -display none -serial file:qemu-serial.log \
+	  -pidfile qemu.pid -daemonize
+	QEMU_ACTION=true QEMU_TIMEOUT=$(QEMU_BOOT_TIMEOUT) $(MAKE) qemu
+
+# the guest agent runs whatever lands in ./cmd and writes ./cmd.rc back
+qemu:
+	@rm -f cmd.rc cmd.log
+	@{ echo 'cd /mnt/host'; \
+	   echo 'export ARCH=$(ARCH) VERSION=$(VERSION) SUFFIX=$(SUFFIX) TARGET=$(TARGET)'; \
+	   echo 'export CFLAGS="$(CFLAGS)" LINKFLAGS="$(LINKFLAGS)"'; \
+	   echo 'export LISP_IMPL="$(LISP_IMPL)"'; \
+	   echo '$(QEMU_ACTION)'; } > cmd
+	@i=0; while [ ! -f cmd.rc ]; do \
+	  sleep 2; i=`expr $$i + 2`; \
+	  kill -0 `cat qemu.pid` 2>/dev/null || { echo "qemu is gone"; tail -20 qemu-serial.log; exit 1; }; \
+	  if [ $$i -ge $(QEMU_TIMEOUT) ]; then echo "timeout after $$i seconds"; tail -20 qemu-serial.log; exit 1; fi; \
+	done; \
+	cat cmd.log; exit `cat cmd.rc`
+
+stop-qemu:
+	-kill `cat qemu.pid` 2>/dev/null; rm -f qemu.pid
+
 #NG
 #TARGET=armhf   DOCKER_PLATFORM=linux/arm/v6  DOCKER_IMAGE_SUFFIX=armhf   IMAGE=glibc2.13-raspbian SUFFIX=-glibc2.13 LINKFLAGS=-lrt  make cross-docker
 
