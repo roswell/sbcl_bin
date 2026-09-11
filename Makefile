@@ -155,6 +155,7 @@ docker:
 		-e LINKFLAGS="$(LINKFLAGS)" \
 		-e TARGET=$(TARGET) \
 		-e LISP_IMPL="$(LISP_IMPL)" \
+		-e SBCL_OPTIONS="$(SBCL_OPTIONS)" \
 		$(DOCKER_REPO)/$$(cat ./tools-for-build/$(IMAGE)/Name)$(DOCKER_IMAGE_SUFFIX) \
 		bash \
 		-c "cd /tmp;$(DOCKER_ACTION)"

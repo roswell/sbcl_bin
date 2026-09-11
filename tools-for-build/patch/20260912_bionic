@@ -1,0 +1,39 @@
+diff --git a/make-config.sh b/make-config.sh
+index 4627cc3..d7e1291 100755
+--- a/make-config.sh
++++ b/make-config.sh
+@@ -277,7 +277,7 @@ echo "$SBCL_DYNAMIC_SPACE_SIZE" > output/dynamic-space-size.txt
+ . ./find-gnumake.sh
+ find_gnumake
+ 
+-./generate-version.sh
++sh ./generate-version.sh
+ 
+ # Now that we've done our option parsing and found various
+ # dependencies, write them out to a file to be sourced by other
+diff --git a/src/runtime/run-program.c b/src/runtime/run-program.c
+index b1b8545..79e1855 100644
+--- a/src/runtime/run-program.c
++++ b/src/runtime/run-program.c
+@@ -146,7 +146,7 @@ void closefds_range(unsigned int first, unsigned int last)
+         unsigned int close_fd;
+         if (last == ~0U)
+         {
+-#if defined SVR4 || defined LISP_FEATURE_ANDROID
++#if defined SVR4 || defined LISP_FEATURE_ANDROID || defined __ANDROID__ || defined __BIONIC__
+             last = sysconf(_SC_OPEN_MAX)-1;
+ #else
+             last = getdtablesize()-1;
+diff --git a/tools-for-build/grovel-headers.c b/tools-for-build/grovel-headers.c
+index 5ea38e5..e68512f 100644
+--- a/tools-for-build/grovel-headers.c
++++ b/tools-for-build/grovel-headers.c
+@@ -40,7 +40,7 @@
+   #include <sys/times.h>
+   #include <sys/wait.h>
+   #include <sys/ioctl.h>
+-#if defined __HAIKU__ || defined __DragonFly__ || defined LISP_FEATURE_ANDROID
++#if defined __HAIKU__ || defined __DragonFly__ || defined LISP_FEATURE_ANDROID || defined __ANDROID__ || defined __BIONIC__
+   #include <termios.h>
+ #else
+   #include <sys/termios.h>
