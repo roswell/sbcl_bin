@@ -1,0 +1,78 @@
+--- a/src/runtime/gc-common.c
++++ b/src/runtime/gc-common.c
+@@ -2978,7 +2978,7 @@
+  *   Otherwise, pages which are already zero-filled are skipped.
+  *   For each newly zeroed page, clear the need_to_zero flag.
+  */
+-#if defined LISP_FEATURE_RISCV && defined LISP_FEATURE_LINUX // KLUDGE
++#if (defined LISP_FEATURE_RISCV || defined LISP_FEATURE_LOONGARCH64) && defined LISP_FEATURE_LINUX // KLUDGE
+ int mmap_does_not_zero;
+ #endif
+ void prepare_pages(__attribute__((unused)) bool commit,
+--- a/src/runtime/interrupt.c
++++ b/src/runtime/interrupt.c
+@@ -486,12 +486,12 @@
+         lose("deferrables unblocked");
+ }
+ 
+-#ifdef LISP_FEATURE_RISCV
++#if defined LISP_FEATURE_RISCV || defined LISP_FEATURE_LOONGARCH64
+ int sigaction_does_not_mask;
+ #endif
+ static void assert_blockables_blocked()
+ {
+-#ifdef LISP_FEATURE_RISCV
++#if defined LISP_FEATURE_RISCV || defined LISP_FEATURE_LOONGARCH64
+     if (sigaction_does_not_mask) return; // assert nothing
+ #endif
+ #if !defined(LISP_FEATURE_WIN32)
+--- a/src/runtime/linux-os.c
++++ b/src/runtime/linux-os.c
+@@ -205,6 +205,25 @@
+     }
+     fclose(f);
+ #endif
++#ifdef LISP_FEATURE_LOONGARCH64
++    /* qemu-linux-user shadows the signal mask, as it does for riscv. It does
++     * not synthesize /proc/cpuinfo for loongarch64, so the host's contents
++     * show through and the absence of a Loongson line means emulation. */
++    {
++        extern int mmap_does_not_zero, sigaction_does_not_mask;
++        char buf[100];
++        FILE *f = fopen("/proc/cpuinfo", "r");
++        int emulated = 1;
++        while (f && fgets(buf, sizeof buf, f))
++            if (strstr(buf, "Loongson") || strstr(buf, "loongarch")) { emulated = 0; break; }
++        if (f) fclose(f);
++        if (emulated) {
++            fprintf(stderr, "WARNING: enabling mmap() workaround. GC time may be affected\n");
++            mmap_does_not_zero = 1;
++            sigaction_does_not_mask = 1;
++        }
++    }
++#endif
+ 
+ #if ALLOW_PERSONALITY_CHANGE
+     if (getenv("SBCL_IS_RESTARTING")) {
+--- a/src/runtime/gencgc-impl.h
++++ b/src/runtime/gencgc-impl.h
+@@ -600,7 +600,7 @@
+ typedef unsigned int page_bytes_t;
+ #define page_words_used(index) page_table[index].words_used_
+ #define page_bytes_used(index) ((page_bytes_t)page_table[index].words_used_<<WORD_SHIFT)
+-#if defined LISP_FEATURE_RISCV && defined LISP_FEATURE_LINUX // KLUDGE
++#if (defined LISP_FEATURE_RISCV || defined LISP_FEATURE_LOONGARCH64) && defined LISP_FEATURE_LINUX // KLUDGE
+ #define page_need_to_zero(index) (mmap_does_not_zero || page_table[index].need_zerofill)
+ #else
+ #define page_need_to_zero(index) page_table[index].need_zerofill
+--- a/src/runtime/pmrgc-impl.h
++++ b/src/runtime/pmrgc-impl.h
+@@ -584,7 +584,7 @@
+ typedef unsigned int page_bytes_t;
+ #define page_words_used(index) page_table[index].words_used_
+ #define page_bytes_used(index) ((page_bytes_t)page_table[index].words_used_<<WORD_SHIFT)
+-#if defined LISP_FEATURE_RISCV && defined LISP_FEATURE_LINUX // KLUDGE
++#if (defined LISP_FEATURE_RISCV || defined LISP_FEATURE_LOONGARCH64) && defined LISP_FEATURE_LINUX // KLUDGE
+ #define page_need_to_zero(index) (mmap_does_not_zero || page_table[index].need_zerofill)
+ #else
+ #define page_need_to_zero(index) page_table[index].need_zerofill

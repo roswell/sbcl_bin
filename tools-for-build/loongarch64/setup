@@ -1,0 +1,6 @@
+#!/bin/sh
+if [ "$ARCH" == "x86" ]; then
+  bash -c 'cd zstd/lib;make PREFIX=/usr LIBDIR=/usr/lib32 CFLAGS="-fPIC -m32" install-includes install-static'
+else
+  bash -c 'cd zstd/lib;make PREFIX=/usr CFLAGS=-fPIC install-includes install-static'
+fi
