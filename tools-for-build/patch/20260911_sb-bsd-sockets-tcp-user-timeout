@@ -1,0 +1,13 @@
+--- a/contrib/sb-bsd-sockets/sockopt.lisp
++++ b/contrib/sb-bsd-sockets/sockopt.lisp
+@@ -122,6 +122,10 @@
+ (define-socket-option-int
+   sockopt-tcp-keepintvl :tcp sockint::tcp-keepintvl (or :linux (and :bsd (not :openbsd)))
+   "Available only on Linux, BSD (except OpenBSD).")
++;; the constant is groveled behind #ifdef; glibc before 2.14 lacks it
++#+#.(cl:if (cl:and (cl:find-symbol "TCP-USER-TIMEOUT" "SB-BSD-SOCKETS-INTERNAL")
++                   (cl:boundp (cl:find-symbol "TCP-USER-TIMEOUT" "SB-BSD-SOCKETS-INTERNAL")))
++           '(cl:and) '(cl:or))
+ (define-socket-option-int
+   sockopt-tcp-user-timeout :tcp sockint::tcp-user-timeout :linux
+   "Available only on Linux.")
