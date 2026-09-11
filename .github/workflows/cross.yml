@@ -71,7 +71,7 @@ jobs:
         run: make latest-version upload-archive-p
         continue-on-error: true
       - name: pull or build&push docker image
-        if: ${{ steps.check_uploaded.outcome == 'failure' || github.event_name != 'schedule' }}
+        if: ${{ steps.check_uploaded.outcome == 'failure' }}
         env:
           DOCKER_PLATFORM: ${{ matrix.docker-platform }}
           DOCKER_BUILD_OPTIONS: ${{ matrix.docker-build-options }}
@@ -82,7 +82,7 @@ jobs:
              make pull-docker || make build-docker push-docker
           fi
       - name: config
-        if: ${{ steps.check_uploaded.outcome == 'failure' || github.event_name != 'schedule' }}
+        if: ${{ steps.check_uploaded.outcome == 'failure' }}
         env:
           VERSION: ${{ secrets.VERSION }}
           IMAGE: ${{ matrix.image }}
@@ -96,11 +96,11 @@ jobs:
           make latest-version sbcl zstd
           ARCH=""  make latest-version docker
       - name: make-host-1
-        if: ${{ steps.check_uploaded.outcome == 'failure' || github.event_name != 'schedule' }}
+        if: ${{ steps.check_uploaded.outcome == 'failure' }}
         run: |
           sudo bash -c "cd sbcl;sh make-host-1.sh"
       - name: build-runtime
-        if: ${{ steps.check_uploaded.outcome == 'failure' || github.event_name != 'schedule' }}
+        if: ${{ steps.check_uploaded.outcome == 'failure' }}
         env:
           VERSION: ${{ secrets.VERSION }}
           IMAGE: ${{ matrix.image }}
@@ -113,11 +113,11 @@ jobs:
         run: |
           make latest-version docker
       - name: make-host2
-        if: ${{ steps.check_uploaded.outcome == 'failure' || github.event_name != 'schedule' }}
+        if: ${{ steps.check_uploaded.outcome == 'failure' }}
         run: |
           sudo bash -c "cd sbcl;sh make-host-2.sh"
       - name: build-target2 and contrib
-        if: ${{ steps.check_uploaded.outcome == 'failure' || github.event_name != 'schedule' }}
+        if: ${{ steps.check_uploaded.outcome == 'failure' }}
         env:
           VERSION: ${{ secrets.VERSION }}
           IMAGE: ${{ matrix.image }}
@@ -130,7 +130,7 @@ jobs:
         run: |
           make latest-version docker
       - name: upload
-        if: ${{ steps.check_uploaded.outcome == 'failure' || github.event_name != 'schedule' }}
+        if: ${{ steps.check_uploaded.outcome == 'failure' }}
         env:
           GITHUB_OAUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           VERSION: ${{ secrets.VERSION }}
