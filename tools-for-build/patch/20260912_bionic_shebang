@@ -1,0 +1,15 @@
+Termux has no /bin/sh, so the `#!/bin/sh` shebang of generate-version.sh
+cannot be resolved and running it directly fails with "not found". Invoke it
+through sh instead, which is portable everywhere else.
+
+--- a/make-config.sh
++++ b/make-config.sh
+@@ -277,7 +277,7 @@ echo "$SBCL_DYNAMIC_SPACE_SIZE" > output/dynamic-space-size.txt
+ . ./find-gnumake.sh
+ find_gnumake
+ 
+-./generate-version.sh
++sh ./generate-version.sh
+ 
+ # Now that we've done our option parsing and found various
+ # dependencies, write them out to a file to be sourced by other

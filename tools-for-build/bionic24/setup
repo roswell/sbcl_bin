@@ -1,3 +1,7 @@
 #!/bin/sh
 # bionic has no /usr; everything lives under $PREFIX.
 bash -c "cd zstd/lib;make PREFIX=$PREFIX CFLAGS=-fPIC install-includes install-static"
+# termux-packages substitutes this placeholder when it applies its own patches;
+# we apply them with plain `git apply`, so do the substitution here. Idempotent,
+# and the sbcl tree is always checked out and patched before setup runs.
+sed -i "s|@TERMUX_PREFIX@|$PREFIX|g" sbcl/src/code/run-program.lisp
