@@ -1,0 +1,12 @@
+# the published root.tar.xz is gone; carve the rootfs out of the full image instead
+IMG=2017-07-05-raspbian-jessie
+curl -L -O https://downloads.raspberrypi.org/raspbian/images/raspbian-2017-07-05/$IMG.zip
+unzip -o $IMG.zip
+docker run --rm --privileged -v `pwd`:/w debian:12 \
+  sh -c "start=\$(od -An -tu4 -j 470 -N4 /w/$IMG.img | tr -d ' '); \
+         mkdir -p /mnt/r; mount -o loop,offset=\$((start * 512)),ro /w/$IMG.img /mnt/r; \
+         tar -C /mnt/r -cf /w/root.tar .; umount /mnt/r"
+rm -f $IMG.img $IMG.zip
+docker image import ./root.tar raspbian_armhf:2017-07-05 --platform $DOCKER_PLATFORM
+rm -f root.tar
+docker images

@@ -27,7 +27,9 @@ jobs:
           - {suffix: '-glibc2.19',target: armel,docker-platform: linux/arm/v6,docker-image-suffix: armel,image: glibc2.19-debian,  lisp: 'sbcl-bin/2.4.0', cflags: '-std=gnu99 -march=armv5t'}
           - {suffix: ''          ,target: armv7,docker-platform: linux/arm/v7,docker-image-suffix: armv7,image: glibc2.19-debian,  lisp: 'sbcl-bin/2.4.0', cflags: '-std=gnu99'}
           - {suffix: '-glibc2.19',target: armv7,docker-platform: linux/arm/v7,docker-image-suffix: armv7,image: glibc2.19-debian,  lisp: 'sbcl-bin/2.4.0', cflags: '-std=gnu99'}
+          - {suffix: ''          ,target: armhf,docker-platform: linux/arm/v6,docker-image-suffix: armhf,image: glibc2.13-raspbian,lisp: 'sbcl-bin/2.4.0', linkflags: '-lrt', cflags: '-std=gnu99', sbclpatch: '20260911_sb-bsd-sockets-tcp-user-timeout'}
           - {suffix: '-glibc2.13',target: armhf,docker-platform: linux/arm/v6,docker-image-suffix: armhf,image: glibc2.13-raspbian,lisp: 'sbcl-bin/2.4.0', linkflags: '-lrt', cflags: '-std=gnu99', sbclpatch: '20260911_sb-bsd-sockets-tcp-user-timeout'}
+          - {suffix: '-glibc2.19',target: armhf,docker-platform: linux/arm/v6,docker-image-suffix: armhf,image: glibc2.19-raspbian,lisp: 'sbcl-bin/2.4.0', linkflags: '-lrt', cflags: '-std=gnu99'}
           - {suffix: '-bionic24' ,target: arm64,docker-platform: linux/arm64 ,docker-image-suffix: arm64,image: bionic24,          lisp: 'sbcl-bin/2.4.0', runner: ubuntu-24.04-arm, sbcloptions: '--fancy --without-gcc-tls --with-android', sbclpatch: '20260912_termux_fix-build-on-device 20260912_termux_disable-close-range 20260912_bionic_shebang'}
           - {suffix: ''          ,target: loongarch64,docker-platform: linux/loong64,docker-image-suffix: loongarch64,image: loongarch64,        lisp: 'sbcl-bin/2.4.0', sbclpatch: '20260912_loongarch64-qemu-user-guards'}
     environment: SET_VERSION
