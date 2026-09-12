@@ -3,7 +3,8 @@ IMG=2015-05-05-raspbian-wheezy
 curl -L -O https://downloads.raspberrypi.org/raspbian/images/raspbian-2015-05-07/$IMG.zip
 unzip -o $IMG.zip
 docker run --rm --privileged -v `pwd`:/w debian:12 \
-  sh -c "mkdir -p /mnt/r; mount -o loop,offset=62914560,ro /w/$IMG.img /mnt/r; \
+  sh -c "start=\$(od -An -tu4 -j 470 -N4 /w/$IMG.img | tr -d ' '); \
+         mkdir -p /mnt/r; mount -o loop,offset=\$((start * 512)),ro /w/$IMG.img /mnt/r; \
          tar -C /mnt/r -cf /w/root.tar .; umount /mnt/r"
 rm -f $IMG.img $IMG.zip
 docker image import ./root.tar raspbian_armhf:2015-05-12 --platform $DOCKER_PLATFORM
