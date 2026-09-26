@@ -84,6 +84,7 @@ jobs:
           run: |
             sudo touch /usr/bin/ros
             sudo chmod 755 /usr/bin/ros
+            case "$(uname -r)" in 9.*) sudo sed -i "s|https*://cdn.[Nn][Ee][Tt][Bb][Ss][Dd].org/pub/pkgsrc/packages|http://archive.netbsd.org/pub/pkgsrc-archive/packages|" /usr/pkg/etc/pkgin/repositories.conf ;; esac
             sudo pkgin -y install gmake
             SBCL_OPTIONS=$SBCL_OPTIONS LISP_IMPL='ros run' gmake latest-version compile-config
       - name: make-host-1
@@ -102,6 +103,7 @@ jobs:
           run: |
             sudo touch /usr/bin/ros
             sudo chmod 755 /usr/bin/ros
+            case "$(uname -r)" in 9.*) sudo sed -i "s|https*://cdn.[Nn][Ee][Tt][Bb][Ss][Dd].org/pub/pkgsrc/packages|http://archive.netbsd.org/pub/pkgsrc-archive/packages|" /usr/pkg/etc/pkgin/repositories.conf ;; esac
             sudo pkgin -y install gmake
             sudo bash -c "cd zstd/lib; gmake PREFIX=/usr ${{ matrix.target == 'x86' && 'LIBDIR=/usr/lib/i386' || ''}} CFLAGS='${{ matrix.target == 'x86' && '-fPIC -m32' || '-fPIC' }}' install-includes install-static clean"
             cd sbcl;sh make-target-1.sh
@@ -121,6 +123,7 @@ jobs:
           run: |
             sudo touch /usr/bin/ros
             sudo chmod 755 /usr/bin/ros
+            case "$(uname -r)" in 9.*) sudo sed -i "s|https*://cdn.[Nn][Ee][Tt][Bb][Ss][Dd].org/pub/pkgsrc/packages|http://archive.netbsd.org/pub/pkgsrc-archive/packages|" /usr/pkg/etc/pkgin/repositories.conf ;; esac
             sudo pkgin -y install gmake
             /usr/sbin/paxctl +m sbcl/src/runtime/sbcl || true
             bash -c "cd sbcl;sh make-target-2.sh && sh make-target-contrib.sh"
