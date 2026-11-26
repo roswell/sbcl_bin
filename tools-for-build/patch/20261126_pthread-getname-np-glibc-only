@@ -1,0 +1,18 @@
+Only call pthread_getname_np() on glibc and Darwin. musl lacks it
+before 1.2.3 and Android bionic before API level 26, which breaks
+linking the runtime for -musl/-musl1.1/-musl1.2.2 and -bionic24.
+It is only used to decorate lossage messages with the thread name.
+
+diff --git a/src/runtime/interr.c b/src/runtime/interr.c
+index bf4c69b..6e405f7 100644
+--- a/src/runtime/interr.c
++++ b/src/runtime/interr.c
+@@ -97,7 +97,7 @@ void set_lossage_handler(void (*handler)(void))
+ }
+ 
+ void print_pthread_self_name() {
+-#if (defined LISP_FEATURE_LINUX || defined LISP_FEATURE_DARWIN) && defined LISP_FEATURE_SB_THREAD
++#if (defined __GLIBC__ || defined LISP_FEATURE_DARWIN) && defined LISP_FEATURE_SB_THREAD
+     char name[64];
+     int r = pthread_getname_np(pthread_self(), name, sizeof name);
+     if (r == 0 && strlen(name)) {

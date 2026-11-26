@@ -33,12 +33,12 @@ jobs:
           - {suffix: '-glibc2.23',image: glibc2.23 }
           - {suffix: '-glibc2.31',image: glibc2.31 }
           - {suffix: '-glibc2.39',image: glibc2.39 }
-          - {suffix: '-musl',image: musl1.2.2 }
+          - {suffix: '-musl',image: musl1.2.2 ,sbclpatch: '20261126_pthread-getname-np-glibc-only'}
           - {suffix: '-musl',image: musl1.2.5 ,target: riscv64}
           - {suffix: '-musl1.2.5',image: musl1.2.5 }
           - {suffix: '-musl1.2.4',image: musl1.2.4 }
-          - {suffix: '-musl1.2.2',image: musl1.2.2 }
-          - {suffix: '-musl1.1',image: musl1.1.24 }
+          - {suffix: '-musl1.2.2',image: musl1.2.2 ,sbclpatch: '20261126_pthread-getname-np-glibc-only'}
+          - {suffix: '-musl1.1',image: musl1.1.24 ,sbclpatch: '20261126_pthread-getname-np-glibc-only'}
           # set default docker platform and image suffix.
           - {docker-platform: linux/amd64  ,docker-image-suffix: ''}
           - {target: arm64  ,docker-platform: linux/arm64  ,docker-image-suffix: 'aarch64',cross: yes}
