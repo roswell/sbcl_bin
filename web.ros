@@ -158,15 +158,23 @@ exec ros -Q -- $0 "$@"
              (format t "Is ~A exist?~%" uri)
              (nth-value 1 (dex:head uri)))))))))
 
+;; authenticated requests avoid the shared-IP rate limit on CI runners.
+(defun github-api-headers ()
+  (let ((token (env "GITHUB_OAUTH_TOKEN")))
+    (when token
+      `(("Authorization" . ,(format nil "token ~A" token))))))
+
 (defun releases ()
   (multiple-value-bind (user repo)
       (account)
-    (jojo:parse (dex:get (format nil "https://api.github.com/repos/~A/~A/releases" user repo)))))
+    (jojo:parse (dex:get (format nil "https://api.github.com/repos/~A/~A/releases" user repo)
+                         :headers (github-api-headers)))))
 
 (defun latest-relase ()
   (multiple-value-bind (user repo)
       (account)
-    (jojo:parse (dex:get (format nil "https://api.github.com/repos/~A/~A/releases/latest" user repo)))))
+    (jojo:parse (dex:get (format nil "https://api.github.com/repos/~A/~A/releases/latest" user repo)
+                         :headers (github-api-headers)))))
 
 (defun release-uris (&optional (release (latest-relase)))
   (loop for asset in (getf release :|assets|)
