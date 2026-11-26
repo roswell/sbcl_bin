@@ -12,12 +12,21 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        arch: [x86_64]
         include:
         - arch: x86_64
           arch2: amd64
           bit: 64
           target: x86-64
+          prefix: ucrt64
+          toolchain: mingw-w64-ucrt-x86_64-toolchain
+          suffix: ''
+        - arch: x86_64
+          arch2: amd64
+          bit: 64
+          target: x86-64
+          prefix: mingw64
+          toolchain: mingw-w64-x86_64-toolchain
+          suffix: '-msvcrt'
     env:
       LISP: sbcl-bin
       RESULT_NAME: windows-${{ matrix.arch2 }}
@@ -25,6 +34,7 @@ jobs:
       RESULT_PATH_SUB: roswell
       SBCL_OPTIONS: --fancy
       ARCH: ${{ matrix.target }}
+      SUFFIX: ${{ matrix.suffix }}
       VERSION: ${{ secrets.VERSION }}
       GITHUB_OAUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -39,7 +49,7 @@ jobs:
         path-type: inherit
         release: true
         update: true
-        install: 'base-devel mingw-w64-ucrt-${{ matrix.arch }}-toolchain curl unzip'
+        install: 'base-devel mingw-w64-ucrt-${{ matrix.arch }}-toolchain ${{ matrix.toolchain }} curl unzip'
     - name: Run MSYS2 once
       shell: msys2 {0}
       run: |
@@ -56,11 +66,14 @@ jobs:
     - name: build sbcl
       shell: msys2 {0}
       run: |
+        P=/${{ matrix.prefix }}
+        export PATH=$P/bin:$PATH
+        gcc -v
         make zstd
-        find /ucrt64 | grep zstd
-        rm /ucrt64/lib/libzstd.dll.a
-        mv /ucrt64/bin/libzstd.dll /ucrt64/bin/libzstd.dll_
-        bash -c 'cd zstd/lib;make CFLAGS="-fPIC" libzstd.a-release;cp libzstd.a /ucrt64/lib;cp *.h /ucrt64/include'
+        find $P | grep zstd || true
+        rm -f $P/lib/libzstd.dll.a
+        if [ -f $P/bin/libzstd.dll ]; then mv $P/bin/libzstd.dll $P/bin/libzstd.dll_; fi
+        bash -c "cd zstd/lib;make CFLAGS=-fPIC libzstd.a-release;cp libzstd.a $P/lib;cp *.h $P/include"
         if [ "$VERSION" = "" ]; then
           OS=windows make latest-version compile archive;
         else
